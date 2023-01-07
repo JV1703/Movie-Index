@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="8dp"
+    tools:context=".feature.main.ui.home.HomeFragment">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/now_playing_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Now Playing in Theaters"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/view_more_now_playing_movies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="View More >"
+                app:layout_constraintBottom_toBottomOf="@id/now_playing_tv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/now_playing_tv" />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/now_playing_vp"
+                android:layout_width="match_parent"
+                android:layout_height="450dp"
+                android:layout_marginTop="8dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingEnd="60dp"
+                app:layout_constraintStart_toStartOf="@id/now_playing_tv"
+                app:layout_constraintTop_toBottomOf="@id/now_playing_tv" />
+
+            <TextView
+                android:id="@+id/popular_movies_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Popular Movies"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@id/now_playing_vp"
+                app:layout_constraintTop_toBottomOf="@id/now_playing_vp" />
+
+            <TextView
+                android:id="@+id/view_more_popular_movies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="View More >"
+                app:layout_constraintBottom_toBottomOf="@id/popular_movies_tv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/popular_movies_tv" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/popular_movies_rv"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintStart_toStartOf="@id/popular_movies_tv"
+                app:layout_constraintTop_toBottomOf="@id/popular_movies_tv"
+                tools:listitem="@layout/movie_vh_item" />
+
+            <TextView
+                android:id="@+id/trending_movies_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Trending Movies"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@id/popular_movies_rv"
+                app:layout_constraintTop_toBottomOf="@id/popular_movies_rv" />
+
+            <TextView
+                android:id="@+id/view_more_trending_movies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="View More >"
+                app:layout_constraintBottom_toBottomOf="@id/trending_movies_tv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/trending_movies_tv" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/trending_movies_rv"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintStart_toStartOf="@id/trending_movies_tv"
+                app:layout_constraintTop_toBottomOf="@id/trending_movies_tv"
+                tools:listitem="@layout/movie_vh_item" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

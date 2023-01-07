@@ -16,4 +16,11 @@ interface CacheDataSource {
     fun getAllMovieKey(): Flow<List<MovieKeyEntity>>
     suspend fun movieKeyId(id: String, pagingCategory: MoviePagingCategory): MovieKeyEntity?
     suspend fun clearMovieKeys(pagingCategory: MoviePagingCategory)
+    suspend fun saveSessionId(sessionId: String)
+    fun getSessionId(): Flow<String>
+    suspend fun clearDataStore()
+    suspend fun saveCasts(casts: String)
+    fun getCasts(): Flow<String>
+    suspend fun saveCrews(crews: String)
+    fun getCrews(): Flow<String>
 }

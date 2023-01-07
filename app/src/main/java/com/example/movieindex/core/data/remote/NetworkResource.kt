@@ -30,12 +30,19 @@ suspend fun <T, R> safeNetworkCall(
                     NetworkResource.Error(errCode = 408, errMessage = "Network Timeout")
                 }
 
+                response.message().toString()
+                    .contains("(only-if-cached)") && response.code() == 504 -> {
+                    NetworkResource.Error(errCode = response.code(),
+                        errMessage = "Please check internet connection")
+                }
+
                 response.errorBody() != null -> {
-                    val errorBody = getErrorBody(response)
+                    val errorBody = getErrorBody(response)?.parseErrorMessage()
+                    Timber.i("response - message:${response.message()}, errBody: ${response.errorBody()}")
                     Timber.e("network_result", errorBody)
                     Timber.e("safeNetworkCall - errMsg: $errorBody")
                     NetworkResource.Error(errCode = response.code(),
-                        errMessage = errorBody.toString())
+                        errMessage = errorBody)
                 }
 
                 response.isSuccessful -> {
@@ -44,6 +51,7 @@ suspend fun <T, R> safeNetworkCall(
                         NetworkResource.Empty
                     } else {
                         val convertedData = conversion(content)
+                        Timber.i("safeNetworkCall - is data from cache: ${response.raw().networkResponse == null} ")
                         NetworkResource.Success(data = convertedData)
                     }
                 }
@@ -61,12 +69,16 @@ suspend fun <T, R> safeNetworkCall(
 }
 
 data class NetworkErrorResponse(
-    val status_code: String,
-    val status_message: String,
-    val success: Boolean,
-)
+    val status_code: String? = null,
+    val status_message: String = "unknown_error",
+    val success: Boolean = false,
+) {
+    fun parseErrorMessage(): String {
+        return "code: $status_code, msg: $status_message"
+    }
+}
 
-fun <T> getErrorBody(response: Response<T>): NetworkErrorResponse {
+fun <T> getErrorBody(response: Response<T>): NetworkErrorResponse? {
     return Gson().fromJson(
         response.errorBody()!!.charStream(),
         object : TypeToken<NetworkErrorResponse>() {}.type

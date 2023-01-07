@@ -8,19 +8,19 @@ data class ReleaseDateDetailsResponse(
     @Json(name = "certification")
     val certification: String?,
     @Json(name = "iso_639_1")
-    val iso6391: String?,
+    val iso_639_1: String?,
     @Json(name = "note")
     val note: String?,
     @Json(name = "release_date")
-    val releaseDate: String?,
+    val release_date: String?,
     @Json(name = "type")
     val type: Int?,
 )
 
 fun ReleaseDateDetailsResponse.toReleaseDetails() = ReleaseDetails(
     certification = certification,
-    iso6391 = iso6391,
+    iso6391 = iso_639_1,
     note = note,
-    releaseDate = releaseDate,
+    releaseDate = release_date,
     type = type
 )

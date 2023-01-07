@@ -1,8 +1,12 @@
 package com.example.movieindex.core.data.remote.implementation
 
+import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.MovieApi
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
+import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
+import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.data.remote.model.common.MoviesResponse
 import com.example.movieindex.core.data.remote.model.details.MovieDetailsResponse
 import com.example.movieindex.core.data.remote.safeNetworkCall
@@ -37,6 +41,15 @@ class NetworkDataSourceImpl @Inject constructor(
             movieApi.getPopularMovies(page = page, language = language, region = region)
         }, conversion = { data: MoviesResponse -> data })
 
+    override suspend fun getMovieRecommendations(
+        movieId: Int,
+        page: Int,
+        language: String?,
+    ): NetworkResource<MoviesResponse> =
+        safeNetworkCall(dispatcher = ioDispatcher, networkCall = {
+            movieApi.getMovieRecommendations(movieId = movieId, page = page, language = language)
+        }, conversion = { data: MoviesResponse -> data })
+
     override suspend fun getTrendingMovies(
         page: Int,
         mediaType: String,
@@ -64,7 +77,35 @@ class NetworkDataSourceImpl @Inject constructor(
         year: Int?,
         primaryReleaseYear: Int?,
     ): NetworkResource<MoviesResponse> = safeNetworkCall(dispatcher = ioDispatcher,
-        networkCall = { movieApi.searchMovies(query = query) },
+        networkCall = {
+            movieApi.searchMovies(query = query,
+                language = language,
+                page = page,
+                includeAdult = includeAdult,
+                region = region,
+                year = year,
+                primaryReleaseYear = primaryReleaseYear)
+        },
         conversion = { it })
+
+    override suspend fun requestToken(): NetworkResource<RequestTokenResponse> =
+        safeNetworkCall(dispatcher = ioDispatcher,
+            networkCall = { movieApi.requestToken() },
+            conversion = { it })
+
+    override suspend fun login(
+        loginBody: LoginBody,
+    ): NetworkResource<LoginResponse> =
+        safeNetworkCall(dispatcher = ioDispatcher, networkCall = {
+            movieApi.login(
+                loginBody
+            )
+        }, conversion = { it })
+
+    override suspend fun createSession(requestToken: String): NetworkResource<SessionIdResponse> =
+        safeNetworkCall(
+            dispatcher = ioDispatcher,
+            networkCall = { movieApi.createSession(requestToken) },
+            conversion = { it })
 
 }

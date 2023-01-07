@@ -9,7 +9,7 @@ data class ReviewsResponse(
     @Json(name = "results")
     val results: List<ReviewResultResponse>,
     @Json(name = "total_pages")
-    val totalPages: Int,
+    val total_pages: Int,
     @Json(name = "total_results")
-    val totalResults: Int,
+    val total_results: Int,
 )

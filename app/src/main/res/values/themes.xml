@@ -12,5 +12,15 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <!--        <item name="android:windowBackground">@color/main_bg</item>-->
     </style>
+
+    <style name="Theme.MovieIndex.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.MovieIndex.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.MovieIndex.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

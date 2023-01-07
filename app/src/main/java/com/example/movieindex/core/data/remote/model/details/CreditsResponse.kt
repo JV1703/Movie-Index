@@ -5,7 +5,7 @@ import com.squareup.moshi.Json
 
 data class CreditsResponse(
     @Json(name = "cast")
-    val castResponse: List<CastResponse>,
+    val cast: List<CastResponse>,
     @Json(name = "crew")
-    val crewResponse: List<CrewResponse>,
+    val crew: List<CrewResponse>,
 )

@@ -6,12 +6,12 @@ import com.squareup.moshi.Json
 
 data class ReleaseDateResultResponse(
     @Json(name = "iso_3166_1")
-    val iso31661: String,
+    val iso_3166_1: String,
     @Json(name = "release_dates")
-    val releaseDates: List<ReleaseDateDetailsResponse>,
+    val release_dates: List<ReleaseDateDetailsResponse>,
 )
 
 fun ReleaseDateResultResponse.toReleaseDate() = ReleaseDate(
-    country = iso31661,
-    releaseDates = releaseDates.map { it.toReleaseDetails() }
+    country = iso_3166_1,
+    releaseDates = release_dates.map { it.toReleaseDetails() }
 )

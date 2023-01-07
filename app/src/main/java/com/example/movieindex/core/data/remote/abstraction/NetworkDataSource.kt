@@ -1,6 +1,10 @@
 package com.example.movieindex.core.data.remote.abstraction
 
+import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.NetworkResource
+import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
+import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.data.remote.model.common.MoviesResponse
 import com.example.movieindex.core.data.remote.model.details.MovieDetailsResponse
 
@@ -20,6 +24,12 @@ interface NetworkDataSource {
         timeWindow: String = "week",
     ): NetworkResource<MoviesResponse>
 
+    suspend fun getMovieRecommendations(
+        movieId: Int,
+        page: Int = 1,
+        language: String? = null,
+    ): NetworkResource<MoviesResponse>
+
     suspend fun getMovieDetails(
         movieId: Int,
         language: String? = null,
@@ -35,5 +45,9 @@ interface NetworkDataSource {
         year: Int? = null,
         primaryReleaseYear: Int? = null,
     ): NetworkResource<MoviesResponse>
+
+    suspend fun requestToken(): NetworkResource<RequestTokenResponse>
+    suspend fun createSession(requestToken: String): NetworkResource<SessionIdResponse>
+    suspend fun login(loginBody: LoginBody): NetworkResource<LoginResponse>
 
 }

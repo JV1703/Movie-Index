@@ -1,5 +1,9 @@
 package com.example.movieindex.core.data.external
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Cast(
     val adult: Boolean?,
     val castId: Int?,
@@ -13,4 +17,4 @@ data class Cast(
     val originalName: String?,
     val popularity: Double?,
     val profilePath: String?,
-)
+) : Parcelable

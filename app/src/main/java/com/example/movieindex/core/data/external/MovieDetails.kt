@@ -12,7 +12,7 @@ data class MovieDetails(
     val crews: List<Crew>,
     val genres: List<GenreResponse>,
     val overview: String?,
-    val recommendations: Movies?,
+    val recommendations: List<Result>?,
     val releaseDate: String?,
     val runtime: Int?,
     val tagline: String?,
