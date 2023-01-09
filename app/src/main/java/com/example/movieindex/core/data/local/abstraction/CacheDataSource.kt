@@ -17,7 +17,7 @@ interface CacheDataSource {
     fun getMovie(movieId: Int): Flow<MovieEntity?>
     fun getFavoriteMovies(): Flow<List<MovieEntity>>
     fun getBookmarkedMovies(): Flow<List<MovieEntity>>
-    suspend fun updateBookmark(isBookmark: Boolean)
-    suspend fun updateFavorite(isFavorite: Boolean)
+    suspend fun updateBookmark(movieId: Int, isBookmark: Boolean)
+    suspend fun updateFavorite(movieId: Int, isFavorite: Boolean)
     suspend fun deleteMovie(movieId: Int)
 }

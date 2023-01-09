@@ -1,6 +1,5 @@
 package com.example.movieindex.feature.detail.movie
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
@@ -42,7 +41,6 @@ import com.example.movieindex.feature.yt_player.YtPlayerActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -108,32 +106,6 @@ class MovieDetailFragment : Fragment() {
             toggleFab()
         }
 
-        collectLatestLifecycleFlow(viewModel.uiState.map { it.movieDetails?.casts }.distinctUntilChanged()){
-
-        }
-
-        collectLatestLifecycleFlow(viewModel.fabState) { fabState ->
-            val isFavorite = fabState.isFavorite
-            val isBookmarked = fabState.isBookmarked
-            Timber.i("fabState - isFav: $isFavorite, isBookmarked: $isBookmarked")
-            val fabPlaylistIcon =
-                if (fabState.isBookmarked) R.drawable.ic_filter_list_off_48 else R.drawable.ic_playlist_play_48
-            binding.fabPlaylist.setImageDrawable(ContextCompat.getDrawable(requireContext(), fabPlaylistIcon))
-            val fabFavoriteIcon =
-                if (fabState.isFavorite) R.drawable.ic_heart_minus_48 else R.drawable.ic_heart_plus_48
-            binding.fabFavorite.setImageDrawable(ContextCompat.getDrawable(requireContext(), fabFavoriteIcon))
-
-            binding.fabFavorite.setOnClickListener {
-                viewModel.addToFavorite(favorite = !isFavorite, mediaId = movieId, movieDetails = movieDetails?.copy(isFavorite = !isFavorite, isBookmark = isBookmarked)!!)
-                toggleFab()
-            }
-
-            binding.fabPlaylist.setOnClickListener {
-                viewModel.addToWatchList(watchlist = !isBookmarked, mediaId = movieId, movieDetails = movieDetails?.copy(isFavorite = isFavorite, isBookmark = !isBookmarked)!!)
-                toggleFab()
-            }
-        }
-
         collectLatestLifecycleFlow(viewModel.uiState) { uiState ->
 
             uiState.userMsg?.let {
@@ -141,57 +113,93 @@ class MovieDetailFragment : Fragment() {
                 viewModel.msgShown()
             }
 
-            isLoading(uiState.isLoadingGeneral)
+            isLoading(uiState.isLoading)
 
             val movieDetails = uiState.movieDetails
+            val cachedMovie = uiState.cachedMovie
             movieDetails?.let { details ->
                 this@MovieDetailFragment.movieDetails = movieDetails
                 val casts = details.casts
                 val crews = details.crews
-                val reviews = details.reviews
-                val videos = details.videos
-                val recommendations = details.recommendations
 
                 this@MovieDetailFragment.casts = casts
                 this@MovieDetailFragment.crews = crews
 
                 setupMovieGeneralDetails(movieDetails = details)
-                setupCastSection(casts)
-                setupReviewSection(reviews = reviews)
-                setupVideosSection(videos = videos)
-                recommendations?.let {
-                    setupRecommendationSection(recommendations = recommendations)
-                }
+
             }
 
+            val isFavorite = cachedMovie?.isFavorite ?: false
+            val isBookmarked = cachedMovie?.isBookmark ?: false
 
-//            when (uiState) {
-//                is MovieDetailViewModel.MovieDetailUiState.Loading -> {
-//                    isLoading(true)
-//                }
-//                is MovieDetailViewModel.MovieDetailUiState.Error -> {
-//                    isLoading(false)
-//                }
-//                is MovieDetailViewModel.MovieDetailUiState.Success -> {
-//                    isLoading(isLoading = uiState.isLoading)
-//                    casts = uiState.movieDetails.casts
-//                    crews = uiState.movieDetails.crews
-//                    setupMovieGeneralDetails(movieDetails = uiState.movieDetails)
-//                    setupCastSection(casts = uiState.movieDetails.casts,
-//                        crews = uiState.movieDetails.crews)
-//                    setupReviewSection(uiState.movieDetails.reviews)
-//                    setupVideosSection(uiState.movieDetails.videos)
-//                    setupRecommendationSection(uiState.movieDetails.recommendations
-//                        ?: emptyList())
-//
-//                    binding.fabMain.setOnClickListener {
-//                        setupFabListener(isOpen)
-//                        isOpen = !isOpen
-//                    }
-//
-//
-//                }
-//            }
+            val fabPlaylistIcon =
+                if (isBookmarked) R.drawable.ic_filter_list_off_48 else R.drawable.ic_playlist_play_48
+            binding.fabPlaylist.setImageDrawable(ContextCompat.getDrawable(requireContext(),
+                fabPlaylistIcon))
+            val fabFavoriteIcon =
+                if (isFavorite) R.drawable.ic_heart_minus_48 else R.drawable.ic_heart_plus_48
+            binding.fabFavorite.setImageDrawable(ContextCompat.getDrawable(requireContext(),
+                fabFavoriteIcon))
+
+            binding.fabFavorite.setOnClickListener {
+                if (cachedMovie == null) {
+                    viewModel.insertMovie(
+                        mediaId = movieId,
+                        movieDetails = movieDetails!!, isFavorite = true)
+                } else {
+                    viewModel.updateFavorite(movieId = movieId,
+                        isBookmarked = isBookmarked,
+                        isFavorite = !isFavorite)
+                }
+                toggleFab()
+            }
+
+            binding.fabPlaylist.setOnClickListener {
+                if (cachedMovie == null) {
+                    viewModel.insertMovie(
+                        mediaId = movieId,
+                        movieDetails = movieDetails!!, isBookmarked = true)
+                } else {
+                    viewModel.updateBookmark(movieId = movieId,
+                        isBookmarked = !isBookmarked,
+                        isFavorite = isFavorite)
+                }
+                toggleFab()
+            }
+        }
+
+        // lists needs to have a different collector is to apply distinct until change on list
+        // the idea is that if uiState is updated, however the list doesn't change, therefore
+        // flow will omit emission to list data.
+        // thus avoiding unnecessary glide operations
+        collectLatestLifecycleFlow(viewModel.uiState.map { it.movieDetails?.casts }
+            .distinctUntilChanged()) { casts: List<Cast>? ->
+            casts?.let {
+                setupCastSection(it)
+            }
+        }
+
+
+        // selection of reviews is through selecting a single review from reviews in a randomized manner
+        // a distinctUntilChanged is required to avoid review to be randomly reselected everytime UI change occurs
+        collectLatestLifecycleFlow(viewModel.uiState.map { it.movieDetails?.reviews }
+            .distinctUntilChanged()) { reviews: List<ReviewResult>? ->
+            reviews?.let {
+                setupReviewSection(it)
+            }
+        }
+
+        collectLatestLifecycleFlow(viewModel.uiState.map { it.movieDetails?.videos }
+            .distinctUntilChanged()) { videos: List<VideosResult>? ->
+            videos?.let {
+                setupVideosSection(it)
+            }
+        }
+
+        collectLatestLifecycleFlow(viewModel.uiState.map { it.movieDetails?.recommendations }) { recommendations: List<Result>? ->
+            recommendations?.let {
+                setupRecommendationSection(it)
+            }
         }
 
     }
@@ -211,7 +219,9 @@ class MovieDetailFragment : Fragment() {
                 duration = 500
             }
             binding.coordinator.apply {
-                isGone = false
+                children.forEach {
+                    it.isEnabled = true
+                }
                 animate().alpha(1F).apply {
                     startDelay = 500
                     duration = 500
@@ -219,7 +229,10 @@ class MovieDetailFragment : Fragment() {
             }
         } else {
             binding.nestedScrollView.alpha = 0F
-            binding.coordinator.isGone = true
+            binding.coordinator.apply {
+                alpha = 0F
+                children.forEach { it.isEnabled = false }
+            }
         }
         binding.loadingInd.isGone = !isLoading
     }
@@ -308,6 +321,8 @@ class MovieDetailFragment : Fragment() {
             onRecommendationClicked = {
                 viewModel.saveMovieId(it)
                 binding.nestedScrollView.smoothScrollTo(0, 0)
+                isOpen = true
+                toggleFab()
             }
         )
         recommendationAdapter.stateRestorationPolicy = PREVENT_WHEN_EMPTY
@@ -580,7 +595,6 @@ class MovieDetailFragment : Fragment() {
     }
 
     private fun toggleFab() {
-
         if (isOpen) {
             binding.fabMain.startAnimation(rotateBackward)
             binding.fabFavorite.startAnimation(fabClose)

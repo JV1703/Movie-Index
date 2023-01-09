@@ -2,7 +2,6 @@ package com.example.movieindex.feature.common.domain.implementation
 
 import androidx.paging.PagingData
 import com.example.movieindex.core.data.external.*
-import com.example.movieindex.core.data.remote.model.common.PostResponse
 import com.example.movieindex.core.repository.abstraction.MovieRepository
 import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
 import kotlinx.coroutines.flow.Flow
@@ -108,7 +107,7 @@ class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRep
     override fun addToWatchList(
         watchlist: Boolean,
         mediaId: Int,
-        mediaType: String
+        mediaType: String,
     ) = movieRepository.addToWatchList(
         watchlist = watchlist,
         mediaId = mediaId,
@@ -128,11 +127,28 @@ class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRep
 
     override fun getAccountId(): Flow<Int> = movieRepository.getAccountId()
 
-    override suspend fun insertMovie(movieDetails: MovieDetails) {
-        movieRepository.insertMovie(movie = movieDetails)
+    override suspend fun insertMovieToCache(
+        movieDetails: MovieDetails,
+        isFavorite: Boolean,
+        isBookmarked: Boolean,
+    ) {
+        movieRepository.insertMovieToCache(movie = movieDetails,
+            isFavorite = isFavorite,
+            isBookmark = isBookmarked)
     }
 
     override fun getCachedMovie(movieId: Int): Flow<SavedMovie?> =
         movieRepository.getCachedMovie(movieId = movieId)
 
+    override suspend fun updateBookmark(movieId: Int, isBookmarked: Boolean) {
+        movieRepository.updateBookmark(movieId = movieId, isBookmark = isBookmarked)
+    }
+
+    override suspend fun updateFavorite(movieId: Int, isFavorite: Boolean) {
+        movieRepository.updateFavorite(movieId = movieId, isFavorite = isFavorite)
+    }
+
+    override suspend fun deleteSavedMovie(movieId: Int) {
+        movieRepository.deleteMovie(movieId)
+    }
 }

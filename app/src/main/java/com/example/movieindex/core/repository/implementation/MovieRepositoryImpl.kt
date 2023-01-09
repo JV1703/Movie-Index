@@ -350,8 +350,11 @@ class MovieRepositoryImpl @Inject constructor(
 
     override fun getAccountId(): Flow<Int> = cache.getAccountId()
 
-    override suspend fun insertMovie(movie: MovieDetails) {
-        val entity = movie.toMovieEntity()
+    override suspend fun insertMovieToCache(movie: MovieDetails, isFavorite: Boolean, isBookmark: Boolean) {
+        val entity = movie.toMovieEntity(
+            isFavorite,
+            isBookmark
+        )
         cache.insertMovie(entity)
     }
 
@@ -367,12 +370,12 @@ class MovieRepositoryImpl @Inject constructor(
         cache.getFavoriteMovies().map { it.map { it.toSavedMovie() } }
             .catch { t -> Timber.e("getBookmarkedMovies: ${t.message}") }
 
-    override suspend fun updateBookmark(isBookmark: Boolean) {
-        cache.updateBookmark(isBookmark = isBookmark)
+    override suspend fun updateBookmark(movieId: Int, isBookmark: Boolean) {
+        cache.updateBookmark(movieId = movieId, isBookmark = isBookmark)
     }
 
-    override suspend fun updateFavorite(isFavorite: Boolean) {
-        cache.updateFavorite(isFavorite = isFavorite)
+    override suspend fun updateFavorite(movieId: Int, isFavorite: Boolean) {
+        cache.updateFavorite(movieId = movieId, isFavorite = isFavorite)
     }
 
     override suspend fun deleteMovie(movieId: Int) {

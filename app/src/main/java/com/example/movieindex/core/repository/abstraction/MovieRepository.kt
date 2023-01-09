@@ -107,11 +107,11 @@ interface MovieRepository {
         sortBy: String? = null,
     ): Flow<PagingData<Result>>
 
-    suspend fun insertMovie(movie: MovieDetails)
+    suspend fun insertMovieToCache(movie: MovieDetails, isFavorite: Boolean, isBookmark: Boolean)
     fun getCachedMovie(movieId: Int): Flow<SavedMovie?>
     fun getFavoriteMovies(): Flow<List<SavedMovie>>
     fun getBookmarkedMovies(): Flow<List<SavedMovie>>
-    suspend fun updateBookmark(isBookmark: Boolean)
-    suspend fun updateFavorite(isFavorite: Boolean)
+    suspend fun updateBookmark(movieId: Int, isBookmark: Boolean)
+    suspend fun updateFavorite(movieId: Int, isFavorite: Boolean)
     suspend fun deleteMovie(movieId: Int)
 }

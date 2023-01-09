@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MovieDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertMovie(movie: MovieEntity)
 
     @Query("SELECT * FROM movies_table WHERE movieId = :movieId")
@@ -22,11 +22,11 @@ interface MovieDao {
     @Query("SELECT * FROM movies_table WHERE isBookmark = 1")
     fun getBookmarkedMovies(): Flow<List<MovieEntity>>
 
-    @Query("UPDATE movies_table SET isBookmark = :isBookmark")
-    suspend fun updateBookmark(isBookmark: Boolean)
+    @Query("UPDATE movies_table SET isBookmark = :isBookmark WHERE movieId = :movieId")
+    suspend fun updateBookmark(movieId: Int, isBookmark: Boolean)
 
-    @Query("UPDATE movies_table SET isFavorite = :isFavorite")
-    suspend fun updateFavorite(isFavorite: Boolean)
+    @Query("UPDATE movies_table SET isFavorite = :isFavorite WHERE movieId = :movieId")
+    suspend fun updateFavorite(movieId: Int, isFavorite: Boolean)
 
     @Query("DELETE FROM movies_table WHERE movieId = :movieId")
     suspend fun deleteMovie(movieId: Int)

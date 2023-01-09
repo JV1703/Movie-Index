@@ -2,7 +2,6 @@ package com.example.movieindex.feature.common.domain.abstraction
 
 import androidx.paging.PagingData
 import com.example.movieindex.core.data.external.*
-import com.example.movieindex.core.data.remote.model.common.PostResponse
 import kotlinx.coroutines.flow.Flow
 
 interface MovieUseCase {
@@ -72,16 +71,24 @@ interface MovieUseCase {
     fun addToFavorite(
         favorite: Boolean,
         mediaId: Int,
-        mediaType: String = "movie"
+        mediaType: String = "movie",
     )
 
     fun addToWatchList(
         watchlist: Boolean,
         mediaId: Int,
-        mediaType: String = "movie"
+        mediaType: String = "movie",
     )
 
     fun getAccountId(): Flow<Int>
-    suspend fun insertMovie(movieDetails: MovieDetails)
+    suspend fun insertMovieToCache(
+        movieDetails: MovieDetails,
+        isFavorite: Boolean = false,
+        isBookmarked: Boolean = false,
+    )
+
     fun getCachedMovie(movieId: Int): Flow<SavedMovie?>
+    suspend fun updateBookmark(movieId: Int, isBookmarked: Boolean)
+    suspend fun updateFavorite(movieId: Int, isFavorite: Boolean)
+    suspend fun deleteSavedMovie(movieId: Int)
 }

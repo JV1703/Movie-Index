@@ -22,11 +22,9 @@ data class MovieDetails(
     val voteAverage: Double?,
     val reviews: List<ReviewResult>?,
     val mpaaRating: String?,
-    val isFavorite: Boolean,
-    val isBookmark: Boolean
 )
 
-fun MovieDetails.toMovieEntity() = MovieEntity(
+fun MovieDetails.toMovieEntity(isFavorite: Boolean = false, isBookmark: Boolean = false) = MovieEntity(
     movieId = id,
     title = title,
     overview = overview,

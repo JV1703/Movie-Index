@@ -44,15 +44,15 @@ class CacheDataSourceImpl @Inject constructor(
         movieDao.getFavoriteMovies().catch { t -> Timber.e("getBookmarkedMovies: ${t.message}") }
             .flowOn(ioDispatcher)
 
-    override suspend fun updateBookmark(isBookmark: Boolean) {
-        movieDao.updateBookmark(isBookmark = isBookmark)
+    override suspend fun updateBookmark(movieId: Int, isBookmark: Boolean) {
+        movieDao.updateBookmark(movieId = movieId, isBookmark = isBookmark)
     }
 
-    override suspend fun updateFavorite(isFavorite: Boolean){
-        movieDao.updateFavorite(isFavorite = isFavorite)
+    override suspend fun updateFavorite(movieId: Int, isFavorite: Boolean) {
+        movieDao.updateFavorite(movieId = movieId, isFavorite = isFavorite)
     }
 
-    override suspend fun deleteMovie(movieId: Int){
+    override suspend fun deleteMovie(movieId: Int) {
         movieDao.deleteMovie(movieId = movieId)
     }
 

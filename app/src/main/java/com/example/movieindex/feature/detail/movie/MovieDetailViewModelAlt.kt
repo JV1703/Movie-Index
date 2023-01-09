@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieindex.core.common.RvListHelper
 import com.example.movieindex.core.data.external.*
-import com.example.movieindex.feature.auth.domain.abstraction.AuthUseCase
 import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -15,7 +14,6 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MovieDetailViewModelAlt @Inject constructor(
-    private val authUseCase: AuthUseCase,
     private val movieUseCase: MovieUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -25,56 +23,41 @@ class MovieDetailViewModelAlt @Inject constructor(
     }
 
     private val movieId = savedStateHandle.getStateFlow(SAVED_MOVIE_ID, 0)
-    private var sessionId: String? = null
-    private var accountId: Int? = null
 
-    init {
-        viewModelScope.launch {
-            sessionId = authUseCase.getSessionId().first()
-            accountId = movieUseCase.getAccountId().first()
-        }
-    }
-
-    private val cachedMovie =
-        movieId.filter { it != 0 }.flatMapLatest { movieUseCase.getCachedMovie(it) }
-
-    private val movieDetails =
-        movieId.filter { it != 0 }.flatMapLatest { movieUseCase.getMovieDetails(it) }
 
     private val _uiState: MutableStateFlow<MovieDetailUiState> =
         MutableStateFlow(MovieDetailUiState())
-    val uiState =
-        combine(
-            movieDetails,
-            _uiState) { resource: Resource<MovieDetails>, uiState: MovieDetailUiState ->
+    val uiState = _uiState.asStateFlow()
 
+    init {
+        val cachedMovie =
+            movieId.filter { it != 0 }.flatMapLatest { movieUseCase.getCachedMovie(it) }
+
+        val movieDetails =
+            movieId.filter { it != 0 }.flatMapLatest { movieUseCase.getMovieDetails(it) }
+
+        combine(cachedMovie, movieDetails) { cache, resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    uiState
+                    _uiState.value = MovieDetailUiState(isLoading = true)
                 }
                 is Resource.Success -> {
-                    _fabState.update { fabState ->
-                        fabState.copy(isFavorite = resource.data.isFavorite,
-                            isBookmarked = resource.data.isBookmark)
-                    }
-                    uiState.copy(movieDetails = resource.data)
+                    _uiState.value = MovieDetailUiState(
+                        isLoading = false,
+                        movieDetails = resource.data,
+                        cachedMovie = cache
+                    )
                 }
                 is Resource.Empty -> {
-                    uiState.copy(userMsg = "No Data Available")
+                    _uiState.value =
+                        MovieDetailUiState(isLoading = false, userMsg = "No Data Available")
                 }
                 is Resource.Error -> {
-                    uiState.copy(userMsg = resource.errMsg)
+                    _uiState.value =
+                        MovieDetailUiState(isLoading = false, userMsg = resource.errMsg)
                 }
             }
-
-        }.stateIn(scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = MovieDetailUiState())
-
-    private val _fabState = MutableStateFlow(MovieDetailsFabState())
-    val fabState = combine(cachedMovie, _fabState) { movie, fabState ->
-        fabState.copy(isFavorite = movie?.isFavorite ?: false,
-            isBookmarked = movie?.isBookmark ?: false)
+        }.launchIn(viewModelScope)
     }
 
     fun saveMovieId(movieId: Int) {
@@ -94,7 +77,7 @@ class MovieDetailViewModelAlt @Inject constructor(
     }
 
     fun updatePosterLoadingStatus(isLoading: Boolean) {
-        _uiState.update { uiState -> uiState.copy(isLoadingGeneral = isLoading) }
+        _uiState.update { uiState -> uiState.copy(isLoading = isLoading) }
     }
 
     suspend fun generateCastList(
@@ -145,51 +128,59 @@ class MovieDetailViewModelAlt @Inject constructor(
         _uiState.update { uiState -> uiState.copy(userMsg = null) }
     }
 
-    fun addToFavorite(
-        favorite: Boolean,
+    fun insertMovie(
         mediaId: Int,
         movieDetails: MovieDetails,
         mediaType: String = "movie",
+        isFavorite: Boolean = false,
+        isBookmarked: Boolean = false,
     ) {
         viewModelScope.launch {
+            movieUseCase.insertMovieToCache(movieDetails = movieDetails,
+                isFavorite = isFavorite,
+                isBookmarked = isBookmarked)
 
-            movieUseCase.insertMovie(movieDetails = movieDetails)
+            if (isFavorite) {
+                movieUseCase.addToFavorite(favorite = true,
+                    mediaId = mediaId,
+                    mediaType = mediaType)
+            }
 
-            movieUseCase.addToFavorite(favorite = favorite,
-                mediaId = mediaId,
-                mediaType = mediaType)
-
+            if (isBookmarked) {
+                movieUseCase.addToWatchList(watchlist = true,
+                    mediaId = mediaId,
+                    mediaType = mediaType)
+            }
         }
     }
 
-    fun addToWatchList(
-        watchlist: Boolean,
-        mediaId: Int,
-        movieDetails: MovieDetails,
-        mediaType: String = "movie",
-    ) {
+    fun updateBookmark(movieId: Int, isBookmarked: Boolean, isFavorite: Boolean){
         viewModelScope.launch {
+            if(!isBookmarked && !isFavorite){
+               movieUseCase.deleteSavedMovie(movieId)
+            }else{
+                movieUseCase.updateBookmark(movieId = movieId, isBookmarked = isBookmarked)
+            }
+            movieUseCase.addToWatchList(watchlist = isBookmarked, mediaId = movieId)
+        }
+    }
 
-            movieUseCase.insertMovie(movieDetails = movieDetails)
+    fun updateFavorite(movieId: Int, isBookmarked: Boolean, isFavorite: Boolean){
+        viewModelScope.launch {
+            if(!isBookmarked && !isFavorite){
+                movieUseCase.deleteSavedMovie(movieId)
+            }else{
+                movieUseCase.updateFavorite(movieId = movieId, isFavorite = isFavorite)
+            }
 
-            movieUseCase.addToWatchList(watchlist = watchlist,
-                mediaId = mediaId,
-                mediaType = mediaType)
-
+            movieUseCase.addToFavorite(favorite = isFavorite, mediaId = movieId)
         }
     }
 
     data class MovieDetailUiState(
-        val isLoadingGeneral: Boolean = true,
+        val isLoading: Boolean = true,
         val movieDetails: MovieDetails? = null,
+        val cachedMovie: SavedMovie? = null,
         val userMsg: String? = null,
     )
-
-    data class MovieDetailsFabState(
-        val isOpen: Boolean = false,
-        val isBookmarked: Boolean = false,
-        val isFavorite: Boolean = false,
-        val userMsg: String? = null,
-    )
-
 }
