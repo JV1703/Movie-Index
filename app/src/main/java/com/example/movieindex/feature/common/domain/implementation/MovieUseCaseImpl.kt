@@ -5,6 +5,7 @@ import com.example.movieindex.core.data.external.*
 import com.example.movieindex.core.repository.abstraction.MovieRepository
 import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
 import kotlinx.coroutines.flow.Flow
+import timber.log.Timber
 import javax.inject.Inject
 
 class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRepository) :

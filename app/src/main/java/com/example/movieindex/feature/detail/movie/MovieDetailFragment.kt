@@ -58,7 +58,7 @@ class MovieDetailFragment : Fragment() {
     private var _movieId: Int? = null
     private val movieId get() = _movieId!!
 
-    private val viewModel: MovieDetailViewModelAlt by viewModels()
+    private val viewModel: MovieDetailViewModel by viewModels()
 
     private lateinit var castAdapter: MovieDetailCastAdapter
     private lateinit var videosAdapter: MovieVideosAdapter
@@ -90,7 +90,6 @@ class MovieDetailFragment : Fragment() {
 
         navArgs.movieId.let {
             viewModel.saveMovieId(it)
-            _movieId = it
         }
         return binding.root
     }
@@ -118,6 +117,7 @@ class MovieDetailFragment : Fragment() {
             val movieDetails = uiState.movieDetails
             val cachedMovie = uiState.cachedMovie
             movieDetails?.let { details ->
+                _movieId = details.id
                 this@MovieDetailFragment.movieDetails = movieDetails
                 val casts = details.casts
                 val crews = details.crews
@@ -218,10 +218,25 @@ class MovieDetailFragment : Fragment() {
                 startDelay = 500
                 duration = 500
             }
-            binding.coordinator.apply {
-                children.forEach {
-                    it.isEnabled = true
+
+            binding.fabMain.apply {
+                isEnabled = true
+                animate().alpha(1F).apply {
+                    startDelay = 500
+                    duration = 500
                 }
+            }
+
+            binding.fabFavorite.apply {
+                isEnabled = true
+                animate().alpha(1F).apply {
+                    startDelay = 500
+                    duration = 500
+                }
+            }
+
+            binding.fabPlaylist.apply {
+                isEnabled = true
                 animate().alpha(1F).apply {
                     startDelay = 500
                     duration = 500
@@ -229,9 +244,20 @@ class MovieDetailFragment : Fragment() {
             }
         } else {
             binding.nestedScrollView.alpha = 0F
-            binding.coordinator.apply {
+
+            binding.fabMain.apply {
+                isEnabled = true
                 alpha = 0F
-                children.forEach { it.isEnabled = false }
+            }
+
+            binding.fabFavorite.apply {
+                isEnabled = true
+                alpha = 0F
+            }
+
+            binding.fabPlaylist.apply {
+                isEnabled = true
+                alpha = 0F
             }
         }
         binding.loadingInd.isGone = !isLoading
@@ -385,9 +411,15 @@ class MovieDetailFragment : Fragment() {
     private fun setupMovieGeneralDetails(movieDetails: MovieDetails) {
         val defaultDominantColor = Color.parseColor("#263238")
 
-        val trailerKey = movieDetails.videos.random().key
+        val trailerKey = if(movieDetails.videos.isNotEmpty()){
+            movieDetails.videos.random().key
+        }else{
+            null
+        }
         binding.playTrailer.setOnClickListener {
-            watchTrailer(trailerKey)
+            trailerKey?.let {
+                watchTrailer(it)
+            }?:viewModel.showMsg("No trailer for this movie")
         }
 
         movieDetails.posterPath?.let {
