@@ -11,8 +11,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.movieindex.core.common.extensions.collectLatestLifecycleFlow
 import com.example.movieindex.core.common.extensions.makeToast
-import com.example.movieindex.core.common.extensions.removeSpan
-import com.example.movieindex.core.common.extensions.textWithColorClickable
 import com.example.movieindex.databinding.FragmentLoginBinding
 import com.example.movieindex.feature.auth.AuthViewModel
 import com.github.razir.progressbutton.*

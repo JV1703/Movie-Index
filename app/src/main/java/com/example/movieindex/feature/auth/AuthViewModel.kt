@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.movieindex.core.data.external.Resource
 import com.example.movieindex.core.data.remote.NetworkConstants.TMDB_RESET_PASSWORD
 import com.example.movieindex.core.data.remote.NetworkConstants.TMDB_SIGN_UP_URL
+import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.feature.auth.domain.abstraction.AuthUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -95,5 +96,12 @@ class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : 
         Register(TMDB_SIGN_UP_URL),
         ForgetPassword(TMDB_RESET_PASSWORD)
     }
+
+    data class AuthState(
+        val isLoading: Boolean = false,
+        val isLoggedIn: Boolean = false,
+        val loginResult: Resource<SessionIdResponse>,
+        val userMsg: String? = null
+    )
 
 }

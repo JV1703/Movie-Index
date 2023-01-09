@@ -4,16 +4,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.paging.PagingSource
+import com.example.movieindex.core.data.local.CacheConstants.ACCOUNT_ID
 import com.example.movieindex.core.data.local.CacheConstants.CASTS
 import com.example.movieindex.core.data.local.CacheConstants.CREWS
 import com.example.movieindex.core.data.local.CacheConstants.SESSION_ID
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
 import com.example.movieindex.core.data.local.dao.MovieDao
-import com.example.movieindex.core.data.local.dao.MovieKeyDao
 import com.example.movieindex.core.data.local.model.MovieEntity
-import com.example.movieindex.core.data.local.model.MovieKeyEntity
-import com.example.movieindex.core.data.local.model.MoviePagingCategory
 import com.example.movieindex.core.di.CoroutinesQualifiers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -21,45 +18,43 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
 class CacheDataSourceImpl @Inject constructor(
     private val movieDao: MovieDao,
-    private val movieKeyDao: MovieKeyDao,
     private val dataStore: DataStore<Preferences>,
     @CoroutinesQualifiers.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CacheDataSource {
 
-    override suspend fun insertAllMovies(movies: List<MovieEntity>) =
-        movieDao.insertAllMovies(movies = movies)
+    override suspend fun insertMovie(movie: MovieEntity) {
+        movieDao.insertMovie(movie)
+    }
 
-    override fun getMovies(pagingCategory: MoviePagingCategory): PagingSource<Int, MovieEntity> =
-        movieDao.getMovies(pagingCategory = pagingCategory)
-
-    override fun getMoviesWithReferenceToPagingCategory(pagingCategory: MoviePagingCategory): Flow<List<MovieEntity>> =
-        movieDao.getMoviesWithReferenceToPagingCategory(pagingCategory = pagingCategory)
+    override fun getMovie(movieId: Int): Flow<MovieEntity?> =
+        movieDao.getMovie(movieId).catch { t -> Timber.e("getMovie: ${t.message}") }
             .flowOn(ioDispatcher)
 
-    override fun getAllMovies(): Flow<List<MovieEntity>> =
-        movieDao.getAllMovies().flowOn(ioDispatcher)
+    override fun getFavoriteMovies(): Flow<List<MovieEntity>> =
+        movieDao.getFavoriteMovies().catch { t -> Timber.e("getFavoriteMovies: ${t.message}") }
+            .flowOn(ioDispatcher)
 
-    override suspend fun clearMovies(pagingCategory: MoviePagingCategory) =
-        movieDao.clearMovies(pagingCategory = pagingCategory)
+    override fun getBookmarkedMovies(): Flow<List<MovieEntity>> =
+        movieDao.getFavoriteMovies().catch { t -> Timber.e("getBookmarkedMovies: ${t.message}") }
+            .flowOn(ioDispatcher)
 
-    override suspend fun insertAllMovieKeys(movieKeys: List<MovieKeyEntity>) =
-        movieKeyDao.insertAllMovieKeys(movieKeys = movieKeys)
+    override suspend fun updateBookmark(isBookmark: Boolean) {
+        movieDao.updateBookmark(isBookmark = isBookmark)
+    }
 
-    override fun getAllMovieKey(): Flow<List<MovieKeyEntity>> =
-        movieKeyDao.getAllMovieKey().flowOn(ioDispatcher)
+    override suspend fun updateFavorite(isFavorite: Boolean){
+        movieDao.updateFavorite(isFavorite = isFavorite)
+    }
 
-    override suspend fun movieKeyId(
-        id: String,
-        pagingCategory: MoviePagingCategory,
-    ): MovieKeyEntity? = movieKeyDao.movieKeyId(id = id, pagingCategory = pagingCategory)
-
-    override suspend fun clearMovieKeys(pagingCategory: MoviePagingCategory) =
-        movieKeyDao.clearMovieKeys(pagingCategory = pagingCategory)
+    override suspend fun deleteMovie(movieId: Int){
+        movieDao.deleteMovie(movieId = movieId)
+    }
 
     // datastore - preferences
 
@@ -126,6 +121,25 @@ class CacheDataSourceImpl @Inject constructor(
         }
     }.map { preferences ->
         preferences[CREWS] ?: ""
+    }.flowOn(ioDispatcher)
+
+    override suspend fun saveAccountId(accountId: Int) {
+        withContext(ioDispatcher) {
+            dataStore.edit { preferences ->
+                preferences[ACCOUNT_ID] = accountId
+            }
+        }
+    }
+
+    override fun getAccountId(): Flow<Int> = dataStore.data.catch {
+        if (it is IOException) {
+            it.printStackTrace()
+            emit(emptyPreferences())
+        } else {
+            throw it
+        }
+    }.map { preferences ->
+        preferences[ACCOUNT_ID] ?: 0
     }.flowOn(ioDispatcher)
 
 }

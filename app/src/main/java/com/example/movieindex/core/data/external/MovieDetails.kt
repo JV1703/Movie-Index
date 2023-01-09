@@ -1,5 +1,6 @@
 package com.example.movieindex.core.data.external
 
+import com.example.movieindex.core.data.local.model.MovieEntity
 import com.example.movieindex.core.data.remote.model.details.GenreResponse
 
 data class MovieDetails(
@@ -16,9 +17,21 @@ data class MovieDetails(
     val releaseDate: String?,
     val runtime: Int?,
     val tagline: String?,
-    val title: String?,
+    val title: String,
     val videos: List<VideosResult>,
     val voteAverage: Double?,
     val reviews: List<ReviewResult>?,
     val mpaaRating: String?,
+    val isFavorite: Boolean,
+    val isBookmark: Boolean
+)
+
+fun MovieDetails.toMovieEntity() = MovieEntity(
+    movieId = id,
+    title = title,
+    overview = overview,
+    posterPath = posterPath,
+    releaseDate = releaseDate,
+    isFavorite = isFavorite,
+    isBookmark = isBookmark
 )

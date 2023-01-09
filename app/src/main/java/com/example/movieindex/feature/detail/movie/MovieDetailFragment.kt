@@ -1,5 +1,6 @@
 package com.example.movieindex.feature.detail.movie
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
@@ -8,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
@@ -38,6 +40,8 @@ import com.example.movieindex.feature.detail.movie.adapter.MovieVideosAdapter
 import com.example.movieindex.feature.list.movie_list.ListType
 import com.example.movieindex.feature.yt_player.YtPlayerActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -56,7 +60,7 @@ class MovieDetailFragment : Fragment() {
     private var _movieId: Int? = null
     private val movieId get() = _movieId!!
 
-    private val viewModel: MovieDetailViewModel by viewModels()
+    private val viewModel: MovieDetailViewModelAlt by viewModels()
 
     private lateinit var castAdapter: MovieDetailCastAdapter
     private lateinit var videosAdapter: MovieVideosAdapter
@@ -64,14 +68,28 @@ class MovieDetailFragment : Fragment() {
 
     private var casts: List<Cast> = emptyList()
     private var crews: List<Crew> = emptyList()
+    private var movieDetails: MovieDetails? = null
 
     private var isOpen: Boolean = false
+
+    private lateinit var fabOpen: Animation
+    private lateinit var fabClose: Animation
+    private lateinit var rotateForward: Animation
+    private lateinit var rotateBackward: Animation
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentMovieDetailBinding.inflate(inflater, container, false)
+
+        fabOpen = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_open)
+        fabClose = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_close)
+        rotateForward =
+            AnimationUtils.loadAnimation(requireContext(), R.anim.fab_rotate_forward)
+        rotateBackward =
+            AnimationUtils.loadAnimation(requireContext(), R.anim.fab_rotate_backward)
+
         navArgs.movieId.let {
             viewModel.saveMovieId(it)
             _movieId = it
@@ -82,34 +100,98 @@ class MovieDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupCastAdapter()
+        setupRecommendationsAdapter()
+        setupVideosAdapter()
+
+        binding.fabMain.setOnClickListener {
+            toggleFab()
+        }
+
+        collectLatestLifecycleFlow(viewModel.uiState.map { it.movieDetails?.casts }.distinctUntilChanged()){
+
+        }
+
+        collectLatestLifecycleFlow(viewModel.fabState) { fabState ->
+            val isFavorite = fabState.isFavorite
+            val isBookmarked = fabState.isBookmarked
+            Timber.i("fabState - isFav: $isFavorite, isBookmarked: $isBookmarked")
+            val fabPlaylistIcon =
+                if (fabState.isBookmarked) R.drawable.ic_filter_list_off_48 else R.drawable.ic_playlist_play_48
+            binding.fabPlaylist.setImageDrawable(ContextCompat.getDrawable(requireContext(), fabPlaylistIcon))
+            val fabFavoriteIcon =
+                if (fabState.isFavorite) R.drawable.ic_heart_minus_48 else R.drawable.ic_heart_plus_48
+            binding.fabFavorite.setImageDrawable(ContextCompat.getDrawable(requireContext(), fabFavoriteIcon))
+
+            binding.fabFavorite.setOnClickListener {
+                viewModel.addToFavorite(favorite = !isFavorite, mediaId = movieId, movieDetails = movieDetails?.copy(isFavorite = !isFavorite, isBookmark = isBookmarked)!!)
+                toggleFab()
+            }
+
+            binding.fabPlaylist.setOnClickListener {
+                viewModel.addToWatchList(watchlist = !isBookmarked, mediaId = movieId, movieDetails = movieDetails?.copy(isFavorite = isFavorite, isBookmark = !isBookmarked)!!)
+                toggleFab()
+            }
+        }
+
         collectLatestLifecycleFlow(viewModel.uiState) { uiState ->
-            when (uiState) {
-                is MovieDetailViewModel.MovieDetailUiState.Loading -> {
-                    isLoading(true)
-                }
-                is MovieDetailViewModel.MovieDetailUiState.Error -> {
-                    isLoading(false)
-                }
-                is MovieDetailViewModel.MovieDetailUiState.Success -> {
-                    isLoading(isLoading = uiState.isLoading)
-                    casts = uiState.movieDetails.casts
-                    crews = uiState.movieDetails.crews
-                    setupMovieGeneralDetails(movieDetails = uiState.movieDetails)
-                    setupCastSection(casts = uiState.movieDetails.casts,
-                        crews = uiState.movieDetails.crews)
-                    setupReviewSection(uiState.movieDetails.reviews)
-                    setupVideosSection(uiState.movieDetails.videos)
-                    setupRecommendationSection(uiState.movieDetails.recommendations
-                        ?: emptyList())
 
-                    binding.fabMain.setOnClickListener {
-                        setupFabListener(isOpen)
-                        isOpen = !isOpen
-                    }
+            uiState.userMsg?.let {
+                makeToast(it)
+                viewModel.msgShown()
+            }
 
+            isLoading(uiState.isLoadingGeneral)
 
+            val movieDetails = uiState.movieDetails
+            movieDetails?.let { details ->
+                this@MovieDetailFragment.movieDetails = movieDetails
+                val casts = details.casts
+                val crews = details.crews
+                val reviews = details.reviews
+                val videos = details.videos
+                val recommendations = details.recommendations
+
+                this@MovieDetailFragment.casts = casts
+                this@MovieDetailFragment.crews = crews
+
+                setupMovieGeneralDetails(movieDetails = details)
+                setupCastSection(casts)
+                setupReviewSection(reviews = reviews)
+                setupVideosSection(videos = videos)
+                recommendations?.let {
+                    setupRecommendationSection(recommendations = recommendations)
                 }
             }
+
+
+//            when (uiState) {
+//                is MovieDetailViewModel.MovieDetailUiState.Loading -> {
+//                    isLoading(true)
+//                }
+//                is MovieDetailViewModel.MovieDetailUiState.Error -> {
+//                    isLoading(false)
+//                }
+//                is MovieDetailViewModel.MovieDetailUiState.Success -> {
+//                    isLoading(isLoading = uiState.isLoading)
+//                    casts = uiState.movieDetails.casts
+//                    crews = uiState.movieDetails.crews
+//                    setupMovieGeneralDetails(movieDetails = uiState.movieDetails)
+//                    setupCastSection(casts = uiState.movieDetails.casts,
+//                        crews = uiState.movieDetails.crews)
+//                    setupReviewSection(uiState.movieDetails.reviews)
+//                    setupVideosSection(uiState.movieDetails.videos)
+//                    setupRecommendationSection(uiState.movieDetails.recommendations
+//                        ?: emptyList())
+//
+//                    binding.fabMain.setOnClickListener {
+//                        setupFabListener(isOpen)
+//                        isOpen = !isOpen
+//                    }
+//
+//
+//                }
+//            }
         }
 
     }
@@ -128,11 +210,18 @@ class MovieDetailFragment : Fragment() {
                 startDelay = 500
                 duration = 500
             }
+            binding.coordinator.apply {
+                isGone = false
+                animate().alpha(1F).apply {
+                    startDelay = 500
+                    duration = 500
+                }
+            }
         } else {
             binding.nestedScrollView.alpha = 0F
+            binding.coordinator.isGone = true
         }
         binding.loadingInd.isGone = !isLoading
-        binding.coordinator.isGone = !isLoading
     }
 
     private fun setTextColor(color: Int) {
@@ -149,11 +238,11 @@ class MovieDetailFragment : Fragment() {
             textColor))
     }
 
-    private fun setupCastAdapter(casts: List<Cast>, crews: List<Crew>) {
+    private fun setupCastAdapter(/*casts: List<Cast>, crews: List<Crew>*/) {
         castAdapter = MovieDetailCastAdapter(
             onCastClicked = {},
             onViewMoreClicked = {
-                navigateToCreditListFragment(casts = casts, crews = crews)
+                navigateToCreditListFragment()
             }
         )
         castAdapter.stateRestorationPolicy = PREVENT_WHEN_EMPTY
@@ -258,7 +347,6 @@ class MovieDetailFragment : Fragment() {
     private fun getAvatarPath(path: String): String {
         val output =
             if (path.contains("gravatar")) "https://${path.substringAfter("//")}" else BASE_IMG_URL + CREDIT_IMG_SIZE + path
-        Timber.i("avatar path: $output")
         return output
     }
 
@@ -403,16 +491,16 @@ class MovieDetailFragment : Fragment() {
         binding.overview.text = movieDetails.overview ?: "No overview available"
     }
 
-    private suspend fun setupCastSection(casts: List<Cast>, crews: List<Crew>) {
+    private suspend fun setupCastSection(casts: List<Cast>/*, crews: List<Crew>*/) {
         if (casts.isEmpty()) {
             binding.castContainer.isGone = true
         } else {
-            setupCastAdapter(casts = casts, crews = crews)
+            setupCastAdapter()
             castAdapter.submitList(viewModel.generateCastList(casts))
         }
 
         binding.creditTv.setOnClickListener {
-            navigateToCreditListFragment(casts = casts, crews = crews)
+            navigateToCreditListFragment()
         }
     }
 
@@ -477,7 +565,7 @@ class MovieDetailFragment : Fragment() {
         }
     }
 
-    private fun navigateToCreditListFragment(casts: List<Cast>, crews: List<Crew>) {
+    private fun navigateToCreditListFragment() {
         viewModel.saveCasts(casts)
         viewModel.saveCrews(crews)
         val action =
@@ -491,27 +579,23 @@ class MovieDetailFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun setupFabListener(isOpen: Boolean) {
-        val fabOpen = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_open)
-        val fabClose = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_close)
-        val rotateForward =
-            AnimationUtils.loadAnimation(requireContext(), R.anim.fab_rotate_forward)
-        val rotateBackward =
-            AnimationUtils.loadAnimation(requireContext(), R.anim.fab_rotate_backward)
-
-        binding.fabFavorite.isClickable = !isOpen
-        binding.fabPlaylist.isClickable = !isOpen
+    private fun toggleFab() {
 
         if (isOpen) {
             binding.fabMain.startAnimation(rotateBackward)
             binding.fabFavorite.startAnimation(fabClose)
             binding.fabPlaylist.startAnimation(fabClose)
+            binding.fabFavorite.isClickable = false
+            binding.fabPlaylist.isClickable = false
+            this@MovieDetailFragment.isOpen = false
         } else {
             binding.fabMain.startAnimation(rotateForward)
             binding.fabFavorite.startAnimation(fabOpen)
             binding.fabPlaylist.startAnimation(fabOpen)
+            binding.fabFavorite.isClickable = true
+            binding.fabPlaylist.isClickable = true
+            this@MovieDetailFragment.isOpen = true
         }
-
-
     }
+
 }

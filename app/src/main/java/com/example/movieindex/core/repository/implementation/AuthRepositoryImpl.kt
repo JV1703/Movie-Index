@@ -7,6 +7,7 @@ import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.repository.abstraction.AuthRepository
+import com.example.movieindex.core.repository.abstraction.MovieRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -15,6 +16,7 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val network: NetworkDataSource,
     private val cache: CacheDataSource,
+    private val movieRepository: MovieRepository,
 ) : AuthRepository {
 
     override suspend fun saveSessionId(sessionId: String) {
@@ -26,6 +28,31 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun clearDataStore() {
         cache.clearDataStore()
     }
+
+//    override fun requestToken(): Flow<Resource<RequestTokenResponse>> = flow {
+//        emit(Resource.Loading)
+//        val networkResource = network.requestToken()
+//        emit(networkResourceHandler(networkResource = networkResource, conversion = { it }))
+//    }.catch { t -> Timber.e("requestToken - ${t.message}") }
+//
+//    override fun loginUser(
+//        username: String,
+//        password: String,
+//        requestToken: String,
+//    ): Flow<Resource<LoginResponse>> = flow {
+//        emit(Resource.Loading)
+//        val loginBody = LoginBody(username = username,
+//            password = password,
+//            request_token = requestToken)
+//        val networkResource = network.login(loginBody = loginBody)
+//        emit(networkResourceHandler(networkResource = networkResource, conversion = {it}))
+//    }.catch { t -> Timber.e("loginUser - ${t.message}") }
+//
+//    override fun createSession(requestToken: String): Flow<Resource<SessionIdResponse>> = flow {
+//        emit(Resource.Loading)
+//        val networkResource = network.createSession(requestToken = requestToken)
+//        emit(networkResourceHandler(networkResource = networkResource, conversion = {it}))
+//    }.catch { t -> Timber.e("createSession - ${t.message}") }
 
     override fun login(username: String, password: String): Flow<Resource<SessionIdResponse>> =
         flow {
@@ -51,8 +78,26 @@ class AuthRepositoryImpl @Inject constructor(
                             when (sessionIdRequest) {
                                 is NetworkResource.Success -> {
                                     Timber.i("login request - sessionId request success - sessionId ${sessionIdRequest.data.session_id}")
-                                    saveSessionId(sessionId = sessionIdRequest.data.session_id)
-                                    emit(Resource.Success(sessionIdRequest.data))
+                                    val accountDetailsRequest =
+                                        network.getAccountDetails(sessionId = sessionIdRequest.data.session_id)
+                                    Timber.i("login request - accountDetails requesting... - sessionId ${sessionIdRequest.data.session_id}")
+                                    when (accountDetailsRequest) {
+                                        is NetworkResource.Success -> {
+                                            Timber.i("login request - accountDetails request success - accountId ${accountDetailsRequest.data.id}")
+                                            movieRepository.saveAccountId(accountId = accountDetailsRequest.data.id)
+                                            emit(Resource.Success(sessionIdRequest.data))
+                                            saveSessionId(sessionId = sessionIdRequest.data.session_id)
+                                        }
+                                        is NetworkResource.Error -> {
+                                            Timber.i("login request - accountDetails request error - errMsg ${accountDetailsRequest.errMessage}")
+                                            emit(Resource.Error(errMsg = accountDetailsRequest.errMessage,
+                                                errCode = accountDetailsRequest.errCode))
+                                        }
+                                        is NetworkResource.Empty -> {
+                                            Timber.i("login request - accountDetails request empty")
+                                            emit(Resource.Empty)
+                                        }
+                                    }
                                 }
                                 is NetworkResource.Error -> {
                                     Timber.i("login request - sessionId request error - errMsg ${sessionIdRequest.errMessage}")

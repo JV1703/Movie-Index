@@ -12,4 +12,12 @@ interface AuthRepository {
     fun getSessionId(): Flow<String>
     suspend fun clearDataStore()
 
+//    fun requestToken(): Flow<Resource<RequestTokenResponse>>
+//    fun loginUser(
+//        username: String,
+//        password: String,
+//        requestToken: String
+//    ): Flow<Resource<LoginResponse>>
+//
+//    fun createSession(requestToken: String): Flow<Resource<SessionIdResponse>>
 }

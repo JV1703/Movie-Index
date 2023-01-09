@@ -3,11 +3,11 @@ package com.example.movieindex.core.di
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.work.WorkManager
 import com.example.movieindex.core.common.ColorPalette
 import com.example.movieindex.core.data.local.MovieDatabase
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
 import com.example.movieindex.core.data.local.dao.MovieDao
-import com.example.movieindex.core.data.local.dao.MovieKeyDao
 import com.example.movieindex.core.data.local.implementation.CacheDataSourceImpl
 import com.example.movieindex.core.data.remote.MovieApi
 import com.example.movieindex.core.data.remote.NetworkConstants.CACHE_SIZE
@@ -98,12 +98,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideMovieKeyDao(
-        database: MovieDatabase,
-    ) = database.movieKeyDao()
-
-    @Provides
-    @Singleton
     fun provideNetworkDataSource(
         movieApi: MovieApi, @CoroutinesQualifiers.IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): NetworkDataSource = NetworkDataSourceImpl(movieApi = movieApi, ioDispatcher = ioDispatcher)
@@ -112,27 +106,34 @@ object AppModule {
     @Singleton
     fun provideCacheDataSource(
         movieDao: MovieDao,
-        movieKeyDao: MovieKeyDao,
         dataStore: DataStore<Preferences>,
         @CoroutinesQualifiers.IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): CacheDataSource = CacheDataSourceImpl(movieDao = movieDao,
-        movieKeyDao = movieKeyDao,
         dataStore = dataStore,
         ioDispatcher = ioDispatcher)
 
     @Provides
     @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
+        WorkManager.getInstance(context)
+
+    @Provides
+    @Singleton
     fun provideMovieRepository(
+        workManager: WorkManager,
         network: NetworkDataSource,
         cache: CacheDataSource,
-    ): MovieRepository = MovieRepositoryImpl(network = network, cache = cache)
+    ): MovieRepository =
+        MovieRepositoryImpl(workManager = workManager, network = network, cache = cache)
 
     @Provides
     @Singleton
     fun provideAuthRepository(
         network: NetworkDataSource,
         cache: CacheDataSource,
-    ): AuthRepository = AuthRepositoryImpl(network = network, cache = cache)
+        movieRepository: MovieRepository,
+    ): AuthRepository =
+        AuthRepositoryImpl(network = network, cache = cache, movieRepository = movieRepository)
 
     @Provides
     @Singleton

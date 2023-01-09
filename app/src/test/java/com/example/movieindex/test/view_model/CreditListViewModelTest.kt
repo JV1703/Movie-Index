@@ -7,19 +7,16 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.movieindex.core.data.remote.model.details.toMovieDetails
 import com.example.movieindex.fake.datastore.FakePreferenceDataStore
 import com.example.movieindex.fake.use_case.FakeMovieUseCase
-import com.example.movieindex.feature.detail.movie.MovieDetailViewModel
 import com.example.movieindex.feature.list.credit_list.CreditListViewModel
 import com.example.movieindex.util.MainCoroutineRule
 import com.example.movieindex.util.TestDataFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
@@ -57,7 +54,7 @@ class CreditListViewModelTest {
     // This likely means that there are multiple instances of DataStore for this file. Ensure that you are only creating a single instance of datastore for this file.
     // not resolved yet, tracker: https://github.com/googlecodelabs/android-datastore/issues/48
 //    @Test
-    fun credits_returnTheCorrectDataType()= runTest{
+    fun credits_returnTheCorrectDataType() = runTest {
         val castData = testDataFactory.generateMovieDetailsTestData().toMovieDetails().casts
         val crewData = testDataFactory.generateMovieDetailsTestData().toMovieDetails().crews
 

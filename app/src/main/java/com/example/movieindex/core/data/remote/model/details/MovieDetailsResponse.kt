@@ -31,7 +31,7 @@ data class MovieDetailsResponse(
     @Json(name = "spoken_languages") val spoken_languages: List<SpokenLanguageResponse>,
     @Json(name = "status") val status: String?,
     @Json(name = "tagline") val tagline: String?,
-    @Json(name = "title") val title: String?,
+    @Json(name = "title") val title: String,
     @Json(name = "video") val video: Boolean?,
     @Json(name = "videos") val videos: VideosResponse?,
     @Json(name = "vote_average") val vote_average: Double?,
@@ -58,5 +58,7 @@ fun MovieDetailsResponse.toMovieDetails() = MovieDetails(
     voteAverage = vote_average,
     reviews = reviews?.results?.map { it.toReviewResult() } ?: emptyList(),
     mpaaRating = release_dates?.results?.find { it.iso_3166_1 == "US" }?.release_dates?.find { it.certification != null && it.certification.isNotEmpty() }?.certification
-        ?: ""
+        ?: "",
+    isFavorite = false,
+    isBookmark = false
 )

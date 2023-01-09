@@ -1,14 +1,18 @@
 package com.example.movieindex.core.data.remote.implementation
 
-import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.MovieApi
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
+import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.data.remote.model.common.MoviesResponse
+import com.example.movieindex.core.data.remote.model.common.PostResponse
 import com.example.movieindex.core.data.remote.model.details.MovieDetailsResponse
+import com.example.movieindex.core.data.remote.model.favorite.body.FavoriteBody
+import com.example.movieindex.core.data.remote.model.watchlist.body.WatchListBody
 import com.example.movieindex.core.data.remote.safeNetworkCall
 import com.example.movieindex.core.di.CoroutinesQualifiers
 import kotlinx.coroutines.CoroutineDispatcher
@@ -108,4 +112,63 @@ class NetworkDataSourceImpl @Inject constructor(
             networkCall = { movieApi.createSession(requestToken) },
             conversion = { it })
 
+    override suspend fun getAccountDetails(sessionId: String): NetworkResource<AccountDetailsResponse> =
+        safeNetworkCall(
+            dispatcher = ioDispatcher,
+            networkCall = { movieApi.getAccountDetails(sessionId = sessionId) },
+            conversion = { it })
+
+    override suspend fun addToFavorite(
+        accountId: Int,
+        sessionId: String,
+        body: FavoriteBody,
+    ): NetworkResource<PostResponse> =
+        safeNetworkCall(dispatcher = ioDispatcher,
+            networkCall = {
+                movieApi.addToFavorite(accountId = accountId,
+                    sessionId = sessionId,
+                    body = body)
+            },
+            conversion = { it })
+
+    override suspend fun addToWatchList(
+        accountId: Int,
+        sessionId: String,
+        body: WatchListBody
+    ): NetworkResource<PostResponse> =
+        safeNetworkCall(dispatcher = ioDispatcher,
+            networkCall = { movieApi.addToWatchList(accountId = accountId, sessionId = sessionId, body = body) },
+            conversion = { it })
+
+    override suspend fun getFavoriteList(
+        accountId: String,
+        sessionId: String,
+        page: Int,
+        language: String?,
+        sortBy: String?,
+    ): NetworkResource<MoviesResponse> = safeNetworkCall(dispatcher = ioDispatcher,
+        networkCall = {
+            movieApi.getFavoriteList(accountId = accountId,
+                sessionId = sessionId,
+                page = page,
+                language = language,
+                sortBy = sortBy)
+        },
+        conversion = { it })
+
+    override suspend fun getWatchList(
+        accountId: String,
+        sessionId: String,
+        page: Int,
+        language: String?,
+        sortBy: String?,
+    ): NetworkResource<MoviesResponse> = safeNetworkCall(dispatcher = ioDispatcher,
+        networkCall = {
+            movieApi.getWatchList(accountId = accountId,
+                sessionId = sessionId,
+                page = page,
+                language = language,
+                sortBy = sortBy)
+        },
+        conversion = { it })
 }

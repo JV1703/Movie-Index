@@ -2,25 +2,27 @@ package com.example.movieindex.feature.common.domain.implementation
 
 import androidx.paging.PagingData
 import com.example.movieindex.core.data.external.*
+import com.example.movieindex.core.data.remote.model.common.PostResponse
 import com.example.movieindex.core.repository.abstraction.MovieRepository
 import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class MovieUseCaseImpl @Inject constructor(private val repository: MovieRepository) : MovieUseCase {
+class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRepository) :
+    MovieUseCase {
 
     override fun getNowPlaying(
         page: Int,
         language: String?,
         region: String?,
     ): Flow<Resource<List<Result>>> =
-        repository.getNowPlaying(page = page, language = language, region = region)
+        movieRepository.getNowPlaying(page = page, language = language, region = region)
 
     override fun getPopularMovies(
         page: Int,
         language: String?,
         region: String?,
-    ): Flow<Resource<List<Result>>> = repository.getNowPlaying(page = page,
+    ): Flow<Resource<List<Result>>> = movieRepository.getNowPlaying(page = page,
         language = language,
         region = region)
 
@@ -28,7 +30,7 @@ class MovieUseCaseImpl @Inject constructor(private val repository: MovieReposito
         page: Int,
         mediaType: String,
         timeWindow: String,
-    ): Flow<Resource<List<Result>>> = repository.getTrendingMovies(page = page,
+    ): Flow<Resource<List<Result>>> = movieRepository.getTrendingMovies(page = page,
         mediaType = mediaType,
         timeWindow = timeWindow)
 
@@ -37,7 +39,7 @@ class MovieUseCaseImpl @Inject constructor(private val repository: MovieReposito
         movieId: Int,
         language: String?,
         appendToResponse: String?,
-    ): Flow<Resource<MovieDetails>> = repository.getMovieDetails(movieId = movieId,
+    ): Flow<Resource<MovieDetails>> = movieRepository.getMovieDetails(movieId = movieId,
         language = language,
         appendToResponse = appendToResponse)
 
@@ -46,7 +48,7 @@ class MovieUseCaseImpl @Inject constructor(private val repository: MovieReposito
         region: String?,
         language: String?,
     ): Flow<PagingData<Result>> =
-        repository.getNowPlayingPagingSource(loadSinglePage = loadSinglePage,
+        movieRepository.getNowPlayingPagingSource(loadSinglePage = loadSinglePage,
             region = region,
             language = language)
 
@@ -55,7 +57,7 @@ class MovieUseCaseImpl @Inject constructor(private val repository: MovieReposito
         region: String?,
         language: String?,
     ): Flow<PagingData<Result>> =
-        repository.getPopularMoviesPagingSource(loadSinglePage = loadSinglePage,
+        movieRepository.getPopularMoviesPagingSource(loadSinglePage = loadSinglePage,
             region = region,
             language = language)
 
@@ -64,7 +66,7 @@ class MovieUseCaseImpl @Inject constructor(private val repository: MovieReposito
         mediaType: String,
         timeWindow: String,
     ): Flow<PagingData<Result>> =
-        repository.getTrendingMoviesPagingSource(loadSinglePage = loadSinglePage,
+        movieRepository.getTrendingMoviesPagingSource(loadSinglePage = loadSinglePage,
             mediaType = mediaType,
             timeWindow = timeWindow)
 
@@ -73,7 +75,7 @@ class MovieUseCaseImpl @Inject constructor(private val repository: MovieReposito
         movieId: Int,
         language: String?,
     ): Flow<PagingData<Result>> =
-        repository.getMovieRecommendationPagingSource(loadSinglePage = loadSinglePage,
+        movieRepository.getMovieRecommendationPagingSource(loadSinglePage = loadSinglePage,
             movieId = movieId,
             language = language)
 
@@ -85,7 +87,7 @@ class MovieUseCaseImpl @Inject constructor(private val repository: MovieReposito
         region: String?,
         year: Int?,
         primaryReleaseYear: Int?,
-    ) = repository.searchMoviesPagingSource(
+    ) = movieRepository.searchMoviesPagingSource(
         loadSinglePage = loadSinglePage,
         query = query,
         language = language,
@@ -93,15 +95,44 @@ class MovieUseCaseImpl @Inject constructor(private val repository: MovieReposito
         region = region,
         year = year)
 
+    override fun addToFavorite(
+        favorite: Boolean,
+        mediaId: Int,
+        mediaType: String,
+    ) =
+        movieRepository.addToFavorite(
+            favorite = favorite,
+            mediaId = mediaId,
+            mediaType = mediaType)
+
+    override fun addToWatchList(
+        watchlist: Boolean,
+        mediaId: Int,
+        mediaType: String
+    ) = movieRepository.addToWatchList(
+        watchlist = watchlist,
+        mediaId = mediaId,
+        mediaType = mediaType)
+
     override suspend fun saveCasts(casts: List<Cast>) {
-        repository.saveCasts(casts)
+        movieRepository.saveCasts(casts)
     }
 
-    override fun getCasts(): Flow<List<Cast>> = repository.getCasts()
+    override fun getCasts(): Flow<List<Cast>> = movieRepository.getCasts()
 
     override suspend fun saveCrews(crews: List<Crew>) {
-        repository.saveCrews(crews)
+        movieRepository.saveCrews(crews)
     }
 
-    override fun getCrews(): Flow<List<Crew>> = repository.getCrews()
+    override fun getCrews(): Flow<List<Crew>> = movieRepository.getCrews()
+
+    override fun getAccountId(): Flow<Int> = movieRepository.getAccountId()
+
+    override suspend fun insertMovie(movieDetails: MovieDetails) {
+        movieRepository.insertMovie(movie = movieDetails)
+    }
+
+    override fun getCachedMovie(movieId: Int): Flow<SavedMovie?> =
+        movieRepository.getCachedMovie(movieId = movieId)
+
 }

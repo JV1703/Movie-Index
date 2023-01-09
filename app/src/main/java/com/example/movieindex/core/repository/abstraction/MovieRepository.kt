@@ -2,6 +2,8 @@ package com.example.movieindex.core.repository.abstraction
 
 import androidx.paging.PagingData
 import com.example.movieindex.core.data.external.*
+import com.example.movieindex.core.data.local.model.MovieEntity
+import com.example.movieindex.core.data.remote.model.common.PostResponse
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {
@@ -74,4 +76,42 @@ interface MovieRepository {
     fun getCasts(): Flow<List<Cast>>
     suspend fun saveCrews(crews: List<Crew>)
     fun getCrews(): Flow<List<Crew>>
+    suspend fun saveAccountId(accountId: Int)
+    fun getAccountId(): Flow<Int>
+    fun getAccountDetails(sessionId: String): Flow<Resource<AccountDetails>>
+    fun addToFavorite(
+        favorite: Boolean,
+        mediaId: Int,
+        mediaType: String = "movie",
+    )
+
+    fun addToWatchList(
+        watchlist: Boolean,
+        mediaId: Int,
+        mediaType: String = "movie",
+    )
+
+    fun getFavoriteListPagingSource(
+        accountId: String,
+        sessionId: String,
+        loadSinglePage: Boolean = false,
+        language: String? = null,
+        sortBy: String? = null,
+    ): Flow<PagingData<Result>>
+
+    fun getWatchListPagingSource(
+        accountId: String,
+        sessionId: String,
+        loadSinglePage: Boolean = false,
+        language: String? = null,
+        sortBy: String? = null,
+    ): Flow<PagingData<Result>>
+
+    suspend fun insertMovie(movie: MovieDetails)
+    fun getCachedMovie(movieId: Int): Flow<SavedMovie?>
+    fun getFavoriteMovies(): Flow<List<SavedMovie>>
+    fun getBookmarkedMovies(): Flow<List<SavedMovie>>
+    suspend fun updateBookmark(isBookmark: Boolean)
+    suspend fun updateFavorite(isFavorite: Boolean)
+    suspend fun deleteMovie(movieId: Int)
 }

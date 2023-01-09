@@ -6,6 +6,7 @@ import com.example.movieindex.core.repository.abstraction.AuthRepository
 import com.example.movieindex.feature.auth.domain.abstraction.AuthUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 class AuthUseCaseImpl @Inject constructor(private val repository: AuthRepository) :
@@ -16,6 +17,7 @@ class AuthUseCaseImpl @Inject constructor(private val repository: AuthRepository
             password = password)
 
     override fun isUserLoggedIn(): Flow<Boolean> = getSessionId().map {
+        Timber.i("cached sessionId - $it")
         it.isNotEmpty()
     }
 
@@ -28,4 +30,5 @@ class AuthUseCaseImpl @Inject constructor(private val repository: AuthRepository
     override suspend fun clearDataStore() {
         repository.clearDataStore()
     }
+
 }

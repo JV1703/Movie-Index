@@ -1,10 +1,8 @@
 package com.example.movieindex.core.data.external
 
 import com.example.movieindex.core.data.local.model.MovieEntity
-import com.example.movieindex.core.data.local.model.MoviePagingCategory
 
 data class Result(
-    val id: Int?,
     val movieId: Int,
     val title: String,
     val genres: List<String>,
@@ -15,22 +13,16 @@ data class Result(
     val adult: Boolean,
     val voteAverage: Double?,
     val releaseDate: String?,
-    val pagingCategory: MoviePagingCategory?,
 )
 
-fun Result.toMovieEntity(pagingCategory: MoviePagingCategory) = MovieEntity(
-    id = id,
+fun Result.toMovieEntity(isFavorite: Boolean, isBookmark: Boolean) = MovieEntity(
     movieId = movieId,
     title = title,
     overview = overview,
-    genreIds = genres,
-    popularity = popularity,
     posterPath = posterPath,
-    backdropPath = backdropPath,
-    adult = adult,
-    voteAverage = voteAverage,
     releaseDate = releaseDate,
-    pagingCategory = pagingCategory
+    isFavorite = isFavorite,
+    isBookmark = isBookmark
 )
 
 val genreList = mapOf(

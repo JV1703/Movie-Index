@@ -1,33 +1,34 @@
 package com.example.movieindex.core.data.local.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.movieindex.core.data.local.model.MovieEntity
-import com.example.movieindex.core.data.local.model.MoviePagingCategory
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MovieDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAllMovies(movies: List<MovieEntity>)
+    suspend fun insertMovie(movie: MovieEntity)
 
-    @Query("SELECT * FROM movies_table WHERE pagingCategory = :pagingCategory")
-    fun getMovies(pagingCategory: MoviePagingCategory): PagingSource<Int, MovieEntity>
+    @Query("SELECT * FROM movies_table WHERE movieId = :movieId")
+    fun getMovie(movieId: Int): Flow<MovieEntity?>
 
-    @Query("SELECT * FROM movies_table WHERE pagingCategory = :pagingCategory")
-    fun getMoviesWithReferenceToPagingCategory(pagingCategory: MoviePagingCategory): Flow<List<MovieEntity>>
+    @Query("SELECT * FROM movies_table WHERE isFavorite = 1")
+    fun getFavoriteMovies(): Flow<List<MovieEntity>>
 
-    @Query("SELECT * FROM movies_table")
-    fun getAllMovies(): Flow<List<MovieEntity>>
+    @Query("SELECT * FROM movies_table WHERE isBookmark = 1")
+    fun getBookmarkedMovies(): Flow<List<MovieEntity>>
 
-    @Query("DELETE FROM movies_table WHERE pagingCategory = :pagingCategory")
-    suspend fun clearMovies(pagingCategory: MoviePagingCategory)
+    @Query("UPDATE movies_table SET isBookmark = :isBookmark")
+    suspend fun updateBookmark(isBookmark: Boolean)
 
-    @Query("SELECT * FROM movies_table")
-    fun getMovies(): Flow<List<MovieEntity>>
+    @Query("UPDATE movies_table SET isFavorite = :isFavorite")
+    suspend fun updateFavorite(isFavorite: Boolean)
+
+    @Query("DELETE FROM movies_table WHERE movieId = :movieId")
+    suspend fun deleteMovie(movieId: Int)
 
 }

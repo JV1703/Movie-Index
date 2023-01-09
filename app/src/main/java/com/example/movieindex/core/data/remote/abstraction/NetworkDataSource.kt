@@ -1,12 +1,16 @@
 package com.example.movieindex.core.data.remote.abstraction
 
-import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.NetworkResource
+import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.data.remote.model.common.MoviesResponse
+import com.example.movieindex.core.data.remote.model.common.PostResponse
 import com.example.movieindex.core.data.remote.model.details.MovieDetailsResponse
+import com.example.movieindex.core.data.remote.model.favorite.body.FavoriteBody
+import com.example.movieindex.core.data.remote.model.watchlist.body.WatchListBody
 
 interface NetworkDataSource {
 
@@ -50,4 +54,32 @@ interface NetworkDataSource {
     suspend fun createSession(requestToken: String): NetworkResource<SessionIdResponse>
     suspend fun login(loginBody: LoginBody): NetworkResource<LoginResponse>
 
+    suspend fun getAccountDetails(sessionId: String): NetworkResource<AccountDetailsResponse>
+    suspend fun addToFavorite(
+        accountId: Int,
+        sessionId: String,
+        body: FavoriteBody,
+    ): NetworkResource<PostResponse>
+
+    suspend fun addToWatchList(
+        accountId: Int,
+        sessionId: String,
+        body: WatchListBody,
+    ): NetworkResource<PostResponse>
+
+    suspend fun getFavoriteList(
+        accountId: String,
+        sessionId: String,
+        page: Int = 1,
+        language: String? = null,
+        sortBy: String? = null,
+    ): NetworkResource<MoviesResponse>
+
+    suspend fun getWatchList(
+        accountId: String,
+        sessionId: String,
+        page: Int = 1,
+        language: String? = null,
+        sortBy: String? = null,
+    ): NetworkResource<MoviesResponse>
 }

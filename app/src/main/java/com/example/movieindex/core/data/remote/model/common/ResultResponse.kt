@@ -4,7 +4,6 @@ package com.example.movieindex.core.data.remote.model.common
 import com.example.movieindex.core.data.external.Result
 import com.example.movieindex.core.data.external.movieGenreMapper
 import com.example.movieindex.core.data.local.model.MovieEntity
-import com.example.movieindex.core.data.local.model.MoviePagingCategory
 import com.squareup.moshi.Json
 
 data class ResultResponse(
@@ -25,8 +24,7 @@ data class ResultResponse(
     @Json(name = "vote_count") val vote_count: Int?,
 )
 
-fun ResultResponse.toResult(pagingCategory: MoviePagingCategory? = null) = Result(
-    id = id,
+fun ResultResponse.toResult() = Result(
     movieId = id,
     title = title,
     genres = movieGenreMapper(genre_ids),
@@ -36,20 +34,15 @@ fun ResultResponse.toResult(pagingCategory: MoviePagingCategory? = null) = Resul
     adult = adult,
     voteAverage = vote_average,
     releaseDate = release_date,
-    overview = overview,
-    pagingCategory = pagingCategory
+    overview = overview
 )
 
-fun ResultResponse.toMovieEntity(pagingCategory: MoviePagingCategory) = MovieEntity(
+fun ResultResponse.toMovieEntity(isFavorite: Boolean, isBookmark: Boolean) = MovieEntity(
     movieId = id,
     title = title,
-    genreIds = movieGenreMapper(genre_ids),
     overview = overview,
-    popularity = popularity,
     posterPath = poster_path,
-    backdropPath = backdrop_path,
-    adult = adult,
-    voteAverage = vote_average,
     releaseDate = release_date,
-    pagingCategory = pagingCategory
+    isFavorite = isFavorite,
+    isBookmark = isBookmark
 )

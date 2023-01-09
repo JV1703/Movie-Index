@@ -2,6 +2,7 @@ package com.example.movieindex.feature.common.domain.abstraction
 
 import androidx.paging.PagingData
 import com.example.movieindex.core.data.external.*
+import com.example.movieindex.core.data.remote.model.common.PostResponse
 import kotlinx.coroutines.flow.Flow
 
 interface MovieUseCase {
@@ -68,4 +69,19 @@ interface MovieUseCase {
     fun getCasts(): Flow<List<Cast>>
     suspend fun saveCrews(crews: List<Crew>)
     fun getCrews(): Flow<List<Crew>>
+    fun addToFavorite(
+        favorite: Boolean,
+        mediaId: Int,
+        mediaType: String = "movie"
+    )
+
+    fun addToWatchList(
+        watchlist: Boolean,
+        mediaId: Int,
+        mediaType: String = "movie"
+    )
+
+    fun getAccountId(): Flow<Int>
+    suspend fun insertMovie(movieDetails: MovieDetails)
+    fun getCachedMovie(movieId: Int): Flow<SavedMovie?>
 }

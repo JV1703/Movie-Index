@@ -4,16 +4,26 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.work.*
+import com.example.movieindex.core.common.WorkerConstants.FAVORITE_WORKER_FAVORITE_KEY
+import com.example.movieindex.core.common.WorkerConstants.WATCH_LIST_WORKER_WATCH_LIST_KEY
+import com.example.movieindex.core.common.WorkerConstants.WORKER_MOVIE_ID_KEY
+import com.example.movieindex.core.common.WorkerConstants.WORKER_MOVIE_TYPE_KEY
 import com.example.movieindex.core.data.external.*
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
+import com.example.movieindex.core.data.local.model.toSavedMovie
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
+import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
+import com.example.movieindex.core.data.remote.model.account.toAccountDetails
 import com.example.movieindex.core.data.remote.model.common.MoviesResponse
 import com.example.movieindex.core.data.remote.model.common.toResult
 import com.example.movieindex.core.data.remote.model.details.MovieDetailsResponse
 import com.example.movieindex.core.data.remote.model.details.toMovieDetails
 import com.example.movieindex.core.repository.abstraction.MovieRepository
 import com.example.movieindex.core.repository.paging.MoviesPagingSource
+import com.example.movieindex.feature.detail.movie.worker.FavoriteWorker
+import com.example.movieindex.feature.detail.movie.worker.WatchListWorker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +31,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 fun <T, R> networkResourceHandler(
@@ -44,6 +55,7 @@ fun <T, R> networkResourceHandler(
 }
 
 class MovieRepositoryImpl @Inject constructor(
+    private val workManager: WorkManager,
     private val network: NetworkDataSource,
     private val cache: CacheDataSource,
 ) : MovieRepository {
@@ -164,6 +176,71 @@ class MovieRepositoryImpl @Inject constructor(
 
     }.catch { t -> Timber.e("getMovieDetails: ${t.message}") }
 
+    override fun getAccountDetails(sessionId: String): Flow<Resource<AccountDetails>> = flow {
+        emit(Resource.Loading)
+
+        val networkResource = network.getAccountDetails(sessionId = sessionId)
+
+        emit(networkResourceHandler(networkResource) { accountDetailsResponse: AccountDetailsResponse ->
+            accountDetailsResponse.toAccountDetails()
+        })
+    }.catch { t -> Timber.e("getAccountDetails: ${t.message}") }
+
+    override fun addToFavorite(
+        favorite: Boolean,
+        mediaId: Int,
+        mediaType: String,
+    ) {
+
+        val request = OneTimeWorkRequestBuilder<FavoriteWorker>()
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+                .build())
+            .setInputData(
+                workDataOf(
+                    FAVORITE_WORKER_FAVORITE_KEY to favorite,
+                    WORKER_MOVIE_ID_KEY to mediaId,
+                    WORKER_MOVIE_TYPE_KEY to mediaType
+                )
+            )
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
+                OneTimeWorkRequest.MAX_BACKOFF_MILLIS,
+                TimeUnit.MINUTES)
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "addToFavoriteWork",
+            ExistingWorkPolicy.APPEND_OR_REPLACE,
+            request)
+    }
+
+    override fun addToWatchList(
+        watchlist: Boolean,
+        mediaId: Int,
+        mediaType: String,
+    ) {
+        val request = OneTimeWorkRequestBuilder<WatchListWorker>()
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+                .build())
+            .setInputData(
+                workDataOf(
+                    WATCH_LIST_WORKER_WATCH_LIST_KEY to watchlist,
+                    WORKER_MOVIE_ID_KEY to mediaId,
+                    WORKER_MOVIE_TYPE_KEY to mediaType
+                )
+            )
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
+                OneTimeWorkRequest.MAX_BACKOFF_MILLIS,
+                TimeUnit.MINUTES)
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "addToFavoriteWork",
+            ExistingWorkPolicy.APPEND_OR_REPLACE,
+            request)
+    }
+
     override fun searchMoviesPagingSource(
         loadSinglePage: Boolean,
         query: String,
@@ -205,6 +282,46 @@ class MovieRepositoryImpl @Inject constructor(
     }).flow.map { pagingData -> pagingData.map { it.toResult() } }
         .catch { t -> Timber.e("getMovieRecommendationPagingSource: ${t.message}") }
 
+    override fun getFavoriteListPagingSource(
+        accountId: String,
+        sessionId: String,
+        loadSinglePage: Boolean,
+        language: String?,
+        sortBy: String?,
+    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
+        pageSize = 20, enablePlaceholders = false
+    ), pagingSourceFactory = {
+        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
+            network.getFavoriteList(
+                accountId = accountId,
+                sessionId = sessionId,
+                page = page,
+                language = language,
+                sortBy = sortBy)
+        })
+    }).flow.map { pagingData -> pagingData.map { it.toResult() } }
+        .catch { t -> Timber.e("getFavoriteListPagingSource: ${t.message}") }
+
+    override fun getWatchListPagingSource(
+        accountId: String,
+        sessionId: String,
+        loadSinglePage: Boolean,
+        language: String?,
+        sortBy: String?,
+    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
+        pageSize = 20, enablePlaceholders = false
+    ), pagingSourceFactory = {
+        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
+            network.getWatchList(
+                accountId = accountId,
+                sessionId = sessionId,
+                page = page,
+                language = language,
+                sortBy = sortBy)
+        })
+    }).flow.map { pagingData -> pagingData.map { it.toResult() } }
+        .catch { t -> Timber.e("getWatchListPagingSource: ${t.message}") }
+
     override suspend fun saveCasts(casts: List<Cast>) {
         val castString = Gson().toJson(casts)
         cache.saveCasts(castString)
@@ -226,5 +343,40 @@ class MovieRepositoryImpl @Inject constructor(
         val listType = object : TypeToken<List<Crew>>() {}.type
         gson.fromJson<List<Crew>>(it, listType)
     }.catch { t -> Timber.e("getCasts: ${t.message}") }
+
+    override suspend fun saveAccountId(accountId: Int) {
+        cache.saveAccountId(accountId = accountId)
+    }
+
+    override fun getAccountId(): Flow<Int> = cache.getAccountId()
+
+    override suspend fun insertMovie(movie: MovieDetails) {
+        val entity = movie.toMovieEntity()
+        cache.insertMovie(entity)
+    }
+
+    override fun getCachedMovie(movieId: Int): Flow<SavedMovie?> =
+        cache.getMovie(movieId).map { it?.toSavedMovie() }
+            .catch { t -> Timber.e("getMovie: ${t.message}") }
+
+    override fun getFavoriteMovies(): Flow<List<SavedMovie>> =
+        cache.getFavoriteMovies().map { it.map { it.toSavedMovie() } }
+            .catch { t -> Timber.e("getFavoriteMovies: ${t.message}") }
+
+    override fun getBookmarkedMovies(): Flow<List<SavedMovie>> =
+        cache.getFavoriteMovies().map { it.map { it.toSavedMovie() } }
+            .catch { t -> Timber.e("getBookmarkedMovies: ${t.message}") }
+
+    override suspend fun updateBookmark(isBookmark: Boolean) {
+        cache.updateBookmark(isBookmark = isBookmark)
+    }
+
+    override suspend fun updateFavorite(isFavorite: Boolean) {
+        cache.updateFavorite(isFavorite = isFavorite)
+    }
+
+    override suspend fun deleteMovie(movieId: Int) {
+        cache.deleteMovie(movieId = movieId)
+    }
 
 }
