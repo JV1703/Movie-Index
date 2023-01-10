@@ -9,18 +9,21 @@ interface MovieUseCase {
         page: Int = 1,
         language: String? = null,
         region: String? = null,
+        
     ): Flow<Resource<List<Result>>>
 
     fun getPopularMovies(
         page: Int = 1,
         language: String? = null,
         region: String? = null,
+        
     ): Flow<Resource<List<Result>>>
 
     fun getTrendingMovies(
         page: Int = 1,
         mediaType: String = "movie",
         timeWindow: String = "week",
+        
     ): Flow<Resource<List<Result>>>
 
     fun getMovieDetails(
@@ -88,7 +91,7 @@ interface MovieUseCase {
     )
 
     fun getCachedMovie(movieId: Int): Flow<SavedMovie?>
-    suspend fun updateBookmark(movieId: Int, isBookmarked: Boolean)
-    suspend fun updateFavorite(movieId: Int, isFavorite: Boolean)
-    suspend fun deleteSavedMovie(movieId: Int)
+    suspend fun updateBookmarkCache(movieId: Int, isBookmarked: Boolean)
+    suspend fun updateFavoriteCache(movieId: Int, isFavorite: Boolean)
+    suspend fun deleteSavedMovieCache(movieId: Int)
 }

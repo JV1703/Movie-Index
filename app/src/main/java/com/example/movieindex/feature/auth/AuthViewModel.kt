@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.movieindex.core.data.external.Resource
 import com.example.movieindex.core.data.remote.NetworkConstants.TMDB_RESET_PASSWORD
 import com.example.movieindex.core.data.remote.NetworkConstants.TMDB_SIGN_UP_URL
-import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.feature.auth.domain.abstraction.AuthUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,6 +20,8 @@ class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : 
 
     private val _authUiState = MutableStateFlow<AuthUiState>(AuthUiState.IsNotLoggedIn())
     val authUiState = _authUiState.asStateFlow()
+
+    private var job: Job? = null
 
     init {
         authUseCase.isUserLoggedIn().map { isLoggedIn: Boolean ->
@@ -56,7 +58,9 @@ class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : 
 
     private fun login(username: String, password: String) {
 
-        authUseCase.login(username = username, password = password).map { loginResource ->
+        if(job != null) return
+
+        job = authUseCase.login(username = username, password = password).map { loginResource ->
             when (loginResource) {
                 is Resource.Loading -> {
                     _authUiState.value = AuthUiState.IsNotLoggedIn(isLoading = true)
@@ -64,16 +68,19 @@ class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : 
                 is Resource.Empty -> {
                     _authUiState.value = AuthUiState.IsNotLoggedIn(isLoading = false)
                     _loginEvents.emit(AuthEvents.AuthError(errMsg = "Unknown Error"))
+                    job = null
                 }
                 is Resource.Success -> {
                     _authUiState.value = AuthUiState.IsNotLoggedIn(isLoading = false)
                     _loginEvents.emit(AuthEvents.Success)
+                    job = null
 
                 }
                 is Resource.Error -> {
                     _authUiState.value = AuthUiState.IsNotLoggedIn(isLoading = false)
                     _loginEvents.emit(AuthEvents.AuthError(errMsg = loginResource.errMsg
                         ?: "Unknown Error"))
+                    job = null
                 }
             }
         }.launchIn(viewModelScope)
@@ -96,12 +103,5 @@ class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : 
         Register(TMDB_SIGN_UP_URL),
         ForgetPassword(TMDB_RESET_PASSWORD)
     }
-
-    data class AuthState(
-        val isLoading: Boolean = false,
-        val isLoggedIn: Boolean = false,
-        val loginResult: Resource<SessionIdResponse>,
-        val userMsg: String? = null
-    )
 
 }

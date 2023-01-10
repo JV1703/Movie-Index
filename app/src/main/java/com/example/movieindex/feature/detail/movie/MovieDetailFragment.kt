@@ -41,6 +41,7 @@ import com.example.movieindex.feature.yt_player.YtPlayerActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -106,7 +107,7 @@ class MovieDetailFragment : Fragment() {
         }
 
         collectLatestLifecycleFlow(viewModel.uiState) { uiState ->
-
+            Timber.i("MovieDetails - redrawn")
             uiState.userMsg?.let {
                 makeToast(it)
                 viewModel.msgShown()
@@ -425,7 +426,6 @@ class MovieDetailFragment : Fragment() {
         movieDetails.posterPath?.let {
             binding.moviePoster.loadImage(BASE_IMG_URL + POSTER_SIZE_LARGE + movieDetails.posterPath,
                 onLoadFailed = {
-
                     binding.posterContainer.background =
                         GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
                             intArrayOf(defaultDominantColor,

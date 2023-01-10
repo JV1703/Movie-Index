@@ -1,18 +1,21 @@
 package com.example.movieindex.fake.apis
 
 import com.example.movieindex.core.data.remote.MovieApi
+import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
 import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.data.remote.model.common.MoviesResponse
+import com.example.movieindex.core.data.remote.model.common.PostResponse
 import com.example.movieindex.core.data.remote.model.details.MovieDetailsResponse
+import com.example.movieindex.core.data.remote.model.favorite.body.FavoriteBody
+import com.example.movieindex.core.data.remote.model.watchlist.body.WatchListBody
 import com.example.movieindex.util.TestDataFactory
 import retrofit2.Response
 
-class FakeMovieApi:MovieApi {
+class FakeMovieApi(private val testDataFactory: TestDataFactory) : MovieApi {
 
-    private val testDataFactory = TestDataFactory()
     var isSuccess = true
     var isBodyEmpty = false
 
@@ -97,4 +100,50 @@ class FakeMovieApi:MovieApi {
             Response.success(testDataFactory.generateSessionIdTestData())
         }
     }
+
+    override suspend fun getAccountDetails(sessionId: String): Response<AccountDetailsResponse> {
+        return testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(testDataFactory.generateAccountDetailsResponseTestData()) }
+    }
+
+    override suspend fun addToFavorite(
+        accountId: Int,
+        sessionId: String,
+        body: FavoriteBody,
+    ): Response<PostResponse> {
+        return testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(testDataFactory.generatePostResponseTestData()) }
+    }
+
+    override suspend fun addToWatchList(
+        accountId: Int,
+        sessionId: String,
+        body: WatchListBody,
+    ): Response<PostResponse> {
+        return testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(testDataFactory.generatePostResponseTestData()) }
+    }
+
+    override suspend fun getFavoriteList(
+        accountId: Int,
+        sessionId: String,
+        page: Int,
+        language: String?,
+        sortBy: String?,
+    ): Response<MoviesResponse> {
+        return testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(testDataFactory.generateFavoriteMoviesListResponseTestData()) }
+    }
+
+    override suspend fun getWatchList(
+        accountId: Int,
+        sessionId: String,
+        page: Int,
+        language: String?,
+        sortBy: String?,
+    ): Response<MoviesResponse> {
+        return testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(testDataFactory.generateWatchListResponseTestData()) }
+    }
+
 }

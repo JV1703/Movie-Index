@@ -41,7 +41,7 @@ class CacheDataSourceImpl @Inject constructor(
             .flowOn(ioDispatcher)
 
     override fun getBookmarkedMovies(): Flow<List<MovieEntity>> =
-        movieDao.getFavoriteMovies().catch { t -> Timber.e("getBookmarkedMovies: ${t.message}") }
+        movieDao.getBookmarkedMovies().catch { t -> Timber.e("getBookmarkedMovies: ${t.message}") }
             .flowOn(ioDispatcher)
 
     override suspend fun updateBookmark(movieId: Int, isBookmark: Boolean) {

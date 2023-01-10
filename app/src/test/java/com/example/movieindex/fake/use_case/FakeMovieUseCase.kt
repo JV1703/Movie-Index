@@ -184,4 +184,40 @@ class FakeMovieUseCase(
         val listType = object : TypeToken<List<Crew>>() {}.type
         gson.fromJson<List<Crew>>(castString, listType)
     }.flowOn(testDispatcher)
+
+    override fun addToFavorite(favorite: Boolean, mediaId: Int, mediaType: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun addToWatchList(watchlist: Boolean, mediaId: Int, mediaType: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAccountId(): Flow<Int> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun insertMovieToCache(
+        movieDetails: MovieDetails,
+        isFavorite: Boolean,
+        isBookmarked: Boolean,
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getCachedMovie(movieId: Int): Flow<SavedMovie?> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateBookmarkCache(movieId: Int, isBookmarked: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateFavoriteCache(movieId: Int, isFavorite: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteSavedMovieCache(movieId: Int) {
+        TODO("Not yet implemented")
+    }
 }

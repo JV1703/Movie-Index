@@ -11,6 +11,7 @@ import com.example.movieindex.fake.data_source.FakeCacheDataSource
 import com.example.movieindex.fake.data_source.FakeNetworkDataSource
 import com.example.movieindex.fake.datastore.FakePreferenceDataStore
 import com.example.movieindex.util.MainCoroutineRule
+import com.example.movieindex.util.TestDataFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
@@ -35,6 +36,7 @@ class AuthRepositoryTest {
 
     private lateinit var network: FakeNetworkDataSource
     private lateinit var cache: CacheDataSource
+    private lateinit var testDataFactory: TestDataFactory
 
     private lateinit var dataStore: DataStore<Preferences>
 
@@ -47,9 +49,10 @@ class AuthRepositoryTest {
     fun setup() {
         testDispatcher = mainDispatcherRule.testDispatcher
         testScope = TestScope(testDispatcher)
+        testDataFactory = TestDataFactory()
         dataStore = FakePreferenceDataStore(testContext = ApplicationProvider.getApplicationContext(),
             testCoroutineScope = testScope).testDataStore
-        network = FakeNetworkDataSource(testDispatcher)
+        network = FakeNetworkDataSource(testDataFactory, testDispatcher)
         cache = FakeCacheDataSource(testDispatcher = testDispatcher, dataStore = dataStore)
 
         repository = AuthRepositoryImpl(network = network, cache = cache)

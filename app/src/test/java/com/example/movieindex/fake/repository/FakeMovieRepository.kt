@@ -9,9 +9,12 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.example.movieindex.core.data.external.*
-import com.example.movieindex.core.data.local.CacheConstants
+import com.example.movieindex.core.data.local.CacheConstants.ACCOUNT_ID
 import com.example.movieindex.core.data.local.CacheConstants.CASTS
 import com.example.movieindex.core.data.local.CacheConstants.CREWS
+import com.example.movieindex.core.data.local.model.MovieEntity
+import com.example.movieindex.core.data.local.model.toSavedMovie
+import com.example.movieindex.core.data.remote.model.account.toAccountDetails
 import com.example.movieindex.core.data.remote.model.common.toMovies
 import com.example.movieindex.core.data.remote.model.common.toResult
 import com.example.movieindex.core.data.remote.model.details.toMovieDetails
@@ -39,6 +42,8 @@ class FakeMovieRepository(
     var isSuccess = true
     var isBodyEmpty = false
     private val gson = Gson()
+
+    private val movieList = arrayListOf<MovieEntity>()
 
     override fun getMovieDetails(
         movieId: Int,
@@ -263,4 +268,127 @@ class FakeMovieRepository(
         val listType = object : TypeToken<List<Crew>>() {}.type
         gson.fromJson<List<Crew>>(castString, listType)
     }.flowOn(testDispatcher)
+
+    override suspend fun saveAccountIdCache(accountId: Int) {
+        withContext(testDispatcher) {
+            dataStore.edit { preferences ->
+                preferences[ACCOUNT_ID] = accountId
+            }
+        }
+    }
+
+    override fun getAccountIdCache(): Flow<Int> {
+        return dataStore.data.catch {
+            if (it is IOException) {
+                it.printStackTrace()
+                emit(emptyPreferences())
+            } else {
+                throw it
+            }
+        }.map { preferences ->
+            preferences[ACCOUNT_ID] ?: 0
+        }.flowOn(testDispatcher)
+    }
+
+    override fun getAccountDetails(sessionId: String): Flow<Resource<AccountDetails>> = flow {
+        emit(Resource.Loading)
+
+        val data = testDataFactory.generateAccountDetailsResponseTestData()
+        val response =
+            testDataFactory.generateResponse(isSuccess = isSuccess,
+                isBodyEmpty = isBodyEmpty) { Response.success(data) }
+        val networkResource =
+            safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
+        emit(networkResourceHandler(networkResource) { it.toAccountDetails() })
+    }
+
+    override fun addToFavorite(favorite: Boolean, mediaId: Int, mediaType: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun addToWatchList(watchlist: Boolean, mediaId: Int, mediaType: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getFavoriteListPagingSource(
+        accountId: Int,
+        sessionId: String,
+        loadSinglePage: Boolean,
+        language: String?,
+        sortBy: String?,
+    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
+        pageSize = 20, enablePlaceholders = false
+    ), pagingSourceFactory = {
+        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
+            val data = testDataFactory.generateFavoriteMoviesListResponseTestData()
+            val response = testDataFactory.generateResponse(isSuccess = isSuccess,
+                isBodyEmpty = isBodyEmpty) { Response.success(data) }
+            safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
+        })
+    }).flow.map { pagingData ->
+        pagingData.map {
+            it.toResult()
+        }
+    }
+
+    override fun getWatchListPagingSource(
+        accountId: Int,
+        sessionId: String,
+        loadSinglePage: Boolean,
+        language: String?,
+        sortBy: String?,
+    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
+        pageSize = 20, enablePlaceholders = false
+    ), pagingSourceFactory = {
+        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
+            val data = testDataFactory.generateWatchListResponseTestData()
+            val response = testDataFactory.generateResponse(isSuccess = isSuccess,
+                isBodyEmpty = isBodyEmpty) { Response.success(data) }
+            safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
+        })
+    }).flow.map { pagingData ->
+        pagingData.map {
+            it.toResult()
+        }
+    }
+
+    override suspend fun insertMovieToCache(
+        movie: MovieDetails,
+        isFavorite: Boolean,
+        isBookmark: Boolean,
+    ) {
+        movieList.add(movie.toMovieEntity(isFavorite, isBookmark))
+    }
+
+    override fun getCachedMovie(movieId: Int): Flow<SavedMovie?> =
+        flow { emit(movieList.find { it.movieId == movieId }?.toSavedMovie()) }
+
+    override fun getCachedFavoriteMovies(): Flow<List<SavedMovie>> =
+        flow { emit(movieList.filter { it.isFavorite }.map { it.toSavedMovie() }) }
+
+    override fun getCachedBookmarkedMovies(): Flow<List<SavedMovie>> =
+        flow { emit(movieList.filter { it.isBookmark }.map { it.toSavedMovie() }) }
+
+    override suspend fun updateBookmarkCache(movieId: Int, isBookmark: Boolean) {
+        val movie = movieList.find { it.movieId == movieId }
+        val index = movieList.indexOf(movie)
+
+        movie?.let {
+            movieList[index] = it.copy(isBookmark = isBookmark)
+        }
+    }
+
+    override suspend fun updateFavoriteCache(movieId: Int, isFavorite: Boolean) {
+        val movie = movieList.find { it.movieId == movieId }
+        val index = movieList.indexOf(movie)
+
+        movie?.let {
+            movieList[index] = it.copy(isFavorite = isFavorite)
+        }
+    }
+
+    override suspend fun deleteMovieCache(movieId: Int) {
+        val movie = movieList.find { it.movieId == movieId }
+        movieList.remove(movie)
+    }
 }

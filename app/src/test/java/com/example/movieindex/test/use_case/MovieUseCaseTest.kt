@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
 import com.example.movieindex.core.data.external.Resource
+import com.example.movieindex.core.data.remote.model.common.toMovies
 import com.example.movieindex.core.data.remote.model.details.toMovieDetails
 import com.example.movieindex.fake.datastore.FakePreferenceDataStore
 import com.example.movieindex.fake.repository.FakeMovieRepository
@@ -16,13 +17,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import kotlin.random.Random.Default.nextBoolean
+import kotlin.random.Random.Default.nextInt
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -48,7 +50,7 @@ class MovieUseCaseTest {
         movieRepository = FakeMovieRepository(testDispatcher = mainDispatcherRule.testDispatcher,
             dataStore = dataStore, testDataFactory = testDataFactory)
 
-        movieUseCase = MovieUseCaseImpl(repository = movieRepository)
+        movieUseCase = MovieUseCaseImpl(movieRepository = movieRepository)
     }
 
     @Test
@@ -201,7 +203,6 @@ class MovieUseCaseTest {
         assertEquals(casts, cachedData)
     }
 
-
     @Test
     fun saveCrews_getCrews() = runTest {
 
@@ -212,6 +213,86 @@ class MovieUseCaseTest {
 
         assertEquals(crews, cachedData)
 
+    }
+
+    @Test
+    fun getAccountId() = runTest {
+        val accountId = nextInt(99_999_999)
+        movieRepository.saveAccountIdCache(accountId = accountId)
+
+        val cachedData = movieUseCase.getAccountId().first()
+        assertEquals(accountId, cachedData)
+    }
+
+    @Test
+    fun updateBookmarkCache() = runTest {
+        val data = testDataFactory.generatePopularMoviesTestData().toMovies().results
+        val convertedData = data.map {
+            testDataFactory.toMovieDetails(it)
+        }
+
+        convertedData.forEach {
+            movieRepository.insertMovieToCache(it,
+                isFavorite = nextBoolean(),
+                isBookmark = nextBoolean())
+        }
+
+        val movieToUpdate = data.random().movieId
+        val dataToUpdate = movieUseCase.getCachedMovie(movieToUpdate).first()
+        movieUseCase.updateBookmarkCache(movieId = movieToUpdate,
+            isBookmarked = !dataToUpdate!!.isBookmark)
+
+        val updatedData = movieUseCase.getCachedMovie(movieToUpdate).first()
+        assertTrue(updatedData?.isBookmark == !dataToUpdate.isBookmark)
+
+    }
+
+    @Test
+    fun updateFavoriteCache() = runTest {
+        val data = testDataFactory.generatePopularMoviesTestData().toMovies().results
+        val convertedData = data.map {
+            testDataFactory.toMovieDetails(it)
+        }
+
+        convertedData.forEach {
+            movieRepository.insertMovieToCache(it,
+                isFavorite = nextBoolean(),
+                isBookmark = nextBoolean())
+        }
+
+        val movieToUpdate = data.random().movieId
+        val dataToUpdate = movieUseCase.getCachedMovie(movieToUpdate).first()
+        movieUseCase.updateFavoriteCache(movieId = movieToUpdate,
+            isFavorite = !dataToUpdate!!.isFavorite)
+
+        val updatedData = movieUseCase.getCachedMovie(movieToUpdate).first()
+        assertTrue(updatedData?.isFavorite == !dataToUpdate.isFavorite)
+
+    }
+
+    @Test
+    fun deleteSavedMovieCache() = runTest {
+        val data = testDataFactory.generatePopularMoviesTestData().toMovies().results
+        val convertedData = data.map {
+            testDataFactory.toMovieDetails(it)
+        }
+
+        convertedData.forEach {
+            movieRepository.insertMovieToCache(it,
+                isFavorite = nextBoolean(),
+                isBookmark = nextBoolean())
+        }
+
+        val movieToDelete = data.random().movieId
+        val dataToDelete = movieRepository.getCachedMovie(movieToDelete).first()
+
+        assertNotNull(dataToDelete)
+
+        movieUseCase.deleteSavedMovieCache(movieToDelete)
+
+        val updatedCacheData = movieRepository.getCachedMovie(movieToDelete).first()
+
+        assertNull(updatedCacheData)
     }
 
 }

@@ -68,7 +68,7 @@ interface NetworkDataSource {
     ): NetworkResource<PostResponse>
 
     suspend fun getFavoriteList(
-        accountId: String,
+        accountId: Int,
         sessionId: String,
         page: Int = 1,
         language: String? = null,
@@ -76,7 +76,7 @@ interface NetworkDataSource {
     ): NetworkResource<MoviesResponse>
 
     suspend fun getWatchList(
-        accountId: String,
+        accountId: Int,
         sessionId: String,
         page: Int = 1,
         language: String? = null,

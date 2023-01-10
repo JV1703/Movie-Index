@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.
 import com.example.movieindex.R
 import com.example.movieindex.core.common.ColorPalette
 import com.example.movieindex.core.common.extensions.collectLatestLifecycleFlow
-import com.example.movieindex.core.data.external.Resource
+import com.example.movieindex.core.common.extensions.makeToast
 import com.example.movieindex.databinding.FragmentHomeBinding
 import com.example.movieindex.feature.list.movie_list.ListType
 import com.example.movieindex.feature.main.ui.MainFragmentDirections
@@ -59,25 +59,32 @@ class HomeFragment : Fragment() {
         binding.viewMorePopularMovies.setOnClickListener { navigateToMovieList(listType = ListType.Popular) }
         binding.viewMoreTrendingMovies.setOnClickListener { navigateToMovieList(listType = ListType.Trending) }
 
-        collectLatestLifecycleFlow(viewModel.nowPlaying) {
-            if (it is Resource.Success) {
-                nowPlayingAdapter.submitList(it.data)
-            }
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.refreshMovies()
+            binding.swipeRefresh.isRefreshing = false
         }
 
-        collectLatestLifecycleFlow(viewModel.popularMovies) {
-            if (it is Resource.Success) {
-                popularMoviesAdapter.submitList(it.data)
+        collectLatestLifecycleFlow(viewModel.nowPlayingUiState) { uiState ->
+            uiState.userMsg?.let {
+                makeToast(it)
+                viewModel.nowPlayingMoviesUserMsgShown()
             }
+            nowPlayingAdapter.submitList(uiState.movies)
         }
-
-        collectLatestLifecycleFlow(viewModel.trendingMovies) {
-            if (it is Resource.Success) {
-                trendingMoviesAdapter.submitList(it.data)
+        collectLatestLifecycleFlow(viewModel.popularMoviesUiState) { uiState ->
+            uiState.userMsg?.let {
+                makeToast(it)
+                viewModel.popularMoviesUserMsgShown()
             }
+            popularMoviesAdapter.submitList(uiState.movies)
         }
-
-
+        collectLatestLifecycleFlow(viewModel.trendingMoviesUisState) { uiState ->
+            uiState.userMsg?.let {
+                makeToast(it)
+                viewModel.trendingMoviesUserMsgShown()
+            }
+            trendingMoviesAdapter.submitList(uiState.movies)
+        }
     }
 
     override fun onDestroyView() {

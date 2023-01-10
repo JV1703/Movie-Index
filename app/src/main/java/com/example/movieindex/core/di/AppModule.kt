@@ -131,9 +131,8 @@ object AppModule {
     fun provideAuthRepository(
         network: NetworkDataSource,
         cache: CacheDataSource,
-        movieRepository: MovieRepository,
     ): AuthRepository =
-        AuthRepositoryImpl(network = network, cache = cache, movieRepository = movieRepository)
+        AuthRepositoryImpl(network = network, cache = cache)
 
     @Provides
     @Singleton

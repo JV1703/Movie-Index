@@ -15,7 +15,7 @@ data class Result(
     val releaseDate: String?,
 )
 
-fun Result.toMovieEntity(isFavorite: Boolean, isBookmark: Boolean) = MovieEntity(
+fun Result.toMovieEntity(isFavorite: Boolean = false, isBookmark: Boolean = false) = MovieEntity(
     movieId = movieId,
     title = title,
     overview = overview,

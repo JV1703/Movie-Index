@@ -4,12 +4,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.paging.PagingSource
 import com.example.movieindex.core.data.local.CacheConstants
+import com.example.movieindex.core.data.local.CacheConstants.ACCOUNT_ID
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
 import com.example.movieindex.core.data.local.model.MovieEntity
-import com.example.movieindex.core.data.local.model.MovieKeyEntity
-import com.example.movieindex.core.data.local.model.MoviePagingCategory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.TestDispatcher
@@ -23,45 +21,46 @@ class FakeCacheDataSource(
 ) : CacheDataSource {
 
     private val movieList = arrayListOf<MovieEntity>()
-    private val movieKeyList = arrayListOf<MovieKeyEntity>()
 
-    override suspend fun insertAllMovies(movies: List<MovieEntity>) {
-        movieList.addAll(movies)
+    override suspend fun insertMovie(movie: MovieEntity) {
+        movieList.add(movie)
     }
 
-    override fun getMovies(pagingCategory: MoviePagingCategory): PagingSource<Int, MovieEntity> {
-        TODO("Not yet implemented")
+    override fun getMovie(movieId: Int): Flow<MovieEntity?> {
+        return flow { emit(movieList.find { it.movieId == movieId }) }
     }
 
-    override fun getMoviesWithReferenceToPagingCategory(pagingCategory: MoviePagingCategory): Flow<List<MovieEntity>> {
-        return flow { emit(movieList.filter { it.pagingCategory == pagingCategory }) }
+    override fun getFavoriteMovies(): Flow<List<MovieEntity>> {
+        return flow { emit(movieList.filter { it.isFavorite }) }
     }
 
-    override fun getAllMovies(): Flow<List<MovieEntity>> {
-        return flow { emit(movieList) }
+    override fun getBookmarkedMovies(): Flow<List<MovieEntity>> {
+        return flow { emit(movieList.filter { it.isBookmark }) }
     }
 
-    override suspend fun clearMovies(pagingCategory: MoviePagingCategory) {
-        movieList.removeIf { it.pagingCategory == pagingCategory }
+    override suspend fun updateBookmark(movieId: Int, isBookmark: Boolean) {
+        val movie = movieList.find { it.movieId == movieId }
+        val index = movieList.indexOf(movie)
+
+        movie?.let {
+            movieList[index] = it.copy(isBookmark = isBookmark)
+        }
     }
 
-    override suspend fun insertAllMovieKeys(movieKeys: List<MovieKeyEntity>) {
-        movieKeyList.addAll(movieKeys)
+    override suspend fun updateFavorite(movieId: Int, isFavorite: Boolean) {
+        val movie = movieList.find { it.movieId == movieId }
+        val index = movieList.indexOf(movie)
+
+        movie?.let {
+            movieList[index] = it.copy(isFavorite = isFavorite)
+        }
     }
 
-    override fun getAllMovieKey(): Flow<List<MovieKeyEntity>> {
-        return flow { emit(movieKeyList) }
-    }
-
-    override suspend fun movieKeyId(
-        id: String,
-        pagingCategory: MoviePagingCategory,
-    ): MovieKeyEntity? {
-        return movieKeyList.find { it.id == id && it.pagingCategory == pagingCategory }
-    }
-
-    override suspend fun clearMovieKeys(pagingCategory: MoviePagingCategory) {
-        movieKeyList.removeIf { it.pagingCategory == pagingCategory }
+    override suspend fun deleteMovie(movieId: Int) {
+        val movie = movieList.find { it.movieId == movieId }
+        movie?.let {
+            movieList.remove(movie)
+        }
     }
 
     override suspend fun saveSessionId(sessionId: String) {
@@ -132,6 +131,27 @@ class FakeCacheDataSource(
             }
         }.map { preferences ->
             preferences[CacheConstants.CREWS] ?: ""
+        }.flowOn(testDispatcher)
+    }
+
+    override suspend fun saveAccountId(accountId: Int) {
+        withContext(testDispatcher) {
+            dataStore.edit { preferences ->
+                preferences[ACCOUNT_ID] = accountId
+            }
+        }
+    }
+
+    override fun getAccountId(): Flow<Int> {
+        return dataStore.data.catch {
+            if (it is IOException) {
+                it.printStackTrace()
+                emit(emptyPreferences())
+            } else {
+                throw it
+            }
+        }.map { preferences ->
+            preferences[ACCOUNT_ID] ?: 0
         }.flowOn(testDispatcher)
     }
 

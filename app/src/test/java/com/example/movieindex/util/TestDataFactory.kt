@@ -1,13 +1,20 @@
 package com.example.movieindex.util
 
 import com.example.movieindex.core.common.extensions.fromJson
-import com.example.movieindex.core.data.remote.NetworkResource
+import com.example.movieindex.core.data.external.MovieDetails
+import com.example.movieindex.core.data.external.Result
+import com.example.movieindex.core.data.external.movieGenreMapper
+import com.example.movieindex.core.data.local.model.MovieEntity
+import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
 import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.data.remote.model.common.MoviesResponse
+import com.example.movieindex.core.data.remote.model.common.PostResponse
 import com.example.movieindex.core.data.remote.model.details.MovieDetailsResponse
+import com.example.movieindex.core.data.remote.model.favorite.body.FavoriteBody
+import com.example.movieindex.core.data.remote.model.watchlist.body.WatchListBody
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -110,5 +117,81 @@ class TestDataFactory {
     fun generateSessionIdTestData(): SessionIdResponse {
         return SessionIdResponse(session_id = UUID.randomUUID().toString(), success = true)
     }
+
+    fun generateAccountDetailsResponseTestData(): AccountDetailsResponse {
+        val json = readFile("account_details.json")
+        return gson.fromJson(json)
+    }
+
+    fun generatePostResponseTestData(): PostResponse {
+        val json = readFile("post_response.json")
+        return gson.fromJson(json)
+    }
+
+    fun generateFavoriteMoviesListResponseTestData(): MoviesResponse {
+        val json = readFile("popular_movies.json")
+        return gson.fromJson(json)
+    }
+
+    fun generateWatchListResponseTestData(): MoviesResponse {
+        val json = readFile("popular_movies.json")
+        return gson.fromJson(json)
+    }
+
+    fun generateLoginBody() = LoginBody(username = "", password = "", request_token = "")
+    fun generateFavoriteBody(favorite: Boolean = true) = FavoriteBody(favorite = favorite,
+        mediaId = 0,
+        mediaType = "")
+
+    fun generateWatchListBody(watchList: Boolean = true) = WatchListBody(watchlist = watchList,
+        mediaId = 0,
+        mediaType = "")
+
+    fun toMovieDetails(
+        movie: Result
+    ) = MovieDetails(
+        id = movie.movieId,
+        imdbId = null,
+        adult = movie.adult,
+        movie.backdropPath,
+        movie.posterPath,
+        casts = emptyList(),
+        crews = emptyList(),
+        genres = emptyList(),
+        overview = movie.overview,
+        recommendations = null,
+        releaseDate = movie.releaseDate,
+        runtime = null,
+        tagline = null,
+        title = movie.title,
+        videos = emptyList(),
+        voteAverage = movie.voteAverage,
+        reviews = null,
+        mpaaRating = null
+    )
+
+    fun toMovieDetails(
+        movieEntity: MovieEntity,
+        isFavorite: Boolean = false,
+        isBookmark: Boolean = false,
+    ) =
+        MovieDetails(id = movieEntity.movieId,
+            title = movieEntity.title,
+            releaseDate = movieEntity.releaseDate,
+            overview = movieEntity.overview,
+            posterPath = movieEntity.posterPath,
+            imdbId = null,
+            adult = true,
+            backdropPath = null,
+            casts = emptyList(),
+            crews = emptyList(),
+            genres = emptyList(),
+            recommendations = null,
+            runtime = null,
+            tagline = null,
+            videos = emptyList(),
+            voteAverage = null,
+            reviews = null,
+            mpaaRating = null)
 
 }

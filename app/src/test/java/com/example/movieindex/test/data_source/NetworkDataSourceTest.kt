@@ -8,6 +8,7 @@ import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
 import com.example.movieindex.core.data.remote.safeNetworkCall
 import com.example.movieindex.fake.apis.FakeMovieApi
 import com.example.movieindex.util.MainCoroutineRule
+import com.example.movieindex.util.TestDataFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -26,12 +27,14 @@ class NetworkDataSourceTest {
     @get:Rule
     val mainDispatcherRule = MainCoroutineRule()
 
+    private lateinit var testDataFactory: TestDataFactory
     private lateinit var api: FakeMovieApi
     private lateinit var network: NetworkDataSource
 
     @Before
     fun setup() {
-        api = FakeMovieApi()
+        testDataFactory = TestDataFactory()
+        api = FakeMovieApi(testDataFactory = testDataFactory)
         network = NetworkDataSourceImpl(api, Dispatchers.Main)
     }
 
@@ -316,5 +319,142 @@ class NetworkDataSourceTest {
 
         assertTrue(actualResult is NetworkResource.Error)
     }
+
+    @Test
+    fun getAccountDetails_success() = runTest {
+        val actualResult = network.getAccountDetails(sessionId = "")
+        assertTrue(actualResult is NetworkResource.Success)
+    }
+
+    @Test
+    fun getAccountDetails_empty() = runTest {
+        api.isBodyEmpty = true
+        val actualResult = network.getAccountDetails(sessionId = "")
+        assertTrue(actualResult is NetworkResource.Empty)
+    }
+
+    @Test
+    fun getAccountDetails_error() = runTest {
+        api.isSuccess = false
+        val actualResult = network.getAccountDetails(sessionId = "")
+        assertTrue(actualResult is NetworkResource.Error)
+    }
+
+    @Test
+    fun addToFavorite_success() = runTest {
+        val favoriteBody = testDataFactory.generateFavoriteBody()
+        val actualResult = network.addToFavorite(0, "", favoriteBody)
+
+        assertTrue(actualResult is NetworkResource.Success)
+    }
+
+    @Test
+    fun addToFavorite_empty() = runTest {
+        api.isBodyEmpty = true
+        val favoriteBody = testDataFactory.generateFavoriteBody()
+        val actualResult = network.addToFavorite(0, "", favoriteBody)
+
+        assertTrue(actualResult is NetworkResource.Empty)
+    }
+
+    @Test
+    fun addToFavorite_error() = runTest {
+        api.isSuccess = false
+        val favoriteBody = testDataFactory.generateFavoriteBody()
+        val actualResult = network.addToFavorite(0, "", favoriteBody)
+
+        assertTrue(actualResult is NetworkResource.Error)
+    }
+
+    @Test
+    fun addToWatchList_success() = runTest {
+        val watchlistBody = testDataFactory.generateWatchListBody()
+        val actualResult = network.addToWatchList(0, "", watchlistBody)
+
+        assertTrue(actualResult is NetworkResource.Success)
+    }
+
+    @Test
+    fun addToWatchList_empty() = runTest {
+        api.isBodyEmpty = true
+        val watchlistBody = testDataFactory.generateWatchListBody()
+        val actualResult = network.addToWatchList(0, "", watchlistBody)
+
+        assertTrue(actualResult is NetworkResource.Empty)
+    }
+
+    @Test
+    fun addToWatchList_error() = runTest {
+        api.isSuccess = false
+        val watchlistBody = testDataFactory.generateWatchListBody()
+        val actualResult = network.addToWatchList(0, "", watchlistBody)
+
+        assertTrue(actualResult is NetworkResource.Error)
+    }
+
+    @Test
+    fun getFavoriteList_success() = runTest {
+        val expectedResult =
+            safeNetworkCall(Dispatchers.Main,
+                networkCall = { api.getFavoriteList(accountId = 0, sessionId = "") },
+                conversion = { it })
+        val actualResult = network.getFavoriteList(accountId = 0, sessionId = "")
+
+        assertTrue(actualResult is NetworkResource.Success)
+        assertEquals(expectedResult, actualResult)
+    }
+
+    @Test
+    fun getFavoriteList_empty() = runTest {
+
+        api.isBodyEmpty = true
+
+        val actualResult = network.getFavoriteList(accountId = 0, sessionId = "")
+
+        assertTrue(actualResult is NetworkResource.Empty)
+    }
+
+    @Test
+    fun getFavoriteList_error() = runTest {
+
+        api.isSuccess = false
+
+        val actualResult = network.getFavoriteList(accountId = 0, sessionId = "")
+
+        assertTrue(actualResult is NetworkResource.Error)
+    }
+
+    @Test
+    fun getWatchList_success() = runTest {
+        val expectedResult =
+            safeNetworkCall(Dispatchers.Main,
+                networkCall = { api.getWatchList(accountId = 0, sessionId = "") },
+                conversion = { it })
+        val actualResult = network.getWatchList(accountId = 0, sessionId = "")
+
+        assertTrue(actualResult is NetworkResource.Success)
+        assertEquals(expectedResult, actualResult)
+    }
+
+    @Test
+    fun getWatchList_empty() = runTest {
+
+        api.isBodyEmpty = true
+
+        val actualResult = network.getWatchList(accountId = 0, sessionId = "")
+
+        assertTrue(actualResult is NetworkResource.Empty)
+    }
+
+    @Test
+    fun getWatchList_error() = runTest {
+
+        api.isSuccess = false
+
+        val actualResult = network.getWatchList(accountId = 0, sessionId = "")
+
+        assertTrue(actualResult is NetworkResource.Error)
+    }
+
 
 }

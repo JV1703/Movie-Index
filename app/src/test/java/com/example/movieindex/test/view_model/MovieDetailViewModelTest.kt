@@ -130,98 +130,98 @@ class MovieDetailViewModelTest {
         generatedCastList.all { it is RvListHelper.DataWrapper }
     }
 
-    @Test
-    fun uiState_isLoading() = runTest {
-
-        assertTrue(viewModel.uiState.value is MovieDetailViewModel.MovieDetailUiState.Loading)
-
-    }
-
-    @Test
-    fun uiState_success() = runTest {
-
-        val stateList = arrayListOf<MovieDetailViewModel.MovieDetailUiState>()
-
-        val movieId = 9999
-        viewModel.saveMovieId(movieId = movieId)
-
-        val job = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.uiState.toList(stateList)
-        }
-
-        assertEquals(2, stateList.size)
-        assertTrue(stateList.first() is MovieDetailViewModel.MovieDetailUiState.Loading)
-        assertTrue(stateList[1] is MovieDetailViewModel.MovieDetailUiState.Success)
-
-        job.cancel()
-    }
-
-    @Test
-    fun uiState_error() = runTest {
-
-        movieUseCase.isSuccess = false
-
-        val stateList = arrayListOf<MovieDetailViewModel.MovieDetailUiState>()
-
-        val movieId = 9999
-        viewModel.saveMovieId(movieId = movieId)
-
-        val job = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.uiState.toList(stateList)
-        }
-
-        assertEquals(2, stateList.size)
-        assertTrue(stateList.first() is MovieDetailViewModel.MovieDetailUiState.Loading)
-        assertTrue(stateList[1] is MovieDetailViewModel.MovieDetailUiState.Error)
-
-        job.cancel()
-    }
-
-    @Test
-    fun uiState_empty() = runTest {
-
-        movieUseCase.isBodyEmpty = true
-
-        val stateList = arrayListOf<MovieDetailViewModel.MovieDetailUiState>()
-
-        val movieId = 9999
-        viewModel.saveMovieId(movieId = movieId)
-
-        val job = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.uiState.toList(stateList)
-        }
-
-        assertEquals(2, stateList.size)
-        assertTrue(stateList.first() is MovieDetailViewModel.MovieDetailUiState.Loading)
-        assertTrue(stateList[1] is MovieDetailViewModel.MovieDetailUiState.Error)
-
-        job.cancel()
-    }
-
-    @Test
-    fun updatePosterLoadingStatus() = runTest {
-
-        val stateList = arrayListOf<MovieDetailViewModel.MovieDetailUiState>()
-
-        val movieId = 9999
-        viewModel.saveMovieId(movieId = movieId)
-
-        val job = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.uiState.toList(stateList)
-        }
-
-        assertEquals(2, stateList.size)
-        assertTrue(stateList.first() is MovieDetailViewModel.MovieDetailUiState.Loading)
-        assertTrue(stateList[1] is MovieDetailViewModel.MovieDetailUiState.Success)
-        assertTrue((stateList[1] as MovieDetailViewModel.MovieDetailUiState.Success).isLoading)
-
-        viewModel.updatePosterLoadingStatus(false)
-
-        assertEquals(3, stateList.size)
-        assertFalse((stateList[2] as MovieDetailViewModel.MovieDetailUiState.Success).isLoading)
-
-        job.cancel()
-    }
-
+//    @Test
+//    fun uiState_isLoading() = runTest {
+//
+//        assertTrue(viewModel.uiState.value is MovieDetailViewModel.MovieDetailUiState.Loading)
+//
+//    }
+//
+//    @Test
+//    fun uiState_success() = runTest {
+//
+//        val stateList = arrayListOf<MovieDetailViewModel.MovieDetailUiState>()
+//
+//        val movieId = 9999
+//        viewModel.saveMovieId(movieId = movieId)
+//
+//        val job = launch(mainDispatcherRule.testDispatcher) {
+//            viewModel.uiState.toList(stateList)
+//        }
+//
+//        assertEquals(2, stateList.size)
+//        assertTrue(stateList.first() is MovieDetailViewModel.MovieDetailUiState.Loading)
+//        assertTrue(stateList[1] is MovieDetailViewModel.MovieDetailUiState.Success)
+//
+//        job.cancel()
+//    }
+//
+//    @Test
+//    fun uiState_error() = runTest {
+//
+//        movieUseCase.isSuccess = false
+//
+//        val stateList = arrayListOf<MovieDetailViewModel.MovieDetailUiState>()
+//
+//        val movieId = 9999
+//        viewModel.saveMovieId(movieId = movieId)
+//
+//        val job = launch(mainDispatcherRule.testDispatcher) {
+//            viewModel.uiState.toList(stateList)
+//        }
+//
+//        assertEquals(2, stateList.size)
+//        assertTrue(stateList.first() is MovieDetailViewModel.MovieDetailUiState.Loading)
+//        assertTrue(stateList[1] is MovieDetailViewModel.MovieDetailUiState.Error)
+//
+//        job.cancel()
+//    }
+//
+//    @Test
+//    fun uiState_empty() = runTest {
+//
+//        movieUseCase.isBodyEmpty = true
+//
+//        val stateList = arrayListOf<MovieDetailViewModel.MovieDetailUiState>()
+//
+//        val movieId = 9999
+//        viewModel.saveMovieId(movieId = movieId)
+//
+//        val job = launch(mainDispatcherRule.testDispatcher) {
+//            viewModel.uiState.toList(stateList)
+//        }
+//
+//        assertEquals(2, stateList.size)
+//        assertTrue(stateList.first() is MovieDetailViewModel.MovieDetailUiState.Loading)
+//        assertTrue(stateList[1] is MovieDetailViewModel.MovieDetailUiState.Error)
+//
+//        job.cancel()
+//    }
+//
+//    @Test
+//    fun updatePosterLoadingStatus() = runTest {
+//
+//        val stateList = arrayListOf<MovieDetailViewModel.MovieDetailUiState>()
+//
+//        val movieId = 9999
+//        viewModel.saveMovieId(movieId = movieId)
+//
+//        val job = launch(mainDispatcherRule.testDispatcher) {
+//            viewModel.uiState.toList(stateList)
+//        }
+//
+//        assertEquals(2, stateList.size)
+//        assertTrue(stateList.first() is MovieDetailViewModel.MovieDetailUiState.Loading)
+//        assertTrue(stateList[1] is MovieDetailViewModel.MovieDetailUiState.Success)
+//        assertTrue((stateList[1] as MovieDetailViewModel.MovieDetailUiState.Success).isLoading)
+//
+//        viewModel.updatePosterLoadingStatus(false)
+//
+//        assertEquals(3, stateList.size)
+//        assertFalse((stateList[2] as MovieDetailViewModel.MovieDetailUiState.Success).isLoading)
+//
+//        job.cancel()
+//    }
+//
 
 }

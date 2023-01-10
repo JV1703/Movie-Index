@@ -141,7 +141,7 @@ class NetworkDataSourceImpl @Inject constructor(
             conversion = { it })
 
     override suspend fun getFavoriteList(
-        accountId: String,
+        accountId: Int,
         sessionId: String,
         page: Int,
         language: String?,
@@ -157,7 +157,7 @@ class NetworkDataSourceImpl @Inject constructor(
         conversion = { it })
 
     override suspend fun getWatchList(
-        accountId: String,
+        accountId: Int,
         sessionId: String,
         page: Int,
         language: String?,

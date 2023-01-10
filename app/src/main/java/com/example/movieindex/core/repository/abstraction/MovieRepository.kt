@@ -33,19 +33,19 @@ interface MovieRepository {
     fun getNowPlaying(
         page: Int = 1,
         language: String? = null,
-        region: String? = null,
+        region: String? = null
     ): Flow<Resource<List<Result>>>
 
     fun getPopularMovies(
         page: Int = 1,
         language: String? = null,
-        region: String? = null,
+        region: String? = null
     ): Flow<Resource<List<Result>>>
 
     fun getTrendingMovies(
         page: Int = 1,
         mediaType: String = "movie",
-        timeWindow: String = "week",
+        timeWindow: String = "week"
     ): Flow<Resource<List<Result>>>
 
     fun getNowPlayingPagingSource(
@@ -76,8 +76,8 @@ interface MovieRepository {
     fun getCasts(): Flow<List<Cast>>
     suspend fun saveCrews(crews: List<Crew>)
     fun getCrews(): Flow<List<Crew>>
-    suspend fun saveAccountId(accountId: Int)
-    fun getAccountId(): Flow<Int>
+    suspend fun saveAccountIdCache(accountId: Int)
+    fun getAccountIdCache(): Flow<Int>
     fun getAccountDetails(sessionId: String): Flow<Resource<AccountDetails>>
     fun addToFavorite(
         favorite: Boolean,
@@ -92,7 +92,7 @@ interface MovieRepository {
     )
 
     fun getFavoriteListPagingSource(
-        accountId: String,
+        accountId: Int,
         sessionId: String,
         loadSinglePage: Boolean = false,
         language: String? = null,
@@ -100,7 +100,7 @@ interface MovieRepository {
     ): Flow<PagingData<Result>>
 
     fun getWatchListPagingSource(
-        accountId: String,
+        accountId: Int,
         sessionId: String,
         loadSinglePage: Boolean = false,
         language: String? = null,
@@ -109,9 +109,24 @@ interface MovieRepository {
 
     suspend fun insertMovieToCache(movie: MovieDetails, isFavorite: Boolean, isBookmark: Boolean)
     fun getCachedMovie(movieId: Int): Flow<SavedMovie?>
-    fun getFavoriteMovies(): Flow<List<SavedMovie>>
-    fun getBookmarkedMovies(): Flow<List<SavedMovie>>
-    suspend fun updateBookmark(movieId: Int, isBookmark: Boolean)
-    suspend fun updateFavorite(movieId: Int, isFavorite: Boolean)
-    suspend fun deleteMovie(movieId: Int)
+    fun getCachedFavoriteMovies(): Flow<List<SavedMovie>>
+    fun getCachedBookmarkedMovies(): Flow<List<SavedMovie>>
+    suspend fun updateBookmarkCache(movieId: Int, isBookmark: Boolean)
+    suspend fun updateFavoriteCache(movieId: Int, isFavorite: Boolean)
+    suspend fun deleteMovieCache(movieId: Int)
+    fun getFavoriteList(
+        accountId: Int,
+        sessionId: String,
+        page: Int,
+        language: String? = null,
+        sortBy: String? = null,
+    ): Flow<Resource<List<Result>>>
+
+    fun getWatchList(
+        accountId: Int,
+        sessionId: String,
+        page: Int,
+        language: String? = null,
+        sortBy: String? = null,
+    ): Flow<Resource<List<Result>>>
 }

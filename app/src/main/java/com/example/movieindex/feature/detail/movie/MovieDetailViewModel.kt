@@ -159,9 +159,9 @@ class MovieDetailViewModel @Inject constructor(
     fun updateBookmark(movieId: Int, isBookmarked: Boolean, isFavorite: Boolean){
         viewModelScope.launch {
             if(!isBookmarked && !isFavorite){
-               movieUseCase.deleteSavedMovie(movieId)
+               movieUseCase.deleteSavedMovieCache(movieId)
             }else{
-                movieUseCase.updateBookmark(movieId = movieId, isBookmarked = isBookmarked)
+                movieUseCase.updateBookmarkCache(movieId = movieId, isBookmarked = isBookmarked)
             }
             movieUseCase.addToWatchList(watchlist = isBookmarked, mediaId = movieId)
         }
@@ -170,9 +170,9 @@ class MovieDetailViewModel @Inject constructor(
     fun updateFavorite(movieId: Int, isBookmarked: Boolean, isFavorite: Boolean){
         viewModelScope.launch {
             if(!isBookmarked && !isFavorite){
-                movieUseCase.deleteSavedMovie(movieId)
+                movieUseCase.deleteSavedMovieCache(movieId)
             }else{
-                movieUseCase.updateFavorite(movieId = movieId, isFavorite = isFavorite)
+                movieUseCase.updateFavoriteCache(movieId = movieId, isFavorite = isFavorite)
             }
 
             movieUseCase.addToFavorite(favorite = isFavorite, mediaId = movieId)

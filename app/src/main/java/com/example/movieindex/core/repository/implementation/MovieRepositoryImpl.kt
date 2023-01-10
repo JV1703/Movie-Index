@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -45,7 +46,7 @@ fun <T, R> networkResourceHandler(
             Resource.Success(convertedData)
         }
         is NetworkResource.Error -> {
-            Resource.Error(errMsg = "errCode: ${networkResource.errCode}, errMsg: ${networkResource.errMessage}",
+            Resource.Error(errMsg = networkResource.errMessage,
                 errCode = networkResource.errCode)
         }
         is NetworkResource.Empty -> {
@@ -54,23 +55,48 @@ fun <T, R> networkResourceHandler(
     }
 }
 
+//suspend fun <T, R> networkResourceHandler(
+//    networkResource: NetworkResource<T>,
+//    onSuccess: suspend (T) -> Resource.Success<R>,
+//): Resource<R> {
+//    return when (networkResource) {
+//        is NetworkResource.Success -> {
+//            val data = networkResource.data
+//            onSuccess(data)
+//        }
+//        is NetworkResource.Error -> {
+//            Resource.Error(errMsg = networkResource.errMessage,
+//                errCode = networkResource.errCode)
+//        }
+//        is NetworkResource.Empty -> {
+//            Resource.Empty
+//        }
+//    }
+//}
+
 class MovieRepositoryImpl @Inject constructor(
     private val workManager: WorkManager,
     private val network: NetworkDataSource,
     private val cache: CacheDataSource,
 ) : MovieRepository {
 
+    private var nowPlayingMoviesList: List<Result> = emptyList()
+    private val nowPlayingMutex = Mutex()
     override fun getNowPlaying(
         page: Int,
         language: String?,
         region: String?,
     ): Flow<Resource<List<Result>>> = flow {
         emit(Resource.Loading)
-        val networkResource =
-            network.getNowPlaying(page = page, language = language, region = region)
-        emit(networkResourceHandler(networkResource) { moviesResponse: MoviesResponse ->
-            moviesResponse.results.map { it.toResult() }
-        })
+
+        val networkResource = network.getNowPlaying(
+            page = page,
+            language = language, region = region)
+        emit(networkResourceHandler(networkResource,
+            conversion = { moviesResponse: MoviesResponse ->
+                moviesResponse.results.map { it.toResult() }
+            }))
+
     }.catch { t -> Timber.e("getNowPlaying - ${t.message}") }
 
     override fun getPopularMovies(
@@ -81,11 +107,11 @@ class MovieRepositoryImpl @Inject constructor(
         emit(Resource.Loading)
         val networkResource = network.getPopularMovies(
             page = page,
-            language = language,
-            region = region)
-        emit(networkResourceHandler(networkResource) { moviesResponse: MoviesResponse ->
-            moviesResponse.results.map { it.toResult() }
-        })
+            language = language, region = region)
+        emit(networkResourceHandler(networkResource,
+            conversion = { moviesResponse: MoviesResponse ->
+                moviesResponse.results.map { it.toResult() }
+            }))
     }.catch { t -> Timber.e("getPopularMovies - ${t.message}") }
 
     override fun getTrendingMovies(
@@ -98,9 +124,10 @@ class MovieRepositoryImpl @Inject constructor(
             page = page,
             mediaType = mediaType,
             timeWindow = timeWindow)
-        emit(networkResourceHandler(networkResource) { moviesResponse: MoviesResponse ->
-            moviesResponse.results.map { it.toResult() }
-        })
+        emit(networkResourceHandler(networkResource,
+            conversion = { moviesResponse: MoviesResponse ->
+                moviesResponse.results.map { it.toResult() }
+            }))
     }.catch { t -> Timber.e("getTrendingMovies - ${t.message}") }
 
     override suspend fun getMovieRecommendations(
@@ -113,9 +140,10 @@ class MovieRepositoryImpl @Inject constructor(
             movieId = movieId,
             page = page,
             language = language)
-        emit(networkResourceHandler(networkResource) { moviesResponse: MoviesResponse ->
-            moviesResponse.results.map { it.toResult() }
-        })
+        emit(networkResourceHandler(networkResource,
+            conversion = { moviesResponse: MoviesResponse ->
+                moviesResponse.results.map { it.toResult() }
+            }))
     }.catch { t -> Timber.e("getMovieRecommendations - ${t.message}") }
 
     override fun getNowPlayingPagingSource(
@@ -170,9 +198,10 @@ class MovieRepositoryImpl @Inject constructor(
             language = language,
             appendToResponse = appendToResponse)
 
-        emit(networkResourceHandler(networkResource) { movieDetailsResponse: MovieDetailsResponse ->
-            movieDetailsResponse.toMovieDetails()
-        })
+        emit(networkResourceHandler(networkResource,
+            conversion = { movieDetailsResponse: MovieDetailsResponse ->
+                movieDetailsResponse.toMovieDetails()
+            }))
 
     }.catch { t -> Timber.e("getMovieDetails: ${t.message}") }
 
@@ -181,9 +210,10 @@ class MovieRepositoryImpl @Inject constructor(
 
         val networkResource = network.getAccountDetails(sessionId = sessionId)
 
-        emit(networkResourceHandler(networkResource) { accountDetailsResponse: AccountDetailsResponse ->
-            accountDetailsResponse.toAccountDetails()
-        })
+        emit(networkResourceHandler(networkResource,
+            conversion = { accountDetailsResponse: AccountDetailsResponse ->
+                accountDetailsResponse.toAccountDetails()
+            }))
     }.catch { t -> Timber.e("getAccountDetails: ${t.message}") }
 
     override fun addToFavorite(
@@ -282,8 +312,49 @@ class MovieRepositoryImpl @Inject constructor(
     }).flow.map { pagingData -> pagingData.map { it.toResult() } }
         .catch { t -> Timber.e("getMovieRecommendationPagingSource: ${t.message}") }
 
+    override fun getFavoriteList(
+        accountId: Int,
+        sessionId: String, page: Int, language: String?,
+        sortBy: String?,
+    ): Flow<Resource<List<Result>>> = flow {
+        emit(Resource.Loading)
+
+        val networkResource = network.getFavoriteList(
+            accountId = accountId,
+            sessionId = sessionId,
+            page = page,
+            language = language,
+            sortBy = sortBy)
+        emit(networkResourceHandler(networkResource,
+            conversion = { moviesResponse: MoviesResponse ->
+                moviesResponse.results.map { it.toResult() }
+            }))
+
+    }.catch { t -> Timber.e("getFavoriteList - ${t.message}") }
+
+    override fun getWatchList(
+        accountId: Int,
+        sessionId: String, page: Int, language: String?,
+        sortBy: String?,
+    ): Flow<Resource<List<Result>>> = flow {
+        emit(Resource.Loading)
+
+        val networkResource = network.getWatchList(
+            accountId = accountId,
+            sessionId = sessionId,
+            page = page,
+            language = language,
+            sortBy = sortBy)
+        emit(networkResourceHandler(networkResource,
+            conversion = { moviesResponse: MoviesResponse ->
+                moviesResponse.results.map { it.toResult() }
+            }))
+
+    }.catch { t -> Timber.e("getWatchList - ${t.message}") }
+
+
     override fun getFavoriteListPagingSource(
-        accountId: String,
+        accountId: Int,
         sessionId: String,
         loadSinglePage: Boolean,
         language: String?,
@@ -303,7 +374,7 @@ class MovieRepositoryImpl @Inject constructor(
         .catch { t -> Timber.e("getFavoriteListPagingSource: ${t.message}") }
 
     override fun getWatchListPagingSource(
-        accountId: String,
+        accountId: Int,
         sessionId: String,
         loadSinglePage: Boolean,
         language: String?,
@@ -344,13 +415,17 @@ class MovieRepositoryImpl @Inject constructor(
         gson.fromJson<List<Crew>>(it, listType)
     }.catch { t -> Timber.e("getCasts: ${t.message}") }
 
-    override suspend fun saveAccountId(accountId: Int) {
+    override suspend fun saveAccountIdCache(accountId: Int) {
         cache.saveAccountId(accountId = accountId)
     }
 
-    override fun getAccountId(): Flow<Int> = cache.getAccountId()
+    override fun getAccountIdCache(): Flow<Int> = cache.getAccountId()
 
-    override suspend fun insertMovieToCache(movie: MovieDetails, isFavorite: Boolean, isBookmark: Boolean) {
+    override suspend fun insertMovieToCache(
+        movie: MovieDetails,
+        isFavorite: Boolean,
+        isBookmark: Boolean,
+    ) {
         val entity = movie.toMovieEntity(
             isFavorite,
             isBookmark
@@ -362,23 +437,23 @@ class MovieRepositoryImpl @Inject constructor(
         cache.getMovie(movieId).map { it?.toSavedMovie() }
             .catch { t -> Timber.e("getMovie: ${t.message}") }
 
-    override fun getFavoriteMovies(): Flow<List<SavedMovie>> =
+    override fun getCachedFavoriteMovies(): Flow<List<SavedMovie>> =
         cache.getFavoriteMovies().map { it.map { it.toSavedMovie() } }
             .catch { t -> Timber.e("getFavoriteMovies: ${t.message}") }
 
-    override fun getBookmarkedMovies(): Flow<List<SavedMovie>> =
+    override fun getCachedBookmarkedMovies(): Flow<List<SavedMovie>> =
         cache.getFavoriteMovies().map { it.map { it.toSavedMovie() } }
             .catch { t -> Timber.e("getBookmarkedMovies: ${t.message}") }
 
-    override suspend fun updateBookmark(movieId: Int, isBookmark: Boolean) {
+    override suspend fun updateBookmarkCache(movieId: Int, isBookmark: Boolean) {
         cache.updateBookmark(movieId = movieId, isBookmark = isBookmark)
     }
 
-    override suspend fun updateFavorite(movieId: Int, isFavorite: Boolean) {
+    override suspend fun updateFavoriteCache(movieId: Int, isFavorite: Boolean) {
         cache.updateFavorite(movieId = movieId, isFavorite = isFavorite)
     }
 
-    override suspend fun deleteMovie(movieId: Int) {
+    override suspend fun deleteMovieCache(movieId: Int) {
         cache.deleteMovie(movieId = movieId)
     }
 

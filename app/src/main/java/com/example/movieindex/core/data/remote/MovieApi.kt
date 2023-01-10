@@ -97,7 +97,7 @@ interface MovieApi {
 
     @GET("account/{account_id}/favorite/movies")
     suspend fun getFavoriteList(
-        @Path("account_id") accountId: String,
+        @Path("account_id") accountId: Int,
         @Query("session_id") sessionId: String,
         @Query("page") page: Int = 1,
         @Query("language") language: String? = null,
@@ -106,7 +106,7 @@ interface MovieApi {
 
     @GET("account/{account_id}/watchlist/movies")
     suspend fun getWatchList(
-        @Path("account_id") accountId: String,
+        @Path("account_id") accountId: Int,
         @Query("session_id") sessionId: String,
         @Query("page") page: Int = 1,
         @Query("language") language: String? = null,

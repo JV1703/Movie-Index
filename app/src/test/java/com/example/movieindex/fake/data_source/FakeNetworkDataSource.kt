@@ -2,12 +2,16 @@ package com.example.movieindex.fake.data_source
 
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
+import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
 import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.data.remote.model.common.MoviesResponse
+import com.example.movieindex.core.data.remote.model.common.PostResponse
 import com.example.movieindex.core.data.remote.model.details.MovieDetailsResponse
+import com.example.movieindex.core.data.remote.model.favorite.body.FavoriteBody
+import com.example.movieindex.core.data.remote.model.watchlist.body.WatchListBody
 import com.example.movieindex.core.data.remote.safeNetworkCall
 import com.example.movieindex.util.TestDataFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,9 +19,8 @@ import kotlinx.coroutines.test.TestDispatcher
 import retrofit2.Response
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class FakeNetworkDataSource(private val testDispatcher: TestDispatcher) : NetworkDataSource {
+class FakeNetworkDataSource(private val testDataFactory: TestDataFactory, private val testDispatcher: TestDispatcher) : NetworkDataSource {
 
-    private val testDataFactory = TestDataFactory()
     var isSuccess = true
     var isBodyEmpty = false
 
@@ -112,4 +115,58 @@ class FakeNetworkDataSource(private val testDispatcher: TestDispatcher) : Networ
         return safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
     }
 
+    override suspend fun getAccountDetails(sessionId: String): NetworkResource<AccountDetailsResponse> {
+        val data = testDataFactory.generateAccountDetailsResponseTestData()
+        val response = testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(data) }
+        return safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
+    }
+
+    override suspend fun addToFavorite(
+        accountId: Int,
+        sessionId: String,
+        body: FavoriteBody,
+    ): NetworkResource<PostResponse> {
+        val data = testDataFactory.generatePostResponseTestData()
+        val response = testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(data) }
+        return safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
+    }
+
+    override suspend fun addToWatchList(
+        accountId: Int,
+        sessionId: String,
+        body: WatchListBody,
+    ): NetworkResource<PostResponse> {
+        val data = testDataFactory.generatePostResponseTestData()
+        val response = testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(data) }
+        return safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
+    }
+
+    override suspend fun getFavoriteList(
+        accountId: Int,
+        sessionId: String,
+        page: Int,
+        language: String?,
+        sortBy: String?,
+    ): NetworkResource<MoviesResponse> {
+        val data = testDataFactory.generateFavoriteMoviesListResponseTestData()
+        val response = testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(data) }
+        return safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
+    }
+
+    override suspend fun getWatchList(
+        accountId: Int,
+        sessionId: String,
+        page: Int,
+        language: String?,
+        sortBy: String?,
+    ): NetworkResource<MoviesResponse> {
+        val data = testDataFactory.generateWatchListResponseTestData()
+        val response = testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(data) }
+        return safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
+    }
 }

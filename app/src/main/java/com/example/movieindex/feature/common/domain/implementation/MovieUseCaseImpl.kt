@@ -5,7 +5,6 @@ import com.example.movieindex.core.data.external.*
 import com.example.movieindex.core.repository.abstraction.MovieRepository
 import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
 import kotlinx.coroutines.flow.Flow
-import timber.log.Timber
 import javax.inject.Inject
 
 class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRepository) :
@@ -15,14 +14,19 @@ class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRep
         page: Int,
         language: String?,
         region: String?,
+        
     ): Flow<Resource<List<Result>>> =
-        movieRepository.getNowPlaying(page = page, language = language, region = region)
+        movieRepository.getNowPlaying(page = page,
+            language = language,
+            region = region,
+            )
 
     override fun getPopularMovies(
         page: Int,
         language: String?,
         region: String?,
-    ): Flow<Resource<List<Result>>> = movieRepository.getNowPlaying(page = page,
+        
+    ): Flow<Resource<List<Result>>> = movieRepository.getPopularMovies(page = page,
         language = language,
         region = region)
 
@@ -30,6 +34,7 @@ class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRep
         page: Int,
         mediaType: String,
         timeWindow: String,
+        
     ): Flow<Resource<List<Result>>> = movieRepository.getTrendingMovies(page = page,
         mediaType = mediaType,
         timeWindow = timeWindow)
@@ -126,7 +131,7 @@ class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRep
 
     override fun getCrews(): Flow<List<Crew>> = movieRepository.getCrews()
 
-    override fun getAccountId(): Flow<Int> = movieRepository.getAccountId()
+    override fun getAccountId(): Flow<Int> = movieRepository.getAccountIdCache()
 
     override suspend fun insertMovieToCache(
         movieDetails: MovieDetails,
@@ -141,15 +146,15 @@ class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRep
     override fun getCachedMovie(movieId: Int): Flow<SavedMovie?> =
         movieRepository.getCachedMovie(movieId = movieId)
 
-    override suspend fun updateBookmark(movieId: Int, isBookmarked: Boolean) {
-        movieRepository.updateBookmark(movieId = movieId, isBookmark = isBookmarked)
+    override suspend fun updateBookmarkCache(movieId: Int, isBookmarked: Boolean) {
+        movieRepository.updateBookmarkCache(movieId = movieId, isBookmark = isBookmarked)
     }
 
-    override suspend fun updateFavorite(movieId: Int, isFavorite: Boolean) {
-        movieRepository.updateFavorite(movieId = movieId, isFavorite = isFavorite)
+    override suspend fun updateFavoriteCache(movieId: Int, isFavorite: Boolean) {
+        movieRepository.updateFavoriteCache(movieId = movieId, isFavorite = isFavorite)
     }
 
-    override suspend fun deleteSavedMovie(movieId: Int) {
-        movieRepository.deleteMovie(movieId)
+    override suspend fun deleteSavedMovieCache(movieId: Int) {
+        movieRepository.deleteMovieCache(movieId)
     }
 }

@@ -7,7 +7,6 @@ import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.repository.abstraction.AuthRepository
-import com.example.movieindex.core.repository.abstraction.MovieRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -16,7 +15,6 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val network: NetworkDataSource,
     private val cache: CacheDataSource,
-    private val movieRepository: MovieRepository,
 ) : AuthRepository {
 
     override suspend fun saveSessionId(sessionId: String) {
@@ -84,7 +82,7 @@ class AuthRepositoryImpl @Inject constructor(
                                     when (accountDetailsRequest) {
                                         is NetworkResource.Success -> {
                                             Timber.i("login request - accountDetails request success - accountId ${accountDetailsRequest.data.id}")
-                                            movieRepository.saveAccountId(accountId = accountDetailsRequest.data.id)
+                                            cache.saveAccountId(accountId = accountDetailsRequest.data.id)
                                             emit(Resource.Success(sessionIdRequest.data))
                                             saveSessionId(sessionId = sessionIdRequest.data.session_id)
                                         }
