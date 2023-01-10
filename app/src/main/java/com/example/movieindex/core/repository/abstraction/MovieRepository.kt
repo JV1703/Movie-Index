@@ -1,9 +1,7 @@
 package com.example.movieindex.core.repository.abstraction
 
 import androidx.paging.PagingData
-import com.example.movieindex.core.data.external.*
-import com.example.movieindex.core.data.local.model.MovieEntity
-import com.example.movieindex.core.data.remote.model.common.PostResponse
+import com.example.movieindex.core.data.external.model.*
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {
@@ -76,8 +74,8 @@ interface MovieRepository {
     fun getCasts(): Flow<List<Cast>>
     suspend fun saveCrews(crews: List<Crew>)
     fun getCrews(): Flow<List<Crew>>
-    suspend fun saveAccountIdCache(accountId: Int)
-    fun getAccountIdCache(): Flow<Int>
+//    suspend fun saveAccountIdCache(accountId: Int)
+//    fun getAccountIdCache(): Flow<Int>
     fun getAccountDetails(sessionId: String): Flow<Resource<AccountDetails>>
     fun addToFavorite(
         favorite: Boolean,
@@ -129,4 +127,26 @@ interface MovieRepository {
         language: String? = null,
         sortBy: String? = null,
     ): Flow<Resource<List<Result>>>
+
+    fun getFavoriteListRemoteMediator(
+        accountId: Int,
+        sessionId: String,
+        loadSinglePage: Boolean = false,
+        language: String? = null,
+        sortBy: String? = null,
+    ): Flow<PagingData<Result>>
+
+    fun getWatchListRemoteMediator(
+        accountId: Int,
+        sessionId: String,
+        loadSinglePage: Boolean = false,
+        language: String? = null,
+        sortBy: String? = null,
+    ): Flow<PagingData<Result>>
+
+    suspend fun insertAccountDetailsCache(account: AccountDetails)
+    fun getAccountDetailsCache(): Flow<AccountDetails?>
+    suspend fun deleteAccountDetailsCache()
+    fun getFavoriteCountCache(): Flow<Int>
+    fun getWatchlistCountCache(): Flow<Int>
 }

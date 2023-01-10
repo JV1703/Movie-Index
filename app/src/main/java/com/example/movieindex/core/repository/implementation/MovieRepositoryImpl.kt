@@ -1,17 +1,15 @@
 package com.example.movieindex.core.repository.implementation
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
+import androidx.paging.*
 import androidx.work.*
 import com.example.movieindex.core.common.WorkerConstants.FAVORITE_WORKER_FAVORITE_KEY
 import com.example.movieindex.core.common.WorkerConstants.WATCH_LIST_WORKER_WATCH_LIST_KEY
 import com.example.movieindex.core.common.WorkerConstants.WORKER_MOVIE_ID_KEY
 import com.example.movieindex.core.common.WorkerConstants.WORKER_MOVIE_TYPE_KEY
 import com.example.movieindex.core.data.external.*
+import com.example.movieindex.core.data.external.model.*
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
-import com.example.movieindex.core.data.local.model.toSavedMovie
+import com.example.movieindex.core.data.local.model.*
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
 import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
@@ -21,6 +19,7 @@ import com.example.movieindex.core.data.remote.model.common.toResult
 import com.example.movieindex.core.data.remote.model.details.MovieDetailsResponse
 import com.example.movieindex.core.data.remote.model.details.toMovieDetails
 import com.example.movieindex.core.repository.abstraction.MovieRepository
+import com.example.movieindex.core.repository.paging.MoviesPagingRemoteMediator
 import com.example.movieindex.core.repository.paging.MoviesPagingSource
 import com.example.movieindex.feature.detail.movie.worker.FavoriteWorker
 import com.example.movieindex.feature.detail.movie.worker.WatchListWorker
@@ -74,14 +73,13 @@ fun <T, R> networkResourceHandler(
 //    }
 //}
 
+@OptIn(ExperimentalPagingApi::class)
 class MovieRepositoryImpl @Inject constructor(
     private val workManager: WorkManager,
     private val network: NetworkDataSource,
     private val cache: CacheDataSource,
 ) : MovieRepository {
 
-    private var nowPlayingMoviesList: List<Result> = emptyList()
-    private val nowPlayingMutex = Mutex()
     override fun getNowPlaying(
         page: Int,
         language: String?,
@@ -373,6 +371,47 @@ class MovieRepositoryImpl @Inject constructor(
     }).flow.map { pagingData -> pagingData.map { it.toResult() } }
         .catch { t -> Timber.e("getFavoriteListPagingSource: ${t.message}") }
 
+    override fun getFavoriteListRemoteMediator(
+        accountId: Int,
+        sessionId: String,
+        loadSinglePage: Boolean,
+        language: String?,
+        sortBy: String?,
+    ): Flow<PagingData<Result>> = Pager(
+        config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+        remoteMediator = MoviesPagingRemoteMediator(
+            networkCall = { page ->
+                network.getFavoriteList(
+                    accountId = accountId,
+                    sessionId = sessionId,
+                    page = page,
+                    language = language,
+                    sortBy = sortBy)
+            },
+            pagingCategory = MoviePagingCategory.FAVORITE,
+            dbCallGetMovieKey = { id: String, pagingCategory: MoviePagingCategory ->
+                cache.movieKeyId(id = id, pagingCategory = pagingCategory)
+            },
+            dbCallOnRefreshClearDb = { pagingCategory: MoviePagingCategory ->
+                cache.clearMovieKeys(pagingCategory = pagingCategory)
+                cache.clearMovies(pagingCategory = pagingCategory)
+            },
+            dbCallOnSuccess = { movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
+                cache.insertAllMovieKeys(movieKeys)
+                cache.insertAllMovies(movies)
+            }
+        ),
+        pagingSourceFactory = {
+            cache.getMovies(pagingCategory = MoviePagingCategory.FAVORITE)
+        }
+    ).flow.map { pagingData ->
+        pagingData.map {
+            it.toResult()
+        }
+    }.catch { t: Throwable ->
+        Timber.e("getFavoriteListRemoteMediator: ${t.message}")
+    }
+
     override fun getWatchListPagingSource(
         accountId: Int,
         sessionId: String,
@@ -392,6 +431,47 @@ class MovieRepositoryImpl @Inject constructor(
         })
     }).flow.map { pagingData -> pagingData.map { it.toResult() } }
         .catch { t -> Timber.e("getWatchListPagingSource: ${t.message}") }
+
+    override fun getWatchListRemoteMediator(
+        accountId: Int,
+        sessionId: String,
+        loadSinglePage: Boolean,
+        language: String?,
+        sortBy: String?,
+    ): Flow<PagingData<Result>> = Pager(
+        config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+        remoteMediator = MoviesPagingRemoteMediator(
+            networkCall = { page ->
+                network.getWatchList(
+                    accountId = accountId,
+                    sessionId = sessionId,
+                    page = page,
+                    language = language,
+                    sortBy = sortBy)
+            },
+            pagingCategory = MoviePagingCategory.WATCHLIST,
+            dbCallGetMovieKey = { id: String, pagingCategory: MoviePagingCategory ->
+                cache.movieKeyId(id = id, pagingCategory = pagingCategory)
+            },
+            dbCallOnRefreshClearDb = { pagingCategory: MoviePagingCategory ->
+                cache.clearMovieKeys(pagingCategory = pagingCategory)
+                cache.clearMovies(pagingCategory = pagingCategory)
+            },
+            dbCallOnSuccess = { movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
+                cache.insertAllMovieKeys(movieKeys)
+                cache.insertAllMovies(movies)
+            }
+        ),
+        pagingSourceFactory = {
+            cache.getMovies(pagingCategory = MoviePagingCategory.WATCHLIST)
+        }
+    ).flow.map { pagingData ->
+        pagingData.map {
+            it.toResult()
+        }
+    }.catch { t: Throwable ->
+        Timber.e("getWatchListRemoteMediator: ${t.message}")
+    }
 
     override suspend fun saveCasts(casts: List<Cast>) {
         val castString = Gson().toJson(casts)
@@ -415,11 +495,11 @@ class MovieRepositoryImpl @Inject constructor(
         gson.fromJson<List<Crew>>(it, listType)
     }.catch { t -> Timber.e("getCasts: ${t.message}") }
 
-    override suspend fun saveAccountIdCache(accountId: Int) {
-        cache.saveAccountId(accountId = accountId)
-    }
-
-    override fun getAccountIdCache(): Flow<Int> = cache.getAccountId()
+//    override suspend fun saveAccountIdCache(accountId: Int) {
+//        cache.saveAccountId(accountId = accountId)
+//    }
+//
+//    override fun getAccountIdCache(): Flow<Int> = cache.getAccountId()
 
     override suspend fun insertMovieToCache(
         movie: MovieDetails,
@@ -456,5 +536,18 @@ class MovieRepositoryImpl @Inject constructor(
     override suspend fun deleteMovieCache(movieId: Int) {
         cache.deleteMovie(movieId = movieId)
     }
+
+    override suspend fun insertAccountDetailsCache(account: AccountDetails){
+        cache.insertAccountDetails(account.toAccountEntity())
+    }
+
+    override fun getAccountDetailsCache(): Flow<AccountDetails?> =
+        cache.getAccountDetails().map { it?.toAccountDetails() }
+
+    override suspend fun deleteAccountDetailsCache() = cache.deleteAccountDetails()
+
+    override fun getFavoriteCountCache(): Flow<Int> = cache.getFavoriteCount()
+
+    override fun getWatchlistCountCache(): Flow<Int> = cache.getWatchlistCount()
 
 }

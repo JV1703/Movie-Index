@@ -1,6 +1,7 @@
 package com.example.movieindex.core.repository.abstraction
 
-import com.example.movieindex.core.data.external.Resource
+import com.example.movieindex.core.data.external.model.Resource
+import com.example.movieindex.core.data.remote.model.auth.response.DeleteSessionResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import kotlinx.coroutines.flow.Flow
 
@@ -20,4 +21,5 @@ interface AuthRepository {
 //    ): Flow<Resource<LoginResponse>>
 //
 //    fun createSession(requestToken: String): Flow<Resource<SessionIdResponse>>
+    fun deleteSession(): Flow<Resource<DeleteSessionResponse>>
 }

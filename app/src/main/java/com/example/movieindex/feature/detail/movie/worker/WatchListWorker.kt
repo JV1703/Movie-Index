@@ -30,7 +30,7 @@ class WatchListWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val sessionId = cache.getSessionId().first()
-        val accountId = cache.getAccountId().first()
+        val accountId = cache.getAccountDetails().first()?.id
         val watchlist =
             workerParams.inputData.getBoolean(WATCH_LIST_WORKER_WATCH_LIST_KEY, false)
         val movieId = workerParams.inputData.getInt(WorkerConstants.WORKER_MOVIE_ID_KEY, 0)
@@ -44,28 +44,38 @@ class WatchListWorker @AssistedInject constructor(
             mediaType = mediaType
         )
 
-        val networkResource = network.addToWatchList(accountId = accountId,
-            sessionId = sessionId,
-            body = body)
+        return if(accountId == null || sessionId.isEmpty()){
+            Timber.e("WatchListWorker - invalidCredentials - sessionId: $sessionId, accountId: $accountId")
+            Result.failure()
+        }else{
+            val networkResource = network.addToWatchList(accountId = accountId,
+                sessionId = sessionId,
+                body = body)
 
-        return when (networkResource) {
-            is NetworkResource.Success -> {
-                Result.success()
-            }
-            is NetworkResource.Error -> {
-                if (runAttemptCount > WorkerConstants.MAX_RETRY_ATTEMPT) {
-                    Result.failure()
-                } else {
-                    Result.retry()
+            when (networkResource) {
+                is NetworkResource.Success -> {
+                    Result.success()
                 }
-            }
-            is NetworkResource.Empty -> {
-                if (runAttemptCount > WorkerConstants.MAX_RETRY_ATTEMPT) {
-                    Result.failure()
-                } else {
-                    Result.retry()
+                is NetworkResource.Error -> {
+                    if (runAttemptCount > WorkerConstants.MAX_RETRY_ATTEMPT) {
+                        Timber.e("WatchListWorker - fail - errMsg: ${networkResource.errMessage}")
+                        Result.failure()
+                    } else {
+                        Timber.e("WatchListWorker - retry - errMsg: ${networkResource.errMessage}")
+                        Result.retry()
+                    }
+                }
+                is NetworkResource.Empty -> {
+                    if (runAttemptCount > WorkerConstants.MAX_RETRY_ATTEMPT) {
+                        Result.failure()
+                    } else {
+                        Result.retry()
+                    }
                 }
             }
         }
+
+
+
     }
 }

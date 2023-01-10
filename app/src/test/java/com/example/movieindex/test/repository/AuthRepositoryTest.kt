@@ -3,7 +3,7 @@ package com.example.movieindex.test.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
-import com.example.movieindex.core.data.external.Resource
+import com.example.movieindex.core.data.external.model.Resource
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
 import com.example.movieindex.core.repository.abstraction.AuthRepository
 import com.example.movieindex.core.repository.implementation.AuthRepositoryImpl

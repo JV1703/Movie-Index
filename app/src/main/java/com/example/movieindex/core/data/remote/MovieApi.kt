@@ -1,7 +1,10 @@
 package com.example.movieindex.core.data.remote
 
 import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
+import com.example.movieindex.core.data.remote.model.account.MovieAccountStateResponse
+import com.example.movieindex.core.data.remote.model.auth.body.DeleteSessionBody
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.DeleteSessionResponse
 import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
@@ -113,4 +116,14 @@ interface MovieApi {
         @Query("sort_by") sortBy: String? = null,
     ):Response<MoviesResponse>
 
+    @HTTP(method = "DELETE", path = "authentication/session", hasBody = true)
+    suspend fun deleteSession(
+        @Body body: DeleteSessionBody,
+    ): Response<DeleteSessionResponse>
+
+    @GET("movie/{movie_id}/account_states")
+    suspend fun getMovieAccountState(
+        @Path("movie_id")movieId: Int,
+        @Query("session_id")sessionId: String
+    ): Response<MovieAccountStateResponse>
 }

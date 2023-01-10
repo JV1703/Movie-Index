@@ -1,4 +1,4 @@
-package com.example.movieindex.core.data.external
+package com.example.movieindex.core.data.external.model
 
 sealed class Resource<out T>() {
     data class Success<out T>(val data: T) : Resource<T>()

@@ -6,7 +6,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movieindex.core.common.extensions.loadImage
-import com.example.movieindex.core.data.external.Result
+import com.example.movieindex.core.data.external.model.Result
 import com.example.movieindex.core.data.remote.NetworkConstants
 import com.example.movieindex.databinding.MovieListVhItemBinding
 

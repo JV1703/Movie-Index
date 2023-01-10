@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieindex.core.common.RvListHelper
 import com.example.movieindex.core.data.external.*
+import com.example.movieindex.core.data.external.model.*
 import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*

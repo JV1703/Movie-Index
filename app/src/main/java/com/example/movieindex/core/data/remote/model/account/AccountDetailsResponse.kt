@@ -1,7 +1,8 @@
 package com.example.movieindex.core.data.remote.model.account
 
 
-import com.example.movieindex.core.data.external.AccountDetails
+import com.example.movieindex.core.data.external.model.AccountDetails
+import com.example.movieindex.core.data.local.model.AccountEntity
 import com.squareup.moshi.Json
 
 data class AccountDetailsResponse(
@@ -21,4 +22,14 @@ data class AccountDetailsResponse(
     val username: String
 )
 
-fun AccountDetailsResponse.toAccountDetails() = AccountDetails(avatar, id, include_adult, iso_3166_1, iso_639_1, name, username)
+fun Avatar.getAvatarPath() = this.tmdb.avatarPath ?: "https://www.gravatar.com/avatar/${this.gravatar.hash}.jpg"
+
+fun AccountDetailsResponse.toAccountDetails() = AccountDetails(avatar.getAvatarPath(), id, include_adult, iso_3166_1, iso_639_1, name, username)
+fun AccountDetailsResponse.toAccountEntity() = AccountEntity(
+    avatarPath = avatar.getAvatarPath(),
+    id = id,
+    include_adult = include_adult,
+    iso_3166_1 = iso_3166_1,
+    iso_639_1 = iso_639_1,
+    name = name,
+    username = username)

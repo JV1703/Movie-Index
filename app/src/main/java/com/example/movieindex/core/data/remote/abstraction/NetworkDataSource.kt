@@ -2,7 +2,10 @@ package com.example.movieindex.core.data.remote.abstraction
 
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
+import com.example.movieindex.core.data.remote.model.account.MovieAccountStateResponse
+import com.example.movieindex.core.data.remote.model.auth.body.DeleteSessionBody
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.DeleteSessionResponse
 import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
@@ -82,4 +85,10 @@ interface NetworkDataSource {
         language: String? = null,
         sortBy: String? = null,
     ): NetworkResource<MoviesResponse>
+
+    suspend fun deleteSession(body: DeleteSessionBody): NetworkResource<DeleteSessionResponse>
+    suspend fun getMovieAccountState(
+        movieId: Int,
+        sessionId: String
+    ): NetworkResource<MovieAccountStateResponse>
 }

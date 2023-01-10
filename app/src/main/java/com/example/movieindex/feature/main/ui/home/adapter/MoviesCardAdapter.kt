@@ -13,7 +13,7 @@ import com.example.movieindex.core.common.extensions.toSuperScript
 import com.example.movieindex.core.common.getCurrentLocale
 import com.example.movieindex.core.common.getMovieRatingIndicatorColor
 import com.example.movieindex.core.common.getMovieRatingTrackColor
-import com.example.movieindex.core.data.external.Result
+import com.example.movieindex.core.data.external.model.Result
 import com.example.movieindex.core.data.remote.NetworkConstants.BASE_IMG_URL
 import com.example.movieindex.core.data.remote.NetworkConstants.POSTER_SIZE_SMALL
 import com.example.movieindex.databinding.MovieVhItemBinding

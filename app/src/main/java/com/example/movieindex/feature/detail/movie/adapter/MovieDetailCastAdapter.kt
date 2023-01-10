@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.movieindex.core.common.RvListHelper
 import com.example.movieindex.core.common.extensions.loadErrorImage
 import com.example.movieindex.core.common.extensions.loadImage
-import com.example.movieindex.core.data.external.Cast
+import com.example.movieindex.core.data.external.model.Cast
 import com.example.movieindex.core.data.remote.NetworkConstants.BASE_IMG_URL
 import com.example.movieindex.core.data.remote.NetworkConstants.CREDIT_IMG_SIZE
 import com.example.movieindex.databinding.MovieDetailCastVhItemBinding

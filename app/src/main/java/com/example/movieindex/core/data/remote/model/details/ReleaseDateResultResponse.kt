@@ -1,7 +1,7 @@
 package com.example.movieindex.core.data.remote.model.details
 
 
-import com.example.movieindex.core.data.external.ReleaseDate
+import com.example.movieindex.core.data.external.model.ReleaseDate
 import com.squareup.moshi.Json
 
 data class ReleaseDateResultResponse(

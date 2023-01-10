@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import com.example.movieindex.core.data.external.Resource
+import com.example.movieindex.core.data.external.model.Resource
 import com.example.movieindex.core.data.local.CacheConstants
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse

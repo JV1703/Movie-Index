@@ -2,7 +2,7 @@ package com.example.movieindex.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.movieindex.core.data.external.Resource
+import com.example.movieindex.core.data.external.model.Resource
 import com.example.movieindex.core.data.remote.NetworkConstants.TMDB_RESET_PASSWORD
 import com.example.movieindex.core.data.remote.NetworkConstants.TMDB_SIGN_UP_URL
 import com.example.movieindex.feature.auth.domain.abstraction.AuthUseCase

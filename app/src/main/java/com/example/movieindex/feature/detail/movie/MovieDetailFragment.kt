@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.
 import com.example.movieindex.R
 import com.example.movieindex.core.common.*
 import com.example.movieindex.core.common.extensions.*
-import com.example.movieindex.core.data.external.*
+import com.example.movieindex.core.data.external.model.*
 import com.example.movieindex.core.data.remote.NetworkConstants.BACKDROP_SIZE
 import com.example.movieindex.core.data.remote.NetworkConstants.BASE_IMG_URL
 import com.example.movieindex.core.data.remote.NetworkConstants.CREDIT_IMG_SIZE

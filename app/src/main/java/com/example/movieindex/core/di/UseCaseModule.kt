@@ -6,6 +6,8 @@ import com.example.movieindex.feature.auth.domain.abstraction.AuthUseCase
 import com.example.movieindex.feature.auth.domain.implementation.AuthUseCaseImpl
 import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
 import com.example.movieindex.feature.common.domain.implementation.MovieUseCaseImpl
+import com.example.movieindex.feature.main.ui.account.domain.abstraction.AccountUseCase
+import com.example.movieindex.feature.main.ui.account.domain.implementation.AccountUseCaseImpl
 import com.example.movieindex.feature.splash.domain.abstraction.SyncUseCase
 import com.example.movieindex.feature.splash.domain.implementaion.SyncUseCaseImpl
 import dagger.Module
@@ -39,4 +41,11 @@ object UseCaseModule {
     ): SyncUseCase = SyncUseCaseImpl(authRepository = authRepository,
         movieRepository = movieRepository)
 
+    @Provides
+    @ViewModelScoped
+    fun provideAccountUseCase(
+        authRepository: AuthRepository,
+        movieRepository: MovieRepository,
+    ): AccountUseCase =
+        AccountUseCaseImpl(authRepository = authRepository, movieRepository = movieRepository)
 }

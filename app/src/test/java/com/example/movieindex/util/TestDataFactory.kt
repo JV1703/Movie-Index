@@ -1,9 +1,8 @@
 package com.example.movieindex.util
 
 import com.example.movieindex.core.common.extensions.fromJson
-import com.example.movieindex.core.data.external.MovieDetails
-import com.example.movieindex.core.data.external.Result
-import com.example.movieindex.core.data.external.movieGenreMapper
+import com.example.movieindex.core.data.external.model.MovieDetails
+import com.example.movieindex.core.data.external.model.Result
 import com.example.movieindex.core.data.local.model.MovieEntity
 import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody

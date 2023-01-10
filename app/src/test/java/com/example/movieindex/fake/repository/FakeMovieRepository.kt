@@ -9,6 +9,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.example.movieindex.core.data.external.*
+import com.example.movieindex.core.data.external.model.*
 import com.example.movieindex.core.data.local.CacheConstants.ACCOUNT_ID
 import com.example.movieindex.core.data.local.CacheConstants.CASTS
 import com.example.movieindex.core.data.local.CacheConstants.CREWS

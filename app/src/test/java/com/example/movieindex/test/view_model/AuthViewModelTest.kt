@@ -3,7 +3,7 @@ package com.example.movieindex.test.view_model
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
-import com.example.movieindex.core.data.external.Resource
+import com.example.movieindex.core.data.external.model.Resource
 import com.example.movieindex.fake.datastore.FakePreferenceDataStore
 import com.example.movieindex.fake.use_case.FakeAuthUseCase
 import com.example.movieindex.feature.auth.AuthViewModel

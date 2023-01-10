@@ -14,7 +14,7 @@ import com.example.movieindex.core.common.extensions.toSuperScript
 import com.example.movieindex.core.common.getCurrentLocale
 import com.example.movieindex.core.common.getMovieRatingIndicatorColor
 import com.example.movieindex.core.common.getMovieRatingTrackColor
-import com.example.movieindex.core.data.external.Result
+import com.example.movieindex.core.data.external.model.Result
 import com.example.movieindex.core.data.remote.NetworkConstants
 import com.example.movieindex.databinding.MovieDetailRecommendationViewMoreVhItemBinding
 import com.example.movieindex.databinding.MovieVhItemBinding

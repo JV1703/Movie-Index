@@ -7,7 +7,10 @@ import androidx.work.WorkManager
 import com.example.movieindex.core.common.ColorPalette
 import com.example.movieindex.core.data.local.MovieDatabase
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
+import com.example.movieindex.core.data.local.dao.AccountDao
 import com.example.movieindex.core.data.local.dao.MovieDao
+import com.example.movieindex.core.data.local.dao.MoviePagingDao
+import com.example.movieindex.core.data.local.dao.MoviePagingKeyDao
 import com.example.movieindex.core.data.local.implementation.CacheDataSourceImpl
 import com.example.movieindex.core.data.remote.MovieApi
 import com.example.movieindex.core.data.remote.NetworkConstants.CACHE_SIZE
@@ -98,6 +101,22 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideMoviePagingDao(
+        database: MovieDatabase,
+    ) = database.moviePagingDao()
+
+    @Provides
+    @Singleton
+    fun provideMoviePagingKeyDao(
+        database: MovieDatabase,
+    ) = database.moviePagingKeyDao()
+
+    @Provides
+    @Singleton
+    fun provideAccountDao(database: MovieDatabase) = database.accountDao()
+
+    @Provides
+    @Singleton
     fun provideNetworkDataSource(
         movieApi: MovieApi, @CoroutinesQualifiers.IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): NetworkDataSource = NetworkDataSourceImpl(movieApi = movieApi, ioDispatcher = ioDispatcher)
@@ -106,9 +125,16 @@ object AppModule {
     @Singleton
     fun provideCacheDataSource(
         movieDao: MovieDao,
+        moviePagingDao: MoviePagingDao,
+        moviePagingKeyDao: MoviePagingKeyDao,
+        accountDao: AccountDao,
         dataStore: DataStore<Preferences>,
         @CoroutinesQualifiers.IoDispatcher ioDispatcher: CoroutineDispatcher,
-    ): CacheDataSource = CacheDataSourceImpl(movieDao = movieDao,
+    ): CacheDataSource = CacheDataSourceImpl(
+        movieDao = movieDao,
+        moviePagingDao = moviePagingDao,
+        moviePagingKeyDao = moviePagingKeyDao,
+        accountDao = accountDao,
         dataStore = dataStore,
         ioDispatcher = ioDispatcher)
 

@@ -19,8 +19,13 @@ interface MovieDao {
     @Query("SELECT * FROM movies_table WHERE isFavorite = 1")
     fun getFavoriteMovies(): Flow<List<MovieEntity>>
 
+    @Query("SELECT COUNT(*) FROM movies_table WHERE isFavorite = 1")
+    fun getFavoriteCount(): Flow<Int>
+
     @Query("SELECT * FROM movies_table WHERE isBookmark = 1")
     fun getBookmarkedMovies(): Flow<List<MovieEntity>>
+    @Query("SELECT COUNT(*) FROM movies_table WHERE isBookmark = 1")
+    fun getWatchlistCount(): Flow<Int>
 
     @Query("UPDATE movies_table SET isBookmark = :isBookmark WHERE movieId = :movieId")
     suspend fun updateBookmark(movieId: Int, isBookmark: Boolean)

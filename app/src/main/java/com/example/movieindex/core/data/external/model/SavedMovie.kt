@@ -1,4 +1,4 @@
-package com.example.movieindex.core.data.external
+package com.example.movieindex.core.data.external.model
 
 data class SavedMovie(
     val movieId: Int,

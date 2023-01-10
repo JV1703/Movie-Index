@@ -1,8 +1,8 @@
 package com.example.movieindex.feature.splash.domain.implementaion
 
-import com.example.movieindex.core.data.external.Resource
-import com.example.movieindex.core.data.external.Result
-import com.example.movieindex.core.data.external.SavedMovie
+import com.example.movieindex.core.data.external.model.Resource
+import com.example.movieindex.core.data.external.model.Result
+import com.example.movieindex.core.data.external.model.SavedMovie
 import com.example.movieindex.core.repository.abstraction.AuthRepository
 import com.example.movieindex.core.repository.abstraction.MovieRepository
 import com.example.movieindex.feature.splash.domain.abstraction.SyncUseCase

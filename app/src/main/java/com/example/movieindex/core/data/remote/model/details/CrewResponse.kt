@@ -1,7 +1,7 @@
 package com.example.movieindex.core.data.remote.model.details
 
 
-import com.example.movieindex.core.data.external.Crew
+import com.example.movieindex.core.data.external.model.Crew
 import com.squareup.moshi.Json
 
 data class CrewResponse(

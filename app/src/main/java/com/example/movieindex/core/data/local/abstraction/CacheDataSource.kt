@@ -1,6 +1,7 @@
 package com.example.movieindex.core.data.local.abstraction
 
-import com.example.movieindex.core.data.local.model.MovieEntity
+import androidx.paging.PagingSource
+import com.example.movieindex.core.data.local.model.*
 import kotlinx.coroutines.flow.Flow
 
 interface CacheDataSource {
@@ -11,8 +12,8 @@ interface CacheDataSource {
     fun getCasts(): Flow<String>
     suspend fun saveCrews(crews: String)
     fun getCrews(): Flow<String>
-    suspend fun saveAccountId(accountId: Int)
-    fun getAccountId(): Flow<Int>
+//    suspend fun saveAccountId(accountId: Int)
+//    fun getAccountId(): Flow<Int>
     suspend fun insertMovie(movie: MovieEntity)
     fun getMovie(movieId: Int): Flow<MovieEntity?>
     fun getFavoriteMovies(): Flow<List<MovieEntity>>
@@ -20,4 +21,18 @@ interface CacheDataSource {
     suspend fun updateBookmark(movieId: Int, isBookmark: Boolean)
     suspend fun updateFavorite(movieId: Int, isFavorite: Boolean)
     suspend fun deleteMovie(movieId: Int)
+    suspend fun insertAllMovies(movies: List<MoviePagingEntity>)
+    fun getMovies(pagingCategory: MoviePagingCategory): PagingSource<Int, MoviePagingEntity>
+    fun getMoviesWithReferenceToPagingCategory(pagingCategory: MoviePagingCategory): Flow<List<MoviePagingEntity>>
+    fun getAllMovies(): Flow<List<MoviePagingEntity>>
+    suspend fun clearMovies(pagingCategory: MoviePagingCategory)
+    suspend fun insertAllMovieKeys(movieKeys: List<MovieEntityKey>)
+    fun getAllMovieKey(): Flow<List<MovieEntityKey>>
+    suspend fun movieKeyId(id: String, pagingCategory: MoviePagingCategory): MovieEntityKey?
+    suspend fun clearMovieKeys(pagingCategory: MoviePagingCategory)
+    suspend fun insertAccountDetails(account: AccountEntity)
+    fun getAccountDetails(): Flow<AccountEntity?>
+    suspend fun deleteAccountDetails()
+    fun getFavoriteCount(): Flow<Int>
+    fun getWatchlistCount(): Flow<Int>
 }

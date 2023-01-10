@@ -1,6 +1,7 @@
 package com.example.movieindex.feature.auth.domain.implementation
 
-import com.example.movieindex.core.data.external.Resource
+import com.example.movieindex.core.data.external.model.Resource
+import com.example.movieindex.core.data.remote.model.auth.response.DeleteSessionResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.repository.abstraction.AuthRepository
 import com.example.movieindex.feature.auth.domain.abstraction.AuthUseCase
@@ -27,8 +28,6 @@ class AuthUseCaseImpl @Inject constructor(private val repository: AuthRepository
 
     override fun getSessionId(): Flow<String> = repository.getSessionId()
 
-    override suspend fun clearDataStore() {
-        repository.clearDataStore()
-    }
+    override fun logout(): Flow<Resource<DeleteSessionResponse>> = repository.deleteSession()
 
 }

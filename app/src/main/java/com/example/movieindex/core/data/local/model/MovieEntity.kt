@@ -2,8 +2,7 @@ package com.example.movieindex.core.data.local.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.movieindex.core.data.external.MovieDetails
-import com.example.movieindex.core.data.external.SavedMovie
+import com.example.movieindex.core.data.external.model.SavedMovie
 
 @Entity(tableName = "movies_table")
 data class MovieEntity(

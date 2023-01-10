@@ -7,8 +7,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.paging.PagingSource
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.*
-import com.example.movieindex.core.data.external.Resource
-import com.example.movieindex.core.data.external.toMovieEntity
+import com.example.movieindex.core.data.external.model.Resource
+import com.example.movieindex.core.data.external.model.toMovieEntity
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
 import com.example.movieindex.core.data.local.model.toSavedMovie
 import com.example.movieindex.core.data.remote.NetworkResource

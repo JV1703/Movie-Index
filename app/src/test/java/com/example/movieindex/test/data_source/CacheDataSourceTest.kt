@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
-import com.example.movieindex.core.data.external.toMovieEntity
+import com.example.movieindex.core.data.external.model.toMovieEntity
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
 import com.example.movieindex.core.data.local.dao.MovieDao
 import com.example.movieindex.core.data.local.implementation.CacheDataSourceImpl
@@ -18,7 +18,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

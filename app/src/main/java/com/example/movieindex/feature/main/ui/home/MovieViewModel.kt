@@ -2,8 +2,8 @@ package com.example.movieindex.feature.main.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.movieindex.core.data.external.Resource
-import com.example.movieindex.core.data.external.Result
+import com.example.movieindex.core.data.external.model.Resource
+import com.example.movieindex.core.data.external.model.Result
 import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job

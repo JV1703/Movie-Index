@@ -4,13 +4,16 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import com.example.movieindex.core.data.local.CacheConstants.ACCOUNT_ID
+import androidx.paging.PagingSource
 import com.example.movieindex.core.data.local.CacheConstants.CASTS
 import com.example.movieindex.core.data.local.CacheConstants.CREWS
 import com.example.movieindex.core.data.local.CacheConstants.SESSION_ID
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
+import com.example.movieindex.core.data.local.dao.AccountDao
 import com.example.movieindex.core.data.local.dao.MovieDao
-import com.example.movieindex.core.data.local.model.MovieEntity
+import com.example.movieindex.core.data.local.dao.MoviePagingDao
+import com.example.movieindex.core.data.local.dao.MoviePagingKeyDao
+import com.example.movieindex.core.data.local.model.*
 import com.example.movieindex.core.di.CoroutinesQualifiers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +27,9 @@ import javax.inject.Inject
 
 class CacheDataSourceImpl @Inject constructor(
     private val movieDao: MovieDao,
+    private val moviePagingDao: MoviePagingDao,
+    private val moviePagingKeyDao: MoviePagingKeyDao,
+    private val accountDao: AccountDao,
     private val dataStore: DataStore<Preferences>,
     @CoroutinesQualifiers.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CacheDataSource {
@@ -123,23 +129,65 @@ class CacheDataSourceImpl @Inject constructor(
         preferences[CREWS] ?: ""
     }.flowOn(ioDispatcher)
 
-    override suspend fun saveAccountId(accountId: Int) {
-        withContext(ioDispatcher) {
-            dataStore.edit { preferences ->
-                preferences[ACCOUNT_ID] = accountId
-            }
-        }
-    }
+//    override suspend fun saveAccountId(accountId: Int) {
+//        withContext(ioDispatcher) {
+//            dataStore.edit { preferences ->
+//                preferences[ACCOUNT_ID] = accountId
+//            }
+//        }
+//    }
 
-    override fun getAccountId(): Flow<Int> = dataStore.data.catch {
-        if (it is IOException) {
-            it.printStackTrace()
-            emit(emptyPreferences())
-        } else {
-            throw it
-        }
-    }.map { preferences ->
-        preferences[ACCOUNT_ID] ?: 0
-    }.flowOn(ioDispatcher)
+//    override fun getAccountId(): Flow<Int> = dataStore.data.catch {
+//        if (it is IOException) {
+//            it.printStackTrace()
+//            emit(emptyPreferences())
+//        } else {
+//            throw it
+//        }
+//    }.map { preferences ->
+//        preferences[ACCOUNT_ID] ?: 0
+//    }.flowOn(ioDispatcher)
+
+    override suspend fun insertAllMovies(movies: List<MoviePagingEntity>) =
+        moviePagingDao.insertAllMovies(movies = movies)
+
+    override fun getMovies(pagingCategory: MoviePagingCategory): PagingSource<Int, MoviePagingEntity> =
+        moviePagingDao.getMovies(pagingCategory = pagingCategory)
+
+    override fun getMoviesWithReferenceToPagingCategory(pagingCategory: MoviePagingCategory): Flow<List<MoviePagingEntity>> =
+        moviePagingDao.getMoviesWithReferenceToPagingCategory(pagingCategory = pagingCategory)
+            .flowOn(ioDispatcher)
+
+    override fun getAllMovies(): Flow<List<MoviePagingEntity>> =
+        moviePagingDao.getAllMovies().flowOn(ioDispatcher)
+
+    override suspend fun clearMovies(pagingCategory: MoviePagingCategory) =
+        moviePagingDao.clearMovies(pagingCategory = pagingCategory)
+
+    override suspend fun insertAllMovieKeys(movieKeys: List<MovieEntityKey>) =
+        moviePagingKeyDao.insertAllMovieKeys(movieKeys = movieKeys)
+
+    override fun getAllMovieKey(): Flow<List<MovieEntityKey>> =
+        moviePagingKeyDao.getAllMovieKey().flowOn(ioDispatcher)
+
+    override suspend fun movieKeyId(
+        id: String,
+        pagingCategory: MoviePagingCategory,
+    ): MovieEntityKey? = moviePagingKeyDao.movieKeyId(id = id, pagingCategory = pagingCategory)
+
+    override suspend fun clearMovieKeys(pagingCategory: MoviePagingCategory) =
+        moviePagingKeyDao.clearMovieKeys(pagingCategory = pagingCategory)
+
+    override suspend fun insertAccountDetails(account: AccountEntity) =
+        accountDao.insertAccountDetails(account)
+
+    override fun getAccountDetails(): Flow<AccountEntity?> =
+        accountDao.getAccountDetails()
+
+    override suspend fun deleteAccountDetails() = accountDao.deleteAccountDetails()
+
+    override fun getFavoriteCount(): Flow<Int> = movieDao.getFavoriteCount()
+
+    override fun getWatchlistCount(): Flow<Int> = movieDao.getWatchlistCount()
 
 }

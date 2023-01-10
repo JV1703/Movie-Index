@@ -18,6 +18,7 @@ import com.example.movieindex.databinding.FragmentMovieListBinding
 import com.example.movieindex.feature.list.movie_list.adapter.MovieListAdapter
 import com.example.movieindex.feature.list.movie_list.adapter.MovieListPagingLoadStateAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MovieListFragment : Fragment() {
@@ -59,6 +60,7 @@ class MovieListFragment : Fragment() {
         }
 
         collectLatestLifecycleFlow(viewModel.movieList) { data ->
+            Timber.i("movieList - data:$data")
             movieListAdapter.submitData(data)
         }
 
@@ -66,12 +68,6 @@ class MovieListFragment : Fragment() {
 
             binding.prependProgress.isVisible = loadState.source.prepend is LoadState.Loading
             binding.appendProgress.isVisible = loadState.source.append is LoadState.Loading
-
-            val isListEmpty =
-                loadState.refresh is LoadState.NotLoading && movieListAdapter.itemCount == 0
-            if (isListEmpty) {
-                makeToast("No Movies Found")
-            }
 
             binding.loadingInd.isVisible =
                 loadState.source.refresh is LoadState.Loading

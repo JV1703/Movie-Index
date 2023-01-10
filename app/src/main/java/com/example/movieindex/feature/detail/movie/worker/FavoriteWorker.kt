@@ -15,6 +15,7 @@ import com.example.movieindex.core.data.remote.model.favorite.body.FavoriteBody
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltWorker
@@ -31,7 +32,7 @@ class FavoriteWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val sessionId = cache.getSessionId().first()
-        val accountId = cache.getAccountId().first()
+        val accountId = cache.getAccountDetails().first()?.id
         val favorite = workerParams.inputData.getBoolean(FAVORITE_WORKER_FAVORITE_KEY, false)
         val movieId = workerParams.inputData.getInt(WORKER_MOVIE_ID_KEY, 0)
         val mediaType = workerParams.inputData.getString(WORKER_MOVIE_TYPE_KEY) ?: "movie"
@@ -42,26 +43,33 @@ class FavoriteWorker @AssistedInject constructor(
             mediaType = mediaType
         )
 
-        val networkResource = network.addToFavorite(accountId = accountId,
-            sessionId = sessionId,
-            body = body)
+        return if(accountId == null || sessionId.isEmpty()){
+            Timber.e("FavoriteWorker - invalidCredentials - sessionId: $sessionId, accountId: $accountId")
+            Result.failure()
+        }else{
+            val networkResource = network.addToFavorite(accountId = accountId,
+                sessionId = sessionId,
+                body = body)
 
-        return when (networkResource) {
-            is NetworkResource.Success -> {
-                Result.success()
-            }
-            is NetworkResource.Error -> {
-                if (runAttemptCount > MAX_RETRY_ATTEMPT) {
-                    Result.failure()
-                } else {
-                    Result.retry()
+            when (networkResource) {
+                is NetworkResource.Success -> {
+                    Result.success()
                 }
-            }
-            is NetworkResource.Empty -> {
-                if (runAttemptCount > MAX_RETRY_ATTEMPT) {
-                    Result.failure()
-                } else {
-                    Result.retry()
+                is NetworkResource.Error -> {
+                    if (runAttemptCount > MAX_RETRY_ATTEMPT) {
+                        Timber.e("FavoriteWorker - fail - errMsg: ${networkResource.errMessage}")
+                        Result.failure()
+                    } else {
+                        Timber.e("FavoriteWorker - retry - errMsg: ${networkResource.errMessage}")
+                        Result.retry()
+                    }
+                }
+                is NetworkResource.Empty -> {
+                    if (runAttemptCount > MAX_RETRY_ATTEMPT) {
+                        Result.failure()
+                    } else {
+                        Result.retry()
+                    }
                 }
             }
         }

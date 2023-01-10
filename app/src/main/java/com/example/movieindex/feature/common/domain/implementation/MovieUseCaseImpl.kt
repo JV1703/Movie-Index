@@ -1,10 +1,12 @@
 package com.example.movieindex.feature.common.domain.implementation
 
 import androidx.paging.PagingData
-import com.example.movieindex.core.data.external.*
+import com.example.movieindex.core.data.external.model.*
 import com.example.movieindex.core.repository.abstraction.MovieRepository
 import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import timber.log.Timber
 import javax.inject.Inject
 
 class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRepository) :
@@ -14,19 +16,20 @@ class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRep
         page: Int,
         language: String?,
         region: String?,
-        
-    ): Flow<Resource<List<Result>>> =
-        movieRepository.getNowPlaying(page = page,
+
+        ): Flow<Resource<List<Result>>> =
+        movieRepository.getNowPlaying(
+            page = page,
             language = language,
             region = region,
-            )
+        )
 
     override fun getPopularMovies(
         page: Int,
         language: String?,
         region: String?,
-        
-    ): Flow<Resource<List<Result>>> = movieRepository.getPopularMovies(page = page,
+
+        ): Flow<Resource<List<Result>>> = movieRepository.getPopularMovies(page = page,
         language = language,
         region = region)
 
@@ -34,8 +37,8 @@ class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRep
         page: Int,
         mediaType: String,
         timeWindow: String,
-        
-    ): Flow<Resource<List<Result>>> = movieRepository.getTrendingMovies(page = page,
+
+        ): Flow<Resource<List<Result>>> = movieRepository.getTrendingMovies(page = page,
         mediaType = mediaType,
         timeWindow = timeWindow)
 
@@ -100,6 +103,32 @@ class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRep
         region = region,
         year = year)
 
+    override fun getFavoriteListRemoteMediator(
+        accountId: Int,
+        sessionId: String,
+        loadSinglePage: Boolean,
+        language: String?,
+        sortBy: String?,
+    ): Flow<PagingData<Result>> = movieRepository.getFavoriteListRemoteMediator(
+        accountId = accountId,
+        sessionId = sessionId,
+        loadSinglePage = loadSinglePage,
+        language = language,
+        sortBy = sortBy).catch { t -> Timber.e("getFavoriteListRemoteMediator - ${t.message}") }
+
+    override fun getWatchListRemoteMediator(
+        accountId: Int,
+        sessionId: String,
+        loadSinglePage: Boolean,
+        language: String?,
+        sortBy: String?,
+    ): Flow<PagingData<Result>> = movieRepository.getWatchListRemoteMediator(
+        accountId = accountId,
+        sessionId = sessionId,
+        loadSinglePage = loadSinglePage,
+        language = language,
+        sortBy = sortBy).catch { t -> Timber.e("getWatchListRemoteMediator - ${t.message}") }
+
     override fun addToFavorite(
         favorite: Boolean,
         mediaId: Int,
@@ -131,7 +160,7 @@ class MovieUseCaseImpl @Inject constructor(private val movieRepository: MovieRep
 
     override fun getCrews(): Flow<List<Crew>> = movieRepository.getCrews()
 
-    override fun getAccountId(): Flow<Int> = movieRepository.getAccountIdCache()
+//    override fun getAccountId(): Flow<Int> = movieRepository.getAccountIdCache()
 
     override suspend fun insertMovieToCache(
         movieDetails: MovieDetails,

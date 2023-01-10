@@ -4,7 +4,9 @@ import com.example.movieindex.core.data.remote.MovieApi
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
 import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
+import com.example.movieindex.core.data.remote.model.auth.body.DeleteSessionBody
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.DeleteSessionResponse
 import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
@@ -134,10 +136,14 @@ class NetworkDataSourceImpl @Inject constructor(
     override suspend fun addToWatchList(
         accountId: Int,
         sessionId: String,
-        body: WatchListBody
+        body: WatchListBody,
     ): NetworkResource<PostResponse> =
         safeNetworkCall(dispatcher = ioDispatcher,
-            networkCall = { movieApi.addToWatchList(accountId = accountId, sessionId = sessionId, body = body) },
+            networkCall = {
+                movieApi.addToWatchList(accountId = accountId,
+                    sessionId = sessionId,
+                    body = body)
+            },
             conversion = { it })
 
     override suspend fun getFavoriteList(
@@ -171,4 +177,17 @@ class NetworkDataSourceImpl @Inject constructor(
                 sortBy = sortBy)
         },
         conversion = { it })
+
+    override suspend fun deleteSession(body: DeleteSessionBody): NetworkResource<DeleteSessionResponse> =
+        safeNetworkCall(
+            dispatcher = ioDispatcher,
+            networkCall = { movieApi.deleteSession(body = body) },
+            conversion = { it })
+
+    override suspend fun getMovieAccountState(movieId: Int, sessionId: String) =
+        safeNetworkCall(dispatcher = ioDispatcher, networkCall = {
+            movieApi.getMovieAccountState(
+                movieId = movieId,
+                sessionId = sessionId)
+        }, conversion = { it })
 }

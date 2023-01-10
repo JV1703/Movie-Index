@@ -1,13 +1,17 @@
 package com.example.movieindex.core.repository.implementation
 
-import com.example.movieindex.core.data.external.Resource
+import com.example.movieindex.core.data.external.model.Resource
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
+import com.example.movieindex.core.data.remote.model.account.toAccountEntity
+import com.example.movieindex.core.data.remote.model.auth.body.DeleteSessionBody
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.DeleteSessionResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.repository.abstraction.AuthRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import javax.inject.Inject
@@ -27,30 +31,31 @@ class AuthRepositoryImpl @Inject constructor(
         cache.clearDataStore()
     }
 
-//    override fun requestToken(): Flow<Resource<RequestTokenResponse>> = flow {
-//        emit(Resource.Loading)
-//        val networkResource = network.requestToken()
-//        emit(networkResourceHandler(networkResource = networkResource, conversion = { it }))
-//    }.catch { t -> Timber.e("requestToken - ${t.message}") }
-//
-//    override fun loginUser(
-//        username: String,
-//        password: String,
-//        requestToken: String,
-//    ): Flow<Resource<LoginResponse>> = flow {
-//        emit(Resource.Loading)
-//        val loginBody = LoginBody(username = username,
-//            password = password,
-//            request_token = requestToken)
-//        val networkResource = network.login(loginBody = loginBody)
-//        emit(networkResourceHandler(networkResource = networkResource, conversion = {it}))
-//    }.catch { t -> Timber.e("loginUser - ${t.message}") }
-//
-//    override fun createSession(requestToken: String): Flow<Resource<SessionIdResponse>> = flow {
-//        emit(Resource.Loading)
-//        val networkResource = network.createSession(requestToken = requestToken)
-//        emit(networkResourceHandler(networkResource = networkResource, conversion = {it}))
-//    }.catch { t -> Timber.e("createSession - ${t.message}") }
+    override fun deleteSession(): Flow<Resource<DeleteSessionResponse>> =
+        flow {
+            emit(Resource.Loading)
+
+            val sessionId = cache.getSessionId().first()
+            val body = DeleteSessionBody(sessionId = sessionId)
+            when (val networkResource = network.deleteSession(body = body)) {
+                is NetworkResource.Success -> {
+
+                    if (networkResource.data.success) {
+                        cache.deleteAccountDetails()
+                        cache.clearDataStore()
+                    }
+                    emit(Resource.Success(data = networkResource.data))
+
+                }
+                is NetworkResource.Error -> {
+                    emit(Resource.Error(errCode = networkResource.errCode,
+                        errMsg = networkResource.errMessage))
+                }
+                is NetworkResource.Empty -> {
+                    emit(Resource.Error(errMsg = "empty request body"))
+                }
+            }
+        }
 
     override fun login(username: String, password: String): Flow<Resource<SessionIdResponse>> =
         flow {
@@ -82,7 +87,8 @@ class AuthRepositoryImpl @Inject constructor(
                                     when (accountDetailsRequest) {
                                         is NetworkResource.Success -> {
                                             Timber.i("login request - accountDetails request success - accountId ${accountDetailsRequest.data.id}")
-                                            cache.saveAccountId(accountId = accountDetailsRequest.data.id)
+//                                            cache.saveAccountId(accountId = accountDetailsRequest.data.id)
+                                            cache.insertAccountDetails(accountDetailsRequest.data.toAccountEntity())
                                             emit(Resource.Success(sessionIdRequest.data))
                                             saveSessionId(sessionId = sessionIdRequest.data.session_id)
                                         }

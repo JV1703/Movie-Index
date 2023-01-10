@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.example.movieindex.core.common.extensions.loadErrorImage
 import com.example.movieindex.core.common.extensions.loadImage
-import com.example.movieindex.core.data.external.Result
+import com.example.movieindex.core.data.external.model.Result
 import com.example.movieindex.core.data.remote.NetworkConstants.BASE_IMG_URL
 import com.example.movieindex.core.data.remote.NetworkConstants.POSTER_SIZE_LARGE
 import com.example.movieindex.databinding.NowPlayingVhItemBinding

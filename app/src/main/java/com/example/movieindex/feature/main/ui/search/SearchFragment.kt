@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.
 import com.example.movieindex.R
 import com.example.movieindex.core.common.extensions.collectLatestLifecycleFlow
 import com.example.movieindex.core.common.extensions.makeToast
-import com.example.movieindex.core.data.external.Result
+import com.example.movieindex.core.data.external.model.Result
 import com.example.movieindex.databinding.FragmentSearchBinding
 import com.example.movieindex.feature.list.movie_list.PagingLoadStateAdapterType
 import com.example.movieindex.feature.list.movie_list.adapter.MovieListAdapter

@@ -1,6 +1,6 @@
 package com.example.movieindex.core.data.remote.model.details
 
-import com.example.movieindex.core.data.external.MovieDetails
+import com.example.movieindex.core.data.external.model.MovieDetails
 import com.example.movieindex.core.data.remote.model.common.MoviesResponse
 import com.example.movieindex.core.data.remote.model.common.toResult
 import com.squareup.moshi.Json

@@ -1,4 +1,4 @@
-package com.example.movieindex.core.data.external
+package com.example.movieindex.core.data.external.model
 
 import com.example.movieindex.core.data.local.model.MovieEntity
 import com.example.movieindex.core.data.remote.model.details.GenreResponse
