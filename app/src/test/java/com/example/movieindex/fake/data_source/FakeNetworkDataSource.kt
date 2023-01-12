@@ -3,7 +3,10 @@ package com.example.movieindex.fake.data_source
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
 import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
+import com.example.movieindex.core.data.remote.model.account.MovieAccountStateResponse
+import com.example.movieindex.core.data.remote.model.auth.body.DeleteSessionBody
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.DeleteSessionResponse
 import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
@@ -19,7 +22,10 @@ import kotlinx.coroutines.test.TestDispatcher
 import retrofit2.Response
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class FakeNetworkDataSource(private val testDataFactory: TestDataFactory, private val testDispatcher: TestDispatcher) : NetworkDataSource {
+class FakeNetworkDataSource(
+    private val testDataFactory: TestDataFactory,
+    private val testDispatcher: TestDispatcher,
+) : NetworkDataSource {
 
     var isSuccess = true
     var isBodyEmpty = false
@@ -168,5 +174,22 @@ class FakeNetworkDataSource(private val testDataFactory: TestDataFactory, privat
         val response = testDataFactory.generateResponse(isSuccess = isSuccess,
             isBodyEmpty = isBodyEmpty) { Response.success(data) }
         return safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
+    }
+
+    override suspend fun deleteSession(body: DeleteSessionBody): NetworkResource<DeleteSessionResponse> {
+        val data = testDataFactory.generateDeleteSessionResponseTestData()
+        val response = testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(data) }
+        return safeNetworkCall(dispatcher = testDispatcher, networkCall = {response}, conversion = {it})
+    }
+
+    override suspend fun getMovieAccountState(
+        movieId: Int,
+        sessionId: String,
+    ): NetworkResource<MovieAccountStateResponse> {
+        val data = testDataFactory.generateMovieAccountStateResponseTestData()
+        val response = testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(data) }
+        return safeNetworkCall(dispatcher = testDispatcher, networkCall = {response}, conversion = {it})
     }
 }

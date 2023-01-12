@@ -9,5 +9,5 @@ data class WatchListBody(
     @Json(name = "media_type")
     val mediaType: String,
     @Json(name = "watchlist")
-    val watchlist: Boolean
+    val watchlist: Boolean,
 )

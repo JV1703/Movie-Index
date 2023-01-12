@@ -107,7 +107,6 @@ class MovieDetailFragment : Fragment() {
         }
 
         collectLatestLifecycleFlow(viewModel.uiState) { uiState ->
-            Timber.i("MovieDetails - redrawn")
             uiState.userMsg?.let {
                 makeToast(it)
                 viewModel.msgShown()
@@ -116,7 +115,7 @@ class MovieDetailFragment : Fragment() {
             isLoading(uiState.isLoading)
 
             val movieDetails = uiState.movieDetails
-            val cachedMovie = uiState.cachedMovie
+
             movieDetails?.let { details ->
                 _movieId = details.id
                 this@MovieDetailFragment.movieDetails = movieDetails
@@ -130,8 +129,8 @@ class MovieDetailFragment : Fragment() {
 
             }
 
-            val isFavorite = cachedMovie?.isFavorite ?: false
-            val isBookmarked = cachedMovie?.isBookmark ?: false
+            val isFavorite = uiState.isFavorite
+            val isBookmarked = uiState.isBookmarked
 
             val fabPlaylistIcon =
                 if (isBookmarked) R.drawable.ic_filter_list_off_48 else R.drawable.ic_playlist_play_48
@@ -143,30 +142,24 @@ class MovieDetailFragment : Fragment() {
                 fabFavoriteIcon))
 
             binding.fabFavorite.setOnClickListener {
-                if (cachedMovie == null) {
-                    viewModel.insertMovie(
-                        mediaId = movieId,
-                        movieDetails = movieDetails!!, isFavorite = true)
-                } else {
-                    viewModel.updateFavorite(movieId = movieId,
-                        isBookmarked = isBookmarked,
-                        isFavorite = !isFavorite)
-                }
+
+                viewModel.updateFavorite(movieId = movieId,
+                    isFavorite = !isFavorite)
+
                 toggleFab()
             }
 
             binding.fabPlaylist.setOnClickListener {
-                if (cachedMovie == null) {
-                    viewModel.insertMovie(
-                        mediaId = movieId,
-                        movieDetails = movieDetails!!, isBookmarked = true)
-                } else {
-                    viewModel.updateBookmark(movieId = movieId,
-                        isBookmarked = !isBookmarked,
-                        isFavorite = isFavorite)
-                }
+
+                Timber.i("updateBookmark - $isBookmarked")
+                viewModel.updateBookmark(movieId = movieId,
+                    isBookmarked = !isBookmarked)
+
                 toggleFab()
             }
+
+            binding.updatingInd.isGone = !uiState.isUpdating
+            binding.fabMain.isClickable = !uiState.isUpdating
         }
 
         // lists needs to have a different collector is to apply distinct until change on list
@@ -346,6 +339,7 @@ class MovieDetailFragment : Fragment() {
                 findNavController().navigate(action)
             },
             onRecommendationClicked = {
+                viewModel.updatePosterLoadingStatus(isLoading = true)
                 viewModel.saveMovieId(it)
                 binding.nestedScrollView.smoothScrollTo(0, 0)
                 isOpen = true
@@ -412,15 +406,15 @@ class MovieDetailFragment : Fragment() {
     private fun setupMovieGeneralDetails(movieDetails: MovieDetails) {
         val defaultDominantColor = Color.parseColor("#263238")
 
-        val trailerKey = if(movieDetails.videos.isNotEmpty()){
+        val trailerKey = if (movieDetails.videos.isNotEmpty()) {
             movieDetails.videos.random().key
-        }else{
+        } else {
             null
         }
         binding.playTrailer.setOnClickListener {
             trailerKey?.let {
                 watchTrailer(it)
-            }?:viewModel.showMsg("No trailer for this movie")
+            } ?: viewModel.showMsg("No trailer for this movie")
         }
 
         movieDetails.posterPath?.let {

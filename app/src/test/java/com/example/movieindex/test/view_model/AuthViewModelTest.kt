@@ -3,17 +3,16 @@ package com.example.movieindex.test.view_model
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
-import com.example.movieindex.core.data.external.model.Resource
 import com.example.movieindex.fake.datastore.FakePreferenceDataStore
 import com.example.movieindex.fake.use_case.FakeAuthUseCase
 import com.example.movieindex.feature.auth.AuthViewModel
 import com.example.movieindex.util.MainCoroutineRule
 import com.example.movieindex.util.TestDataFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -50,165 +49,92 @@ class AuthViewModelTest {
 
     @Test
     fun validateUserLogin_fieldsEmpty() = runTest {
-
-        val eventList = arrayListOf<AuthViewModel.AuthEvents>()
+        val uiStateList = arrayListOf<AuthViewModel.UiState>()
 
         val job = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.loginEvents.toList(eventList)
+            viewModel.uiState.toList(uiStateList)
         }
 
         viewModel.validateUserLogin(username = "", password = "")
+        advanceUntilIdle()
 
-        assertTrue(eventList.last() is AuthViewModel.AuthEvents.InvalidInput)
-        assertEquals(AuthViewModel.AuthEvents.InvalidInput(errMsg = "empty email & password field"),
-            eventList.last())
+        assertEquals(2,uiStateList.size)
+        assertNotNull(uiStateList.last().userMsg)
+        assertFalse(uiStateList.last().isLoggedIn)
 
         job.cancel()
     }
 
     @Test
-    fun validateUserLogin_emailFieldEmpty() = runTest {
-
-        val eventList = arrayListOf<AuthViewModel.AuthEvents>()
+    fun validateUserLogin_usernameFieldEmpty() = runTest {
+        val uiStateList = arrayListOf<AuthViewModel.UiState>()
 
         val job = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.loginEvents.toList(eventList)
+            viewModel.uiState.toList(uiStateList)
         }
 
         viewModel.validateUserLogin(username = "", password = "Banana")
+        advanceUntilIdle()
 
-        assertTrue(eventList.last() is AuthViewModel.AuthEvents.InvalidInput)
-        assertEquals(AuthViewModel.AuthEvents.InvalidInput(errMsg = "empty username field"),
-            eventList.last())
+        assertEquals(2,uiStateList.size)
+        assertNotNull(uiStateList.last().userMsg)
+        assertFalse(uiStateList.last().isLoggedIn)
 
         job.cancel()
-
     }
 
     @Test
     fun validateUserLogin_passwordFieldEmpty() = runTest {
-
-        val eventList = arrayListOf<AuthViewModel.AuthEvents>()
+        val uiStateList = arrayListOf<AuthViewModel.UiState>()
 
         val job = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.loginEvents.toList(eventList)
+            viewModel.uiState.toList(uiStateList)
         }
 
         viewModel.validateUserLogin(username = "Banana", password = "")
+        advanceUntilIdle()
 
-        assertTrue(eventList.last() is AuthViewModel.AuthEvents.InvalidInput)
-        assertEquals(AuthViewModel.AuthEvents.InvalidInput(errMsg = "empty password field"),
-            eventList.last())
+        assertEquals(2,uiStateList.size)
+        assertNotNull(uiStateList.last().userMsg)
+        assertFalse(uiStateList.last().isLoggedIn)
 
         job.cancel()
-
     }
 
     @Test
     fun validateUserLogin_success() = runTest {
-
-        val eventList = arrayListOf<AuthViewModel.AuthEvents>()
-        val stateList = arrayListOf<AuthViewModel.AuthUiState>()
-
-        val eventJob = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.loginEvents.toList(eventList)
-        }
-
-        val stateJob = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.authUiState.toList(stateList)
-        }
-
-        viewModel.validateUserLogin(username = "Banana", password = "Banana")
-
-        assertTrue(stateList[1] is AuthViewModel.AuthUiState.IsNotLoggedIn)
-        assertTrue((stateList[1] as AuthViewModel.AuthUiState.IsNotLoggedIn).isLoading)
-        assertTrue(stateList[2] is AuthViewModel.AuthUiState.IsNotLoggedIn)
-        assertFalse((stateList[2] as AuthViewModel.AuthUiState.IsNotLoggedIn).isLoading)
-        assertTrue(eventList.last() is AuthViewModel.AuthEvents.Success)
-
-        eventJob.cancel()
-        stateJob.cancel()
-
-    }
-
-    @Test
-    fun validateUserLogin_error() = runTest {
-
-        authUseCase.isSuccess = false
-
-        val eventList = arrayListOf<AuthViewModel.AuthEvents>()
-        val stateList = arrayListOf<AuthViewModel.AuthUiState>()
-
-        val eventJob = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.loginEvents.toList(eventList)
-        }
-
-        val stateJob = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.authUiState.toList(stateList)
-        }
-
-        viewModel.validateUserLogin(username = "Banana", password = "Banana")
-
-        assertTrue(stateList[1] is AuthViewModel.AuthUiState.IsNotLoggedIn)
-        assertTrue((stateList[1] as AuthViewModel.AuthUiState.IsNotLoggedIn).isLoading)
-        assertTrue(stateList[2] is AuthViewModel.AuthUiState.IsNotLoggedIn)
-        assertFalse((stateList[2] as AuthViewModel.AuthUiState.IsNotLoggedIn).isLoading)
-        assertTrue(eventList.last() is AuthViewModel.AuthEvents.AuthError)
-
-        eventJob.cancel()
-        stateJob.cancel()
-
-    }
-
-    @Test
-    fun validateUserLogin_error_emptyResponse() = runTest {
-
-        authUseCase.isBodyEmpty = true
-
-        val eventList = arrayListOf<AuthViewModel.AuthEvents>()
-        val stateList = arrayListOf<AuthViewModel.AuthUiState>()
-
-        val eventJob = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.loginEvents.toList(eventList)
-        }
-
-        val stateJob = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.authUiState.toList(stateList)
-        }
-
-        viewModel.validateUserLogin(username = "Banana", password = "Banana")
-
-        assertTrue(stateList[1] is AuthViewModel.AuthUiState.IsNotLoggedIn)
-        assertTrue((stateList[1] as AuthViewModel.AuthUiState.IsNotLoggedIn).isLoading)
-        assertTrue(stateList[2] is AuthViewModel.AuthUiState.IsNotLoggedIn)
-        assertFalse((stateList[2] as AuthViewModel.AuthUiState.IsNotLoggedIn).isLoading)
-        assertTrue(eventList.last() is AuthViewModel.AuthEvents.AuthError)
-
-        eventJob.cancel()
-        stateJob.cancel()
-
-    }
-
-    @Test
-    fun isUserLoggedIn_loggedIn() = runTest {
-
-        val stateList = arrayListOf<AuthViewModel.AuthUiState>()
+        val uiStateList = arrayListOf<AuthViewModel.UiState>()
 
         val job = launch(mainDispatcherRule.testDispatcher) {
-            viewModel.authUiState.toList(stateList)
+            viewModel.uiState.toList(uiStateList)
         }
 
-        val loginResponseList = authUseCase.login(username = "", password = "").toList()
-        assertTrue(loginResponseList.last() is Resource.Success)
+        viewModel.validateUserLogin(username = "Banana", password = "Banana")
+        advanceUntilIdle()
 
-        val isUserLoggedIn = authUseCase.isUserLoggedIn().first()
-        assertTrue(isUserLoggedIn)
-
-        assertTrue(stateList.last() is AuthViewModel.AuthUiState.IsLoggedIn)
+        assertTrue(uiStateList[1].isLoading)
+        assertTrue(uiStateList.last().isLoggedIn)
+        assertFalse(uiStateList.last().isLoading)
 
         job.cancel()
-
     }
 
+    @Test
+    fun validateUserLogin_empty() = runTest {
+        authUseCase.isBodyEmpty = true
+        val uiStateList = arrayListOf<AuthViewModel.UiState>()
+
+        val job = launch(mainDispatcherRule.testDispatcher) {
+            viewModel.uiState.toList(uiStateList)
+        }
+
+        viewModel.validateUserLogin(username = "Banana", password = "Banana")
+        advanceUntilIdle()
+
+        assertFalse(uiStateList.last().isLoggedIn)
+        assertNotNull(uiStateList.last().userMsg)
+
+        job.cancel()
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.example.movieindex.core.data.external.model
 
-import com.example.movieindex.core.data.local.model.MovieEntity
+import com.example.movieindex.core.data.local.model.MoviePagingCategory
+import com.example.movieindex.core.data.local.model.MoviePagingEntity
 import com.example.movieindex.core.data.remote.model.details.GenreResponse
 
 data class MovieDetails(
@@ -22,14 +23,20 @@ data class MovieDetails(
     val voteAverage: Double?,
     val reviews: List<ReviewResult>?,
     val mpaaRating: String?,
+    val popularity: Double?,
 )
 
-fun MovieDetails.toMovieEntity(isFavorite: Boolean = false, isBookmark: Boolean = false) = MovieEntity(
+fun MovieDetails.toMoviePagingEntity(pagingCategory: MoviePagingCategory) = MoviePagingEntity(
+    id = "$id/$pagingCategory",
     movieId = id,
     title = title,
     overview = overview,
+    genreIds = genres.map { it.name },
+    popularity = popularity,
     posterPath = posterPath,
+    backdropPath = backdropPath,
+    adult = adult,
+    voteAverage = voteAverage,
     releaseDate = releaseDate,
-    isFavorite = isFavorite,
-    isBookmark = isBookmark
+    pagingCategory = pagingCategory
 )

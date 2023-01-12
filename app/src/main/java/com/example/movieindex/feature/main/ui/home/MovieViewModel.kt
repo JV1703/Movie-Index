@@ -4,14 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieindex.core.data.external.model.Resource
 import com.example.movieindex.core.data.external.model.Result
-import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
+import com.example.movieindex.feature.main.ui.home.domain.abstraction.HomeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MovieViewModel @Inject constructor(private val movieUseCase: MovieUseCase) : ViewModel() {
+class MovieViewModel @Inject constructor(
+    private val homeUseCase: HomeUseCase,
+) : ViewModel() {
 
     private val _nowPlayingUiState = MutableStateFlow(NowPlayingMoviesState())
     val nowPlayingUiState = _nowPlayingUiState.asStateFlow()
@@ -45,26 +50,33 @@ class MovieViewModel @Inject constructor(private val movieUseCase: MovieUseCase)
     ) {
 
         if (nowPlayingJob != null) return
-        nowPlayingJob = movieUseCase.getNowPlaying(
-            page = page,
-            language = language,
-            region = region).map { resource ->
+        nowPlayingJob = viewModelScope.launch {
+            val resource = homeUseCase.getNowPlaying(
+                page = page,
+                language = language,
+                region = region)
+
             when (resource) {
-                is Resource.Loading -> {}
                 is Resource.Success -> {
-                    _nowPlayingUiState.update { it.copy(movies = resource.data) }
+                    _nowPlayingUiState.update { it.copy(isLoading = false, movies = resource.data) }
                     nowPlayingJob = null
                 }
                 is Resource.Error -> {
-                    _nowPlayingUiState.update { it.copy(userMsg = resource.errMsg) }
+                    _nowPlayingUiState.update {
+                        it.copy(isLoading = false,
+                            userMsg = resource.errMsg)
+                    }
                     nowPlayingJob = null
                 }
                 is Resource.Empty -> {
-                    _nowPlayingUiState.update { it.copy(userMsg = "No data available") }
+                    _nowPlayingUiState.update {
+                        it.copy(isLoading = false,
+                            userMsg = "No data available")
+                    }
                     nowPlayingJob = null
                 }
             }
-        }.launchIn(viewModelScope)
+        }
     }
 
     private fun getPopularMovies(
@@ -73,27 +85,36 @@ class MovieViewModel @Inject constructor(private val movieUseCase: MovieUseCase)
         region: String? = null,
     ) {
         if (popularMoviesJob != null) return
+        popularMoviesJob = viewModelScope.launch {
+            val resource = homeUseCase.getPopularMovies(
+                page = page,
+                language = language,
+                region = region)
 
-        popularMoviesJob = movieUseCase.getPopularMovies(
-            page = page,
-            language = language,
-            region = region).map { resource ->
             when (resource) {
-                is Resource.Loading -> {}
                 is Resource.Success -> {
-                    _popularMoviesUiState.update { it.copy(movies = resource.data) }
+                    _popularMoviesUiState.update {
+                        it.copy(isLoading = false,
+                            movies = resource.data)
+                    }
                     popularMoviesJob = null
                 }
                 is Resource.Error -> {
-                    _popularMoviesUiState.update { it.copy(userMsg = resource.errMsg) }
+                    _popularMoviesUiState.update {
+                        it.copy(isLoading = false,
+                            userMsg = resource.errMsg)
+                    }
                     popularMoviesJob = null
                 }
                 is Resource.Empty -> {
-                    _popularMoviesUiState.update { it.copy(userMsg = "No data available") }
+                    _popularMoviesUiState.update {
+                        it.copy(isLoading = false,
+                            userMsg = "No data available")
+                    }
                     popularMoviesJob = null
                 }
             }
-        }.launchIn(viewModelScope)
+        }
     }
 
     private fun getTrendingMovies(
@@ -102,26 +123,36 @@ class MovieViewModel @Inject constructor(private val movieUseCase: MovieUseCase)
     ) {
 
         if (trendingMoviesJob != null) return
-        trendingMoviesJob = movieUseCase.getTrendingMovies(
-            page = page,
-            mediaType = mediaType,
-            timeWindow = timeWindow).map { resource ->
+        trendingMoviesJob = viewModelScope.launch {
+            val resource = homeUseCase.getTrendingMovies(
+                page = page,
+                mediaType = mediaType,
+                timeWindow = timeWindow)
+
             when (resource) {
-                is Resource.Loading -> {}
                 is Resource.Success -> {
-                    _trendingMoviesUiState.update { it.copy(movies = resource.data) }
+                    _trendingMoviesUiState.update {
+                        it.copy(isLoading = false,
+                            movies = resource.data)
+                    }
                     trendingMoviesJob = null
                 }
                 is Resource.Error -> {
-                    _trendingMoviesUiState.update { it.copy(userMsg = resource.errMsg) }
+                    _trendingMoviesUiState.update {
+                        it.copy(isLoading = false,
+                            userMsg = resource.errMsg)
+                    }
                     trendingMoviesJob = null
                 }
                 is Resource.Empty -> {
-                    _trendingMoviesUiState.update { it.copy(userMsg = "No data available") }
+                    _trendingMoviesUiState.update {
+                        it.copy(isLoading = false,
+                            userMsg = "No data available")
+                    }
                     trendingMoviesJob = null
                 }
             }
-        }.launchIn(viewModelScope)
+        }
     }
 
     fun nowPlayingMoviesUserMsgShown() {

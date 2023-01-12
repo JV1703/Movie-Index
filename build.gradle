@@ -15,7 +15,6 @@ ext{
     coroutines_version = "1.6.4"
     room_version = "2.4.3"
     retrofit_version = "2.9.0"
-    mockk_version = "1.13.2"
     desugar_version = "1.2.2"
     calendar_version = "2.0.0"
     flexbox_version = "3.0.0"
@@ -23,4 +22,7 @@ ext{
     work_version = "2.7.1"
     paging_version = "3.1.1"
     lottie_version = "5.2.0"
+    mockito_version = "4.11.0"
+    dex_maker_version = "2.28.3"
+    espresso_version = "3.5.1"
 }

@@ -9,5 +9,5 @@ data class PostResponse(
     @Json(name = "status_message")
     val statusMessage: String,
     @Json(name = "success")
-    val success: Boolean
+    val success: Boolean,
 )

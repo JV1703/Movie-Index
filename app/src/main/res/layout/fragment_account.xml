@@ -48,28 +48,22 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_margin="12dp">
 
             <TextView
                 android:id="@+id/favorite_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total favorite"
-                app:layout_constraintBottom_toTopOf="@id/favorite_count"
+                android:text="View Favorite List"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed" />
-
-            <TextView
-                android:id="@+id/favorite_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/favorite_tv"
-                app:layout_constraintStart_toStartOf="@id/favorite_tv"
-                app:layout_constraintTop_toBottomOf="@id/favorite_tv"
-                tools:text="10" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -87,28 +81,22 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_margin="12dp">
 
             <TextView
                 android:id="@+id/watchlist_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total Watchlist"
-                app:layout_constraintBottom_toTopOf="@id/watchlist_count"
+                android:text="View Watch List"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed" />
-
-            <TextView
-                android:id="@+id/watchlist_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/watchlist_tv"
-                app:layout_constraintStart_toStartOf="@id/watchlist_tv"
-                app:layout_constraintTop_toBottomOf="@id/watchlist_tv"
-                tools:text="10" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -123,6 +111,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/watchlist_card"
         app:layout_constraintStart_toStartOf="@id/favorite_card"
-        app:layout_constraintTop_toBottomOf="@id/favorite_card"/>
+        app:layout_constraintTop_toBottomOf="@id/favorite_card" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

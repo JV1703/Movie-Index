@@ -9,5 +9,4 @@ import javax.inject.Inject
 class SplashViewModel @Inject constructor(syncUseCase: SyncUseCase) : ViewModel() {
 
 
-
 }

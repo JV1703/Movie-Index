@@ -60,11 +60,11 @@ fun TextView.textWithColorClickable(
     movementMethod = LinkMovementMethod.getInstance()
 }
 
-fun TextView.removeSpan(){
-    if(text is SpannableString){
+fun TextView.removeSpan() {
+    if (text is SpannableString) {
         val spannableStr = text as SpannableString
         val spans = spannableStr.getSpans(0, spannableStr.length, ClickableSpan::class.java)
-        for(span in spans){
+        for (span in spans) {
             spannableStr.removeSpan(span)
         }
         text = spannableStr

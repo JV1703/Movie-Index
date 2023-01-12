@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieindex.core.common.CastListHelper
 import com.example.movieindex.core.common.CrewListHelper
-import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
+import com.example.movieindex.feature.list.credit_list.domain.abstraction.CreditListUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -13,11 +13,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreditListViewModel @Inject constructor(
-    private val movieUseCase: MovieUseCase,
+    private val creditListUseCase: CreditListUseCase,
 ) :
     ViewModel() {
 
-    private val casts = movieUseCase.getCasts().map { casts ->
+    private val casts = creditListUseCase.getCasts().map { casts ->
         val output = arrayListOf<CastListHelper>()
         if (casts.isNotEmpty()) {
             Timber.i("casts: $casts")
@@ -29,7 +29,7 @@ class CreditListViewModel @Inject constructor(
         output
     }.catch { t -> Timber.e("casts: ${t.message}") }.flowOn(Dispatchers.Default)
 
-    private val crews = movieUseCase.getCrews().map { crews ->
+    private val crews = creditListUseCase.getCrews().map { crews ->
         val output = arrayListOf<CrewListHelper>()
         if (crews.isNotEmpty()) {
             Timber.i("crews: $crews")
@@ -61,6 +61,5 @@ class CreditListViewModel @Inject constructor(
         val casts: List<CastListHelper> = emptyList(),
         val crews: List<CrewListHelper> = emptyList(),
     )
-
 
 }

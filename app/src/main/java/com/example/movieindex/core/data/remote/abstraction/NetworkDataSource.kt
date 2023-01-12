@@ -89,6 +89,7 @@ interface NetworkDataSource {
     suspend fun deleteSession(body: DeleteSessionBody): NetworkResource<DeleteSessionResponse>
     suspend fun getMovieAccountState(
         movieId: Int,
-        sessionId: String
+        sessionId: String,
     ): NetworkResource<MovieAccountStateResponse>
+
 }

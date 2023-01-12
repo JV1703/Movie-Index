@@ -5,5 +5,5 @@ import com.squareup.moshi.Json
 
 data class Gravatar(
     @Json(name = "hash")
-    val hash: String
+    val hash: String,
 )

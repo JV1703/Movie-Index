@@ -27,7 +27,4 @@ interface MoviePagingDao {
     @Query("DELETE FROM movie_paging_table WHERE pagingCategory = :pagingCategory")
     suspend fun clearMovies(pagingCategory: MoviePagingCategory)
 
-    @Query("SELECT * FROM movie_paging_table")
-    fun getMovies(): Flow<List<MoviePagingEntity>>
-
 }

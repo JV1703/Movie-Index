@@ -9,7 +9,7 @@ data class AccountDetails(
     val iso31661: String,
     val iso6391: String,
     val name: String,
-    val username: String
+    val username: String,
 )
 
 fun AccountDetails.toAccountEntity() = AccountEntity(

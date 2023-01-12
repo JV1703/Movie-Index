@@ -16,7 +16,8 @@ import com.example.movieindex.feature.auth.AuthViewModel
 import com.github.razir.progressbutton.*
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 
 @AndroidEntryPoint
@@ -57,10 +58,8 @@ class LoginFragment : Fragment() {
         bindProgressButton(binding.loginButton)
 
         binding.loginButton.setOnClickListener {
-            val username = binding.usernameTil.editText?.text.toString()
-            val password = binding.passwordTil.editText?.text.toString()
-            Timber.i("login - username: $username, password: $password")
-            loginUser(username = username, password = password)
+            loginUser(username = binding.usernameTil.editText?.text.toString(),
+                password = binding.passwordTil.editText?.text.toString())
         }
 
         binding.registerCtaHighlight.setOnClickListener {
@@ -75,52 +74,35 @@ class LoginFragment : Fragment() {
             findNavController().navigate(action)
         }
 
-        collectLatestLifecycleFlow(viewModel.authUiState) { authUiState: AuthViewModel.AuthUiState ->
-            Timber.i("isLoggedIn: $authUiState")
-            when (authUiState) {
-                is AuthViewModel.AuthUiState.IsNotLoggedIn -> {
-                    if (authUiState.isLoading) {
-                        binding.loginButton.attachTextChangeAnimator {
-                            fadeOutMills = 150
-                            fadeInMills = 150
-                        }
-
-                        binding.loginButton.showProgress {
-                            buttonText = "Logging In"
-                            gravity = DrawableButton.GRAVITY_TEXT_END
-
-                            progressColor = Color.WHITE
-                        }
-                    } else {
-                        binding.loginButton.hideProgress("Log In")
-                    }
-                }
-                is AuthViewModel.AuthUiState.IsLoggedIn -> {
-                    val action = LoginFragmentDirections.actionLoginFragmentToMainFragment()
-                    findNavController().navigate(action)
-                }
+        collectLatestLifecycleFlow(viewModel.uiState.map { it.isLoggedIn }
+            .distinctUntilChanged()) { isLoggedIn: Boolean ->
+            if (isLoggedIn) {
+                val action = LoginFragmentDirections.actionLoginFragmentToMainFragment()
+                findNavController().navigate(action)
             }
-
         }
 
-        collectLatestLifecycleFlow(viewModel.loginEvents) { authEvents: AuthViewModel.AuthEvents ->
+        collectLatestLifecycleFlow(viewModel.uiState) { uiState ->
+            if (uiState.isLoading) {
+                binding.loginButton.attachTextChangeAnimator {
+                    fadeOutMills = 150
+                    fadeInMills = 150
+                }
 
-            when (authEvents) {
-                is AuthViewModel.AuthEvents.AuthError -> {
-                    val msg = authEvents.errMsg
-                    Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).setAction("Ok") {}
-                        .show()
+                binding.loginButton.showProgress {
+                    buttonText = "Logging In"
+                    gravity = DrawableButton.GRAVITY_TEXT_END
+
+                    progressColor = Color.WHITE
                 }
-                is AuthViewModel.AuthEvents.InvalidInput -> {
-                    val msg = authEvents.errMsg
-                    makeToast(msg)
-                }
-                is AuthViewModel.AuthEvents.Success -> {
-                    val msg = "Login success"
-                    makeToast(msg)
-                }
+            } else {
+                binding.loginButton.hideProgress("Log In")
             }
 
+            uiState.userMsg?.let { msg ->
+                makeToast(msg)
+                viewModel.userMsgShown()
+            }
         }
     }
 

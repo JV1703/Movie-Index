@@ -105,7 +105,7 @@ interface MovieApi {
         @Query("page") page: Int = 1,
         @Query("language") language: String? = null,
         @Query("sort_by") sortBy: String? = null,
-    ):Response<MoviesResponse>
+    ): Response<MoviesResponse>
 
     @GET("account/{account_id}/watchlist/movies")
     suspend fun getWatchList(
@@ -114,7 +114,7 @@ interface MovieApi {
         @Query("page") page: Int = 1,
         @Query("language") language: String? = null,
         @Query("sort_by") sortBy: String? = null,
-    ):Response<MoviesResponse>
+    ): Response<MoviesResponse>
 
     @HTTP(method = "DELETE", path = "authentication/session", hasBody = true)
     suspend fun deleteSession(
@@ -123,7 +123,7 @@ interface MovieApi {
 
     @GET("movie/{movie_id}/account_states")
     suspend fun getMovieAccountState(
-        @Path("movie_id")movieId: Int,
-        @Query("session_id")sessionId: String
+        @Path("movie_id") movieId: Int,
+        @Query("session_id") sessionId: String,
     ): Response<MovieAccountStateResponse>
 }

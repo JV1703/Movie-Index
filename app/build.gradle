@@ -18,7 +18,8 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.example.movieindex.HiltTestRunner"
     }
 
     buildTypes {
@@ -38,6 +39,14 @@ android {
     buildFeatures {
         viewBinding true
     }
+    testOptions {
+        animationsDisabled = true
+    }
+
+    testOptions.unitTests {
+        includeAndroidResources = true
+        returnDefaultValues = true
+    }
 }
 
 kapt {
@@ -51,9 +60,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.test:core-ktx:1.5.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     // motion layout
     implementation("androidx.constraintlayout:constraintlayout:2.2.0-alpha05")
@@ -62,7 +71,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-//    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycle_version")
     kapt("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
 
     // navigation
@@ -80,7 +88,6 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:$dagger_hilt_version"
     kapt("androidx.hilt:hilt-compiler:1.0.0")
     implementation("androidx.hilt:hilt-work:1.0.0")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
 
     // coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version")
@@ -104,7 +111,6 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
     implementation("androidx.room:room-paging:$room_version")
     testImplementation("androidx.room:room-testing:$room_version")
-//    implementation 'androidx.work:work-runtime:2.7.1'
 
     // DataStore - preference
     implementation("androidx.datastore:datastore-preferences:1.0.0")
@@ -114,8 +120,8 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:$retrofit_version")
 
     // OkHttp
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.6")
-    implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.6'
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
 
     // Moshi
     implementation 'com.squareup.moshi:moshi-kotlin:1.13.0'
@@ -148,7 +154,8 @@ dependencies {
     // hilt testing
     androidTestImplementation("com.google.dagger:hilt-android-testing:$dagger_hilt_version")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:$dagger_hilt_version")
-    debugImplementation("androidx.fragment:fragment-testing:1.5.5")
+    debugImplementation("androidx.fragment:fragment-testing-manifest:1.6.0-alpha04")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.6.0-alpha04")
 
     // desugar
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:$desugar_version")
@@ -168,4 +175,24 @@ dependencies {
     // Instant Task Executor Rule
     testImplementation "androidx.arch.core:core-testing:$coreTesting"
     androidTestImplementation "androidx.arch.core:core-testing:$coreTesting"
+
+    // Mockito
+    androidTestImplementation "org.mockito:mockito-core:$mockito_version"
+    androidTestImplementation "com.linkedin.dexmaker:dexmaker-mockito:$dex_maker_version"
+
+    // Espresso - additional
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espresso_version"
+    implementation "androidx.test.espresso:espresso-idling-resource:$espresso_version"
+
+    // Navigation - Test
+    androidTestImplementation("androidx.navigation:navigation-testing:$navigation_version")
+
+    // MockWebServer
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:4.10.0"
+    androidTestImplementation "com.squareup.okhttp3:okhttp-tls:4.10.0"
+
+    // Ui Thread Test
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+
 }

@@ -19,12 +19,15 @@ data class AccountDetailsResponse(
     @Json(name = "name")
     val name: String,
     @Json(name = "username")
-    val username: String
+    val username: String,
 )
 
-fun Avatar.getAvatarPath() = this.tmdb.avatarPath ?: "https://www.gravatar.com/avatar/${this.gravatar.hash}.jpg"
+fun Avatar.getAvatarPath() =
+    this.tmdb.avatarPath ?: "https://www.gravatar.com/avatar/${this.gravatar.hash}.jpg"
 
-fun AccountDetailsResponse.toAccountDetails() = AccountDetails(avatar.getAvatarPath(), id, include_adult, iso_3166_1, iso_639_1, name, username)
+fun AccountDetailsResponse.toAccountDetails() =
+    AccountDetails(avatar.getAvatarPath(), id, include_adult, iso_3166_1, iso_639_1, name, username)
+
 fun AccountDetailsResponse.toAccountEntity() = AccountEntity(
     avatarPath = avatar.getAvatarPath(),
     id = id,

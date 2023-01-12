@@ -43,10 +43,10 @@ class FavoriteWorker @AssistedInject constructor(
             mediaType = mediaType
         )
 
-        return if(accountId == null || sessionId.isEmpty()){
+        return if (accountId == null || sessionId.isEmpty()) {
             Timber.e("FavoriteWorker - invalidCredentials - sessionId: $sessionId, accountId: $accountId")
             Result.failure()
-        }else{
+        } else {
             val networkResource = network.addToFavorite(accountId = accountId,
                 sessionId = sessionId,
                 body = body)
@@ -57,10 +57,10 @@ class FavoriteWorker @AssistedInject constructor(
                 }
                 is NetworkResource.Error -> {
                     if (runAttemptCount > MAX_RETRY_ATTEMPT) {
-                        Timber.e("FavoriteWorker - fail - errMsg: ${networkResource.errMessage}")
+                        Timber.e("FavoriteWorker - fail - errMsg: ${networkResource.errMsg}")
                         Result.failure()
                     } else {
-                        Timber.e("FavoriteWorker - retry - errMsg: ${networkResource.errMessage}")
+                        Timber.e("FavoriteWorker - retry - errMsg: ${networkResource.errMsg}")
                         Result.retry()
                     }
                 }

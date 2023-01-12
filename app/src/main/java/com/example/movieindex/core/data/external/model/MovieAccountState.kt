@@ -4,5 +4,5 @@ data class MovieAccountState(
     val favorite: Boolean,
     val id: Int,
     val rated: Boolean,
-    val watchlist: Boolean
+    val watchlist: Boolean,
 )

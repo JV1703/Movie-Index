@@ -11,7 +11,6 @@ import com.amulyakhare.textdrawable.TextDrawable
 import com.example.movieindex.R
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
-import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -133,18 +132,18 @@ fun colorChanger(color: Int, factor: Float): Int {
         b.coerceAtMost(255))
 }
 
-fun getMovieRatingIndicatorColor(movieRating: Int) = if(movieRating>50){
+fun getMovieRatingIndicatorColor(movieRating: Int) = if (movieRating > 50) {
     R.color.ratings_green
-}else if(movieRating in 26..50){
+} else if (movieRating in 26..50) {
     R.color.ratings_yellow
-}else{
+} else {
     R.color.ratings_red
 }
 
-fun getMovieRatingTrackColor(movieRating: Int) = if(movieRating>50){
+fun getMovieRatingTrackColor(movieRating: Int) = if (movieRating > 50) {
     R.color.ratings_green_track_color
-}else if(movieRating in 26..50){
+} else if (movieRating in 26..50) {
     R.color.ratings_yellow_track_color
-}else{
+} else {
     R.color.ratings_red_track_color
 }

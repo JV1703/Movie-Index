@@ -25,14 +25,15 @@ class MoviesPagingSource(
             }
             is NetworkResource.Success -> {
                 val data = response.data.results
+                val endOfPagination = loadSinglePage || response.data.total_pages == 0 || response.data.total_pages == page
                 LoadResult.Page(
                     data = data,
                     prevKey = prevKey,
-                    nextKey = if (loadSinglePage || data.isEmpty() || response.data.total_pages == page || response.data.total_pages == 0) null else page + 1
+                    nextKey = if(endOfPagination) null else page + 1
                 )
             }
             is NetworkResource.Error -> {
-                LoadResult.Error(Exception("errCode: ${response.errCode}, errMsg: ${response.errMessage}"))
+                LoadResult.Error(Exception("errCode: ${response.errCode}, errMsg: ${response.errMsg}"))
             }
         }
     }

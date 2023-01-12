@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
 import com.example.movieindex.core.data.remote.implementation.NetworkDataSourceImpl
+import com.example.movieindex.core.data.remote.model.auth.body.DeleteSessionBody
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
 import com.example.movieindex.core.data.remote.safeNetworkCall
 import com.example.movieindex.fake.apis.FakeMovieApi
@@ -103,7 +104,7 @@ class NetworkDataSourceTest {
     }
 
     @Test
-    fun getRecommendations_success() = runTest {
+    fun getMovieRecommendations_success() = runTest {
         val expectedResult =
             safeNetworkCall(Dispatchers.Main,
                 networkCall = { api.getMovieRecommendations(movieId = 0) },
@@ -115,7 +116,7 @@ class NetworkDataSourceTest {
     }
 
     @Test
-    fun getRecommendations_empty() = runTest {
+    fun getMovieRecommendations_empty() = runTest {
 
         api.isBodyEmpty = true
 
@@ -125,7 +126,7 @@ class NetworkDataSourceTest {
     }
 
     @Test
-    fun getRecommendations_error() = runTest {
+    fun getMovieRecommendations_error() = runTest {
 
         api.isSuccess = false
 
@@ -456,5 +457,30 @@ class NetworkDataSourceTest {
         assertTrue(actualResult is NetworkResource.Error)
     }
 
+    @Test
+    fun deleteSession_success() = runTest {
+        val body = DeleteSessionBody(sessionId = "")
+        val actualResult = network.deleteSession(body = body)
+
+        assertTrue(actualResult is NetworkResource.Success)
+    }
+
+    @Test
+    fun deleteSession_empty() = runTest {
+        api.isBodyEmpty = true
+        val body = DeleteSessionBody(sessionId = "")
+        val actualResult = network.deleteSession(body = body)
+
+        assertTrue(actualResult is NetworkResource.Empty)
+    }
+
+    @Test
+    fun deleteSession_error() = runTest {
+        api.isSuccess = false
+        val body = DeleteSessionBody(sessionId = "")
+        val actualResult = network.deleteSession(body = body)
+
+        assertTrue(actualResult is NetworkResource.Error)
+    }
 
 }

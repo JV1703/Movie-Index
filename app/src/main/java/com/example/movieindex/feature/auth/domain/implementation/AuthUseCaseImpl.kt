@@ -13,21 +13,17 @@ import javax.inject.Inject
 class AuthUseCaseImpl @Inject constructor(private val repository: AuthRepository) :
     AuthUseCase {
 
-    override fun login(username: String, password: String): Flow<Resource<SessionIdResponse>> =
+    override suspend fun login(username: String, password: String): Resource<SessionIdResponse> =
         repository.login(username = username,
             password = password)
 
-    override fun isUserLoggedIn(): Flow<Boolean> = getSessionId().map {
+    override fun isUserLoggedIn(): Flow<Boolean> = repository.getSessionId().map {
         Timber.i("cached sessionId - $it")
         it.isNotEmpty()
     }
 
-    override suspend fun saveSessionId(sessionId: String) {
-        repository.saveSessionId(sessionId = sessionId)
-    }
-
     override fun getSessionId(): Flow<String> = repository.getSessionId()
 
-    override fun logout(): Flow<Resource<DeleteSessionResponse>> = repository.deleteSession()
+    override suspend fun logout(): Resource<DeleteSessionResponse> = repository.deleteSession()
 
 }

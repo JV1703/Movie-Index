@@ -16,6 +16,9 @@ interface AccountDao {
     @Query("SELECT * FROM account_table")
     fun getAccountDetails(): Flow<AccountEntity?>
 
+    @Query("SELECT id FROM account_table")
+    fun getAccountId(): Flow<Int?>
+
     @Query("DELETE FROM account_table")
     suspend fun deleteAccountDetails()
 

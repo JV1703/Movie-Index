@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
 import com.example.movieindex.core.data.external.model.Resource
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
+import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.repository.abstraction.AuthRepository
 import com.example.movieindex.core.repository.implementation.AuthRepositoryImpl
 import com.example.movieindex.fake.data_source.FakeCacheDataSource
@@ -14,12 +15,10 @@ import com.example.movieindex.util.MainCoroutineRule
 import com.example.movieindex.util.TestDataFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -50,8 +49,9 @@ class AuthRepositoryTest {
         testDispatcher = mainDispatcherRule.testDispatcher
         testScope = TestScope(testDispatcher)
         testDataFactory = TestDataFactory()
-        dataStore = FakePreferenceDataStore(testContext = ApplicationProvider.getApplicationContext(),
-            testCoroutineScope = testScope).testDataStore
+        dataStore =
+            FakePreferenceDataStore(testContext = ApplicationProvider.getApplicationContext(),
+                testCoroutineScope = testScope).testDataStore
         network = FakeNetworkDataSource(testDataFactory, testDispatcher)
         cache = FakeCacheDataSource(testDispatcher = testDispatcher, dataStore = dataStore)
 
@@ -59,7 +59,7 @@ class AuthRepositoryTest {
     }
 
     @Test
-    fun saveSessionId_getSessionId_cache() = testScope.runTest {
+    fun saveSessionId_getSessionId_cache() = runTest {
         val sessionId = UUID.randomUUID().toString()
         repository.saveSessionId(sessionId = sessionId)
 
@@ -69,37 +69,50 @@ class AuthRepositoryTest {
     }
 
     @Test
-    fun login_loading() = runTest {
-        val actualResult = repository.login(username = "", password = "").first()
-        assertTrue(actualResult is Resource.Loading)
-    }
-
-    @Test
     fun login_success() = runTest {
-        val actualResult = repository.login(username = "", password = "").toList()
+        val apiCall = repository.login(username = "Banana", password = "Banana")
+        val cachedAccountDetails = cache.getAccountDetails().first()
+        val cachedSessionId = cache.getSessionId().first()
 
-        assertEquals(2, actualResult.size)
-        assertTrue(actualResult[1] is Resource.Success)
-    }
-
-    @Test
-    fun login_error() = runTest {
-        network.isSuccess = false
-
-        val actualResult = repository.login(username = "", password = "").toList()
-
-        assertEquals(2, actualResult.size)
-        assertTrue(actualResult[1] is Resource.Error)
+        assertTrue(apiCall is Resource.Success)
+        assertNotNull(cachedAccountDetails)
+        assertTrue(cachedSessionId.isNotEmpty())
     }
 
     @Test
     fun login_empty() = runTest {
         network.isBodyEmpty = true
+        val apiCall = repository.login(username = "Banana", password = "Banana")
 
-        val actualResult = repository.login(username = "", password = "").toList()
-
-        assertEquals(2, actualResult.size)
-        assertTrue(actualResult[1] is Resource.Empty)
+        assertTrue(apiCall is Resource.Empty)
     }
+
+    @Test
+    fun login_error() = runTest {
+        network.isSuccess = false
+        val apiCall = repository.login(username = "Banana", password = "Banana")
+
+        assertTrue(apiCall is Resource.Error)
+    }
+
+    // Manual test, crash when trying to clear fakeDataStore
+//    @Test
+//    fun deleteSession() = runTest {
+//        val login = repository.login(username = "Banana", password = "Banana")
+//        val cachedAccountDetails = cache.getAccountDetails().first()
+//        val cachedSessionId = cache.getSessionId().first()
+//
+//        assertTrue(login is Resource.Success)
+//        assertNotNull(cachedAccountDetails)
+//        assertTrue(cachedSessionId.isNotEmpty())
+//
+//        val logout = repository.deleteSession()
+//        val updatedCachedAccountDetails = cache.getAccountDetails().first()
+//        val updatedCachedSessionId = cache.getSessionId().first()
+//
+//        assertTrue(logout is Resource.Success)
+//        assertNull(updatedCachedAccountDetails)
+//        assertTrue(updatedCachedSessionId.isEmpty())
+//    }
 
 }

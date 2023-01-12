@@ -69,6 +69,16 @@ class MovieListFragment : Fragment() {
             binding.prependProgress.isVisible = loadState.source.prepend is LoadState.Loading
             binding.appendProgress.isVisible = loadState.source.append is LoadState.Loading
 
+            val isListEmpty =
+                (loadState.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && movieListAdapter.itemCount == 0)
+            if (isListEmpty) {
+                binding.lottie.visibility = View.VISIBLE
+                binding.movieListRv.visibility = View.GONE
+            } else {
+                binding.lottie.visibility = View.GONE
+                binding.movieListRv.visibility = View.VISIBLE
+            }
+
             binding.loadingInd.isVisible =
                 loadState.source.refresh is LoadState.Loading
 
@@ -80,7 +90,7 @@ class MovieListFragment : Fragment() {
                 ?: loadState.append as? LoadState.Error ?: loadState.prepend as? LoadState.Error
                 ?: loadState.refresh as? LoadState.Error
 
-            binding.retryButton.isGone = errorState == null
+            binding.retryButton.isGone = loadState.refresh !is LoadState.Error
 
             errorState?.let {
                 makeToast("\uD83D\uDE28 Wooops ${it.error}")

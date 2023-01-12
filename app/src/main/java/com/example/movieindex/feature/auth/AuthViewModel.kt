@@ -10,23 +10,21 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : ViewModel() {
 
-    private val _loginEvents = MutableSharedFlow<AuthEvents>()
-    val loginEvents = _loginEvents.asSharedFlow()
-
-    private val _authUiState = MutableStateFlow<AuthUiState>(AuthUiState.IsNotLoggedIn())
-    val authUiState = _authUiState.asStateFlow()
+    private val _uiState = MutableStateFlow(UiState())
+    val uiState = _uiState.asStateFlow()
 
     private var job: Job? = null
 
     init {
         authUseCase.isUserLoggedIn().map { isLoggedIn: Boolean ->
             if (isLoggedIn) {
-                _authUiState.value = AuthUiState.IsLoggedIn
+                _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
             }
         }.launchIn(viewModelScope)
     }
@@ -36,17 +34,17 @@ class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : 
         viewModelScope.launch {
 
             if (username.isEmpty() && password.isEmpty()) {
-                _loginEvents.emit(AuthEvents.InvalidInput(errMsg = "empty email & password field"))
+                _uiState.update { it.copy(userMsg = "empty email & password field") }
                 return@launch
             }
 
             if (username.isEmpty()) {
-                _loginEvents.emit(AuthEvents.InvalidInput(errMsg = "empty username field"))
+                _uiState.update { it.copy(userMsg = "empty username field") }
                 return@launch
             }
 
             if (password.isEmpty()) {
-                _loginEvents.emit(AuthEvents.InvalidInput(errMsg = "empty password field"))
+                _uiState.update { it.copy(userMsg = "empty password field") }
                 return@launch
             }
 
@@ -58,50 +56,44 @@ class AuthViewModel @Inject constructor(private val authUseCase: AuthUseCase) : 
 
     private fun login(username: String, password: String) {
 
-        if(job != null) return
+        if (job != null) return
 
-        job = authUseCase.login(username = username, password = password).map { loginResource ->
-            when (loginResource) {
-                is Resource.Loading -> {
-                    _authUiState.value = AuthUiState.IsNotLoggedIn(isLoading = true)
-                }
-                is Resource.Empty -> {
-                    _authUiState.value = AuthUiState.IsNotLoggedIn(isLoading = false)
-                    _loginEvents.emit(AuthEvents.AuthError(errMsg = "Unknown Error"))
-                    job = null
-                }
+        job = viewModelScope.launch {
+
+            _uiState.update { it.copy(isLoading = true) }
+
+            when (val resource = authUseCase.login(username = username, password = password)) {
                 is Resource.Success -> {
-                    _authUiState.value = AuthUiState.IsNotLoggedIn(isLoading = false)
-                    _loginEvents.emit(AuthEvents.Success)
-                    job = null
-
+                    _uiState.update { it.copy(isLoading = false, isLoggedIn = true) }
+                    Timber.i("AuthViewModel - success, $resource")
                 }
                 is Resource.Error -> {
-                    _authUiState.value = AuthUiState.IsNotLoggedIn(isLoading = false)
-                    _loginEvents.emit(AuthEvents.AuthError(errMsg = loginResource.errMsg
-                        ?: "Unknown Error"))
-                    job = null
+                    Timber.i("AuthViewModel - error, $resource")
+                    _uiState.update { it.copy(isLoading = false, userMsg = resource.errMsg) }
+                }
+                is Resource.Empty -> {
+                    Timber.i("AuthViewModel - empty, $resource")
+                    _uiState.update { it.copy(isLoading = false, userMsg = "Empty Response") }
                 }
             }
-        }.launchIn(viewModelScope)
 
-
+            job = null
+        }
     }
 
-    sealed interface AuthEvents {
-        data class InvalidInput(val errMsg: String) : AuthEvents
-        data class AuthError(val errMsg: String) : AuthEvents
-        object Success : AuthEvents
-    }
-
-    sealed interface AuthUiState {
-        object IsLoggedIn : AuthUiState
-        data class IsNotLoggedIn(val isLoading: Boolean = false) : AuthUiState
+    fun userMsgShown() {
+        _uiState.update { it.copy(userMsg = null) }
     }
 
     enum class AuthNavigationArgs(val url: String) {
         Register(TMDB_SIGN_UP_URL),
         ForgetPassword(TMDB_RESET_PASSWORD)
     }
+
+    data class UiState(
+        val isLoading: Boolean = false,
+        val isLoggedIn: Boolean = false,
+        val userMsg: String? = null,
+    )
 
 }

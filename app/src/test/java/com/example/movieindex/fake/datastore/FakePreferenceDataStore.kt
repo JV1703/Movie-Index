@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -15,8 +14,6 @@ class FakePreferenceDataStore(testContext: Context, testCoroutineScope: TestScop
     private companion object {
         const val TEST_DATASTORE_NAME = "testDataStore"
     }
-
-    private val testCoroutineDispatcher = StandardTestDispatcher()
 
     val testDataStore: DataStore<Preferences> =
         PreferenceDataStoreFactory.create(

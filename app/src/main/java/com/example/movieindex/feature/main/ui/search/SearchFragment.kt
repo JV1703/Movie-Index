@@ -59,10 +59,6 @@ class SearchFragment : Fragment() {
         Timber.i("fragment lifecycle - onViewCreated")
         setupAdapter()
 
-//        savedInstanceState?.let {
-//            binding.searchField.editText?.setText(it.getString("query"))
-//        }
-
         binding.searchField.editText?.setOnEditorActionListener { textView, actionId, keyEvent ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 viewModel.updateSearchQuery(textView.text.trim().toString())
@@ -71,11 +67,11 @@ class SearchFragment : Fragment() {
             false
         }
 
-        binding.retryButton.setOnClickListener{
+        binding.retryButton.setOnClickListener {
             searchAdapter.retry()
         }
 
-        collectLatestLifecycleFlow(viewModel.searchQuery){
+        collectLatestLifecycleFlow(viewModel.searchQuery) {
             binding.searchField.editText?.setText(it)
         }
 
@@ -90,7 +86,11 @@ class SearchFragment : Fragment() {
             }
 
             val isListEmpty =
-                loadState.refresh is LoadState.NotLoading && searchAdapter.itemCount == 0
+                (loadState.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && searchAdapter.itemCount == 0)
+
+            if(isListEmpty){
+                makeToast("No movie found")
+            }
 
             binding.searchRv.isGone =
                 loadState.refresh is LoadState.Error || loadState.refresh is LoadState.Loading && searchAdapter.itemCount != 0
@@ -183,11 +183,8 @@ class SearchFragment : Fragment() {
                             outRect.bottom = (height * (1 - 0.915)).toInt()
                             Timber.i("height - below R $height")
                         }
-
                     }
-
                 }
-
             })
         }
     }

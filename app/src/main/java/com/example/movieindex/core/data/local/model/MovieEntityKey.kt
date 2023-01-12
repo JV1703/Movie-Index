@@ -10,7 +10,7 @@ data class MovieEntityKey(
     val movieId: Int,
     val prevKey: Int?,
     val nextKey: Int?,
-    val pagingCategory: MoviePagingCategory
+    val pagingCategory: MoviePagingCategory,
 )
 
 enum class MoviePagingCategory {

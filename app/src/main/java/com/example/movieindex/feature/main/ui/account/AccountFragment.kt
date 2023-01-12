@@ -23,7 +23,6 @@ import com.github.razir.progressbutton.showProgress
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 
 @AndroidEntryPoint
 class AccountFragment : Fragment() {
@@ -96,26 +95,16 @@ class AccountFragment : Fragment() {
             }
 
             binding.favoriteCard.setOnClickListener {
-                if(uiState.favoriteMoviesCount == null || uiState.favoriteMoviesCount == 0){
-                    makeToast("No favorite movie available")
-                }else{
-                    val action = MainFragmentDirections.actionMainFragmentToMovieListFragment(listType = ListType.Favorite)
-                    rootNavController.navigate(action)
-                }
+                val action =
+                    MainFragmentDirections.actionMainFragmentToMovieListFragment(listType = ListType.Favorite)
+                rootNavController.navigate(action)
             }
 
             binding.watchlistCard.setOnClickListener {
-                if(uiState.watchlistMoviesCount == 0 || uiState.watchlistMoviesCount == 0){
-                    makeToast("No watchlist movie available")
-                }else{
-                    val action = MainFragmentDirections.actionMainFragmentToMovieListFragment(listType = ListType.Watchlist)
-                    rootNavController.navigate(action)
-                }
+                val action =
+                    MainFragmentDirections.actionMainFragmentToMovieListFragment(listType = ListType.Watchlist)
+                rootNavController.navigate(action)
             }
-
-            binding.favoriteCount.text = (uiState.favoriteMoviesCount ?: 0).toString()
-
-            binding.watchlistCount.text = (uiState.watchlistMoviesCount ?: 0).toString()
 
         }
 

@@ -29,41 +29,45 @@ class NetworkDataSourceImpl @Inject constructor(
         page: Int,
         language: String?,
         region: String?,
-    ): NetworkResource<MoviesResponse> =
-        safeNetworkCall(dispatcher = ioDispatcher,
+    ): NetworkResource<MoviesResponse> {
+        return safeNetworkCall(dispatcher = ioDispatcher,
             networkCall = {
                 movieApi.getNowPlaying(page = page,
                     language = language,
                     region = region)
             },
             conversion = { data: MoviesResponse -> data })
+    }
 
     override suspend fun getPopularMovies(
         page: Int,
         language: String?,
         region: String?,
-    ): NetworkResource<MoviesResponse> =
-        safeNetworkCall(dispatcher = ioDispatcher, networkCall = {
+    ): NetworkResource<MoviesResponse> {
+        return safeNetworkCall(dispatcher = ioDispatcher, networkCall = {
             movieApi.getPopularMovies(page = page, language = language, region = region)
         }, conversion = { data: MoviesResponse -> data })
+    }
 
     override suspend fun getMovieRecommendations(
         movieId: Int,
         page: Int,
         language: String?,
-    ): NetworkResource<MoviesResponse> =
-        safeNetworkCall(dispatcher = ioDispatcher, networkCall = {
+    ): NetworkResource<MoviesResponse> {
+        return safeNetworkCall(dispatcher = ioDispatcher, networkCall = {
             movieApi.getMovieRecommendations(movieId = movieId, page = page, language = language)
         }, conversion = { data: MoviesResponse -> data })
+    }
 
     override suspend fun getTrendingMovies(
         page: Int,
         mediaType: String,
         timeWindow: String,
-    ): NetworkResource<MoviesResponse> =
-        safeNetworkCall(dispatcher = ioDispatcher, networkCall = {
+    ): NetworkResource<MoviesResponse> {
+        return safeNetworkCall(dispatcher = ioDispatcher, networkCall = {
             movieApi.getTrendingMovies(page = page, mediaType = mediaType, timeWindow = timeWindow)
         }, conversion = { data: MoviesResponse -> data })
+    }
 
     override suspend fun getMovieDetails(
         movieId: Int,

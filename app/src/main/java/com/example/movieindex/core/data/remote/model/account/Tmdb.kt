@@ -5,5 +5,5 @@ import com.squareup.moshi.Json
 
 data class Tmdb(
     @Json(name = "avatar_path")
-    val avatarPath: String?
+    val avatarPath: String?,
 )

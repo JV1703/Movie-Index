@@ -34,6 +34,7 @@ class HomeFragment : Fragment() {
     private val rootNavController get() = _rootNavController!!
 
     private val viewModel: MovieViewModel by viewModels()
+
     private lateinit var nowPlayingAdapter: NowPlayingAdapter
     private lateinit var trendingMoviesAdapter: MoviesCardAdapter
     private lateinit var popularMoviesAdapter: MoviesCardAdapter
@@ -145,4 +146,5 @@ class HomeFragment : Fragment() {
             MainFragmentDirections.actionMainFragmentToMovieListFragment(listType = listType)
         rootNavController.navigate(action)
     }
+
 }

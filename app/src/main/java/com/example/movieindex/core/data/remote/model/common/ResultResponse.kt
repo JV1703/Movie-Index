@@ -3,7 +3,6 @@ package com.example.movieindex.core.data.remote.model.common
 
 import com.example.movieindex.core.data.external.model.Result
 import com.example.movieindex.core.data.external.model.movieGenreMapper
-import com.example.movieindex.core.data.local.model.MovieEntity
 import com.example.movieindex.core.data.local.model.MoviePagingCategory
 import com.example.movieindex.core.data.local.model.MoviePagingEntity
 import com.squareup.moshi.Json
@@ -39,17 +38,8 @@ fun ResultResponse.toResult() = Result(
     overview = overview
 )
 
-fun ResultResponse.toMovieEntity(isFavorite: Boolean, isBookmark: Boolean) = MovieEntity(
-    movieId = id,
-    title = title,
-    overview = overview,
-    posterPath = poster_path,
-    releaseDate = release_date,
-    isFavorite = isFavorite,
-    isBookmark = isBookmark
-)
-
 fun ResultResponse.toMoviePagingEntity(pagingCategory: MoviePagingCategory) = MoviePagingEntity(
+    id = "$id/$pagingCategory",
     movieId = id,
     title = title,
     overview = overview,

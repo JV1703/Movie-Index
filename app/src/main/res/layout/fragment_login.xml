@@ -36,8 +36,10 @@
         app:startIconDrawable="@drawable/ic_badge_24">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/username_tiet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
             android:inputType="text"
             android:maxLines="1" />
 
@@ -59,8 +61,10 @@
         app:startIconDrawable="@drawable/ic_lock_24">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/password_tiet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
             android:inputType="textPassword" />
 
     </com.google.android.material.textfield.TextInputLayout>

@@ -1,273 +1,227 @@
 package com.example.movieindex.core.repository.implementation
 
-import androidx.paging.*
-import androidx.work.*
-import com.example.movieindex.core.common.WorkerConstants.FAVORITE_WORKER_FAVORITE_KEY
-import com.example.movieindex.core.common.WorkerConstants.WATCH_LIST_WORKER_WATCH_LIST_KEY
-import com.example.movieindex.core.common.WorkerConstants.WORKER_MOVIE_ID_KEY
-import com.example.movieindex.core.common.WorkerConstants.WORKER_MOVIE_TYPE_KEY
-import com.example.movieindex.core.data.external.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
+import androidx.work.WorkManager
+import com.example.movieindex.core.common.wrapEspressoIdlingResource
 import com.example.movieindex.core.data.external.model.*
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
-import com.example.movieindex.core.data.local.model.*
-import com.example.movieindex.core.data.remote.NetworkResource
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
-import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
-import com.example.movieindex.core.data.remote.model.account.toAccountDetails
 import com.example.movieindex.core.data.remote.model.common.MoviesResponse
 import com.example.movieindex.core.data.remote.model.common.toResult
 import com.example.movieindex.core.data.remote.model.details.MovieDetailsResponse
 import com.example.movieindex.core.data.remote.model.details.toMovieDetails
 import com.example.movieindex.core.repository.abstraction.MovieRepository
-import com.example.movieindex.core.repository.paging.MoviesPagingRemoteMediator
 import com.example.movieindex.core.repository.paging.MoviesPagingSource
-import com.example.movieindex.feature.detail.movie.worker.FavoriteWorker
-import com.example.movieindex.feature.detail.movie.worker.WatchListWorker
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.sync.Mutex
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-fun <T, R> networkResourceHandler(
-    networkResource: NetworkResource<T>,
-    conversion: (T) -> R,
-): Resource<R> {
-    return when (networkResource) {
-        is NetworkResource.Success -> {
-            val data = networkResource.data
-            val convertedData = conversion(data)
-            Resource.Success(convertedData)
-        }
-        is NetworkResource.Error -> {
-            Resource.Error(errMsg = networkResource.errMessage,
-                errCode = networkResource.errCode)
-        }
-        is NetworkResource.Empty -> {
-            Resource.Empty
-        }
-    }
-}
-
-//suspend fun <T, R> networkResourceHandler(
-//    networkResource: NetworkResource<T>,
-//    onSuccess: suspend (T) -> Resource.Success<R>,
-//): Resource<R> {
-//    return when (networkResource) {
-//        is NetworkResource.Success -> {
-//            val data = networkResource.data
-//            onSuccess(data)
-//        }
-//        is NetworkResource.Error -> {
-//            Resource.Error(errMsg = networkResource.errMessage,
-//                errCode = networkResource.errCode)
-//        }
-//        is NetworkResource.Empty -> {
-//            Resource.Empty
-//        }
-//    }
-//}
-
-@OptIn(ExperimentalPagingApi::class)
 class MovieRepositoryImpl @Inject constructor(
     private val workManager: WorkManager,
     private val network: NetworkDataSource,
     private val cache: CacheDataSource,
 ) : MovieRepository {
 
-    override fun getNowPlaying(
+    override suspend fun getNowPlaying(
         page: Int,
         language: String?,
         region: String?,
-    ): Flow<Resource<List<Result>>> = flow {
-        emit(Resource.Loading)
+    ): Resource<List<Result>> {
+        wrapEspressoIdlingResource {
+            val networkResource = network.getNowPlaying(
+                page = page,
+                language = language, region = region)
+            return networkResourceHandler(networkResource,
+                conversion = { moviesResponse: MoviesResponse ->
+                    moviesResponse.results.map { it.toResult() }
+                })
+        }
+    }
 
-        val networkResource = network.getNowPlaying(
-            page = page,
-            language = language, region = region)
-        emit(networkResourceHandler(networkResource,
-            conversion = { moviesResponse: MoviesResponse ->
-                moviesResponse.results.map { it.toResult() }
-            }))
-
-    }.catch { t -> Timber.e("getNowPlaying - ${t.message}") }
-
-    override fun getPopularMovies(
+    override suspend fun getPopularMovies(
         page: Int,
         language: String?,
         region: String?,
-    ): Flow<Resource<List<Result>>> = flow {
-        emit(Resource.Loading)
-        val networkResource = network.getPopularMovies(
-            page = page,
-            language = language, region = region)
-        emit(networkResourceHandler(networkResource,
-            conversion = { moviesResponse: MoviesResponse ->
-                moviesResponse.results.map { it.toResult() }
-            }))
-    }.catch { t -> Timber.e("getPopularMovies - ${t.message}") }
+    ): Resource<List<Result>> {
+        wrapEspressoIdlingResource {
+            val networkResource = network.getPopularMovies(
+                page = page,
+                language = language, region = region)
+            return networkResourceHandler(networkResource,
+                conversion = { moviesResponse: MoviesResponse ->
+                    moviesResponse.results.map { it.toResult() }
+                })
+        }
+    }
 
-    override fun getTrendingMovies(
+    override suspend fun getTrendingMovies(
         page: Int,
         mediaType: String,
         timeWindow: String,
-    ): Flow<Resource<List<Result>>> = flow {
-        emit(Resource.Loading)
-        val networkResource = network.getTrendingMovies(
-            page = page,
-            mediaType = mediaType,
-            timeWindow = timeWindow)
-        emit(networkResourceHandler(networkResource,
-            conversion = { moviesResponse: MoviesResponse ->
-                moviesResponse.results.map { it.toResult() }
-            }))
-    }.catch { t -> Timber.e("getTrendingMovies - ${t.message}") }
+    ): Resource<List<Result>> {
+        wrapEspressoIdlingResource {
+            val networkResource = network.getTrendingMovies(
+                page = page,
+                mediaType = mediaType,
+                timeWindow = timeWindow)
+            return networkResourceHandler(networkResource,
+                conversion = { moviesResponse: MoviesResponse ->
+                    moviesResponse.results.map { it.toResult() }
+                })
+        }
+    }
 
     override suspend fun getMovieRecommendations(
         movieId: Int,
         page: Int,
         language: String?,
-    ): Flow<Resource<List<Result>>> = flow {
-        emit(Resource.Loading)
-        val networkResource = network.getMovieRecommendations(
-            movieId = movieId,
-            page = page,
-            language = language)
-        emit(networkResourceHandler(networkResource,
-            conversion = { moviesResponse: MoviesResponse ->
-                moviesResponse.results.map { it.toResult() }
-            }))
-    }.catch { t -> Timber.e("getMovieRecommendations - ${t.message}") }
+    ): Resource<List<Result>> {
+        wrapEspressoIdlingResource {
+            val networkResource = network.getMovieRecommendations(
+                movieId = movieId,
+                page = page,
+                language = language)
+            return networkResourceHandler(networkResource,
+                conversion = { moviesResponse: MoviesResponse ->
+                    moviesResponse.results.map { it.toResult() }
+                })
+        }
+    }
 
     override fun getNowPlayingPagingSource(
         loadSinglePage: Boolean,
         region: String?,
         language: String?,
-    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
-        pageSize = 20, enablePlaceholders = false
-    ), pagingSourceFactory = {
-        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
-            network.getNowPlaying(page = page, language = language, region = region)
-        })
-    }).flow.map { pagingData -> pagingData.map { it.toResult() } }
-        .catch { t -> Timber.e("getMovieNowPlayingPagingSource: ${t.message}") }
+    ): Flow<PagingData<Result>> =
+        wrapEspressoIdlingResource {
+            Pager(config = PagingConfig(
+                pageSize = 20, enablePlaceholders = false
+            ), pagingSourceFactory = {
+                MoviesPagingSource(loadSinglePage = loadSinglePage,
+                    networkCall = { page ->
+                        network.getNowPlaying(page = page, language = language, region = region)
+                    })
+            })
+        }.flow.map { pagingData -> pagingData.map { it.toResult() } }
+            .catch { t -> Timber.e("getMovieNowPlayingPagingSource: ${t.message}") }
+
 
     override fun getPopularMoviesPagingSource(
         loadSinglePage: Boolean,
         region: String?,
         language: String?,
-    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
-        pageSize = 20, enablePlaceholders = false
-    ), pagingSourceFactory = {
-        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
-            network.getPopularMovies(page = page, language = language, region = region)
-        })
-    }).flow.map { pagingData -> pagingData.map { it.toResult() } }
-        .catch { t -> Timber.e("getPopularMoviesPagingSource: ${t.message}") }
+    ): Flow<PagingData<Result>> =
+        wrapEspressoIdlingResource {
+            Pager(config = PagingConfig(
+                pageSize = 20, enablePlaceholders = false
+            ), pagingSourceFactory = {
+                MoviesPagingSource(loadSinglePage = loadSinglePage,
+                    networkCall = { page ->
+                        network.getPopularMovies(page = page, language = language, region = region)
+                    })
+            })
+        }.flow.map { pagingData -> pagingData.map { it.toResult() } }
+            .catch { t -> Timber.e("getPopularMoviesPagingSource: ${t.message}") }
+
 
     override fun getTrendingMoviesPagingSource(
         loadSinglePage: Boolean,
         mediaType: String,
         timeWindow: String,
-    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
-        pageSize = 20, enablePlaceholders = false
-    ), pagingSourceFactory = {
-        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
-            network.getTrendingMovies(page = page, mediaType = mediaType, timeWindow = timeWindow)
-        })
-    }).flow.map { pagingData -> pagingData.map { it.toResult() } }
-        .catch { t -> Timber.e("getTrendingMoviesPagingSource: ${t.message}") }
+    ): Flow<PagingData<Result>> =
+        wrapEspressoIdlingResource {
+            Pager(config = PagingConfig(
+                pageSize = 20, enablePlaceholders = false
+            ), pagingSourceFactory = {
+                MoviesPagingSource(loadSinglePage = loadSinglePage,
+                    networkCall = { page ->
+                        network.getTrendingMovies(page = page,
+                            mediaType = mediaType,
+                            timeWindow = timeWindow)
+                    })
+            })
+        }.flow.map { pagingData -> pagingData.map { it.toResult() } }
+            .catch { t -> Timber.e("getTrendingMoviesPagingSource: ${t.message}") }
 
-    override fun getMovieDetails(
+
+    override suspend fun getMovieDetails(
         movieId: Int,
         language: String?,
         appendToResponse: String?,
-    ): Flow<Resource<MovieDetails>> = flow {
+    ): Resource<MovieDetails> {
+        wrapEspressoIdlingResource {
+            val networkResource = network.getMovieDetails(
+                movieId = movieId,
+                language = language,
+                appendToResponse = appendToResponse)
 
-        emit(Resource.Loading)
-
-        val networkResource = network.getMovieDetails(
-            movieId = movieId,
-            language = language,
-            appendToResponse = appendToResponse)
-
-        emit(networkResourceHandler(networkResource,
-            conversion = { movieDetailsResponse: MovieDetailsResponse ->
-                movieDetailsResponse.toMovieDetails()
-            }))
-
-    }.catch { t -> Timber.e("getMovieDetails: ${t.message}") }
-
-    override fun getAccountDetails(sessionId: String): Flow<Resource<AccountDetails>> = flow {
-        emit(Resource.Loading)
-
-        val networkResource = network.getAccountDetails(sessionId = sessionId)
-
-        emit(networkResourceHandler(networkResource,
-            conversion = { accountDetailsResponse: AccountDetailsResponse ->
-                accountDetailsResponse.toAccountDetails()
-            }))
-    }.catch { t -> Timber.e("getAccountDetails: ${t.message}") }
-
-    override fun addToFavorite(
-        favorite: Boolean,
-        mediaId: Int,
-        mediaType: String,
-    ) {
-
-        val request = OneTimeWorkRequestBuilder<FavoriteWorker>()
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
-                .build())
-            .setInputData(
-                workDataOf(
-                    FAVORITE_WORKER_FAVORITE_KEY to favorite,
-                    WORKER_MOVIE_ID_KEY to mediaId,
-                    WORKER_MOVIE_TYPE_KEY to mediaType
-                )
-            )
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
-                OneTimeWorkRequest.MAX_BACKOFF_MILLIS,
-                TimeUnit.MINUTES)
-            .build()
-
-        workManager.enqueueUniqueWork(
-            "addToFavoriteWork",
-            ExistingWorkPolicy.APPEND_OR_REPLACE,
-            request)
+            return networkResourceHandler(networkResource,
+                conversion = { movieDetailsResponse: MovieDetailsResponse ->
+                    movieDetailsResponse.toMovieDetails()
+                })
+        }
     }
 
-    override fun addToWatchList(
-        watchlist: Boolean,
-        mediaId: Int,
-        mediaType: String,
-    ) {
-        val request = OneTimeWorkRequestBuilder<WatchListWorker>()
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
-                .build())
-            .setInputData(
-                workDataOf(
-                    WATCH_LIST_WORKER_WATCH_LIST_KEY to watchlist,
-                    WORKER_MOVIE_ID_KEY to mediaId,
-                    WORKER_MOVIE_TYPE_KEY to mediaType
-                )
-            )
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
-                OneTimeWorkRequest.MAX_BACKOFF_MILLIS,
-                TimeUnit.MINUTES)
-            .build()
+//    override fun addToFavorite(
+//        favorite: Boolean,
+//        mediaId: Int,
+//        mediaType: String,
+//    ) {
+//        val request = OneTimeWorkRequestBuilder<FavoriteWorker>()
+//            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+//            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+//                .build())
+//            .setInputData(
+//                workDataOf(
+//                    FAVORITE_WORKER_FAVORITE_KEY to favorite,
+//                    WORKER_MOVIE_ID_KEY to mediaId,
+//                    WORKER_MOVIE_TYPE_KEY to mediaType
+//                )
+//            )
+//            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
+//                OneTimeWorkRequest.MAX_BACKOFF_MILLIS,
+//                TimeUnit.MINUTES)
+//            .build()
+//
+//        workManager.enqueueUniqueWork(
+//            "addToFavoriteWork",
+//            ExistingWorkPolicy.APPEND_OR_REPLACE,
+//            request)
+//    }
 
-        workManager.enqueueUniqueWork(
-            "addToFavoriteWork",
-            ExistingWorkPolicy.APPEND_OR_REPLACE,
-            request)
-    }
+//    override fun addToWatchList(
+//        watchlist: Boolean,
+//        mediaId: Int,
+//        mediaType: String,
+//    ) {
+//        val request = OneTimeWorkRequestBuilder<WatchListWorker>()
+//            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+//            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+//                .build())
+//            .setInputData(
+//                workDataOf(
+//                    WATCH_LIST_WORKER_WATCH_LIST_KEY to watchlist,
+//                    WORKER_MOVIE_ID_KEY to mediaId,
+//                    WORKER_MOVIE_TYPE_KEY to mediaType
+//                )
+//            )
+//            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
+//                OneTimeWorkRequest.MAX_BACKOFF_MILLIS,
+//                TimeUnit.MINUTES)
+//            .build()
+//
+//        workManager.enqueueUniqueWork(
+//            "addToFavoriteWork",
+//            ExistingWorkPolicy.APPEND_OR_REPLACE,
+//            request)
+//    }
 
     override fun searchMoviesPagingSource(
         loadSinglePage: Boolean,
@@ -277,277 +231,78 @@ class MovieRepositoryImpl @Inject constructor(
         region: String?,
         year: Int?,
         primaryReleaseYear: Int?,
-    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
-        pageSize = 20, enablePlaceholders = false
-    ), pagingSourceFactory = {
-        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
-            network.searchMovies(query = query,
-                language = language,
-                page = page,
-                includeAdult = includeAdult,
-                region = region,
-                year = year,
-                primaryReleaseYear = primaryReleaseYear)
-        })
-    }).flow.map { pagingData ->
-        pagingData.map {
-            it.toResult()
+    ): Flow<PagingData<Result>> =
+        wrapEspressoIdlingResource {
+            Pager(config = PagingConfig(
+                pageSize = 20, enablePlaceholders = false
+            ), pagingSourceFactory = {
+                MoviesPagingSource(loadSinglePage = loadSinglePage,
+                    networkCall = { page ->
+                        network.searchMovies(query = query,
+                            language = language,
+                            page = page,
+                            includeAdult = includeAdult,
+                            region = region,
+                            year = year,
+                            primaryReleaseYear = primaryReleaseYear)
+                    })
+            })
+        }.flow.map { pagingData ->
+            pagingData.map {
+                it.toResult()
+            }
+        }.catch { t ->
+            Timber.e("searchMoviesPaging: ${t.message}")
         }
-    }.catch { t ->
-        Timber.e("searchMoviesPaging: ${t.message}")
-    }
 
     override fun getMovieRecommendationPagingSource(
         movieId: Int,
         loadSinglePage: Boolean,
         language: String?,
-    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
-        pageSize = 20, enablePlaceholders = false
-    ), pagingSourceFactory = {
-        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
-            network.getMovieRecommendations(movieId = movieId, page = page, language = language)
-        })
-    }).flow.map { pagingData -> pagingData.map { it.toResult() } }
-        .catch { t -> Timber.e("getMovieRecommendationPagingSource: ${t.message}") }
+    ): Flow<PagingData<Result>> =
+        wrapEspressoIdlingResource {
+            Pager(config = PagingConfig(
+                pageSize = 20, enablePlaceholders = false
+            ), pagingSourceFactory = {
+                MoviesPagingSource(loadSinglePage = loadSinglePage,
+                    networkCall = { page ->
+                        network.getMovieRecommendations(movieId = movieId,
+                            page = page,
+                            language = language)
+                    })
+            })
+        }.flow.map { pagingData -> pagingData.map { it.toResult() } }
+            .catch { t -> Timber.e("getMovieRecommendationPagingSource: ${t.message}") }
 
-    override fun getFavoriteList(
-        accountId: Int,
-        sessionId: String, page: Int, language: String?,
-        sortBy: String?,
-    ): Flow<Resource<List<Result>>> = flow {
-        emit(Resource.Loading)
-
-        val networkResource = network.getFavoriteList(
-            accountId = accountId,
-            sessionId = sessionId,
-            page = page,
-            language = language,
-            sortBy = sortBy)
-        emit(networkResourceHandler(networkResource,
-            conversion = { moviesResponse: MoviesResponse ->
-                moviesResponse.results.map { it.toResult() }
-            }))
-
-    }.catch { t -> Timber.e("getFavoriteList - ${t.message}") }
-
-    override fun getWatchList(
-        accountId: Int,
-        sessionId: String, page: Int, language: String?,
-        sortBy: String?,
-    ): Flow<Resource<List<Result>>> = flow {
-        emit(Resource.Loading)
-
-        val networkResource = network.getWatchList(
-            accountId = accountId,
-            sessionId = sessionId,
-            page = page,
-            language = language,
-            sortBy = sortBy)
-        emit(networkResourceHandler(networkResource,
-            conversion = { moviesResponse: MoviesResponse ->
-                moviesResponse.results.map { it.toResult() }
-            }))
-
-    }.catch { t -> Timber.e("getWatchList - ${t.message}") }
-
-
-    override fun getFavoriteListPagingSource(
-        accountId: Int,
-        sessionId: String,
-        loadSinglePage: Boolean,
-        language: String?,
-        sortBy: String?,
-    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
-        pageSize = 20, enablePlaceholders = false
-    ), pagingSourceFactory = {
-        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
-            network.getFavoriteList(
-                accountId = accountId,
-                sessionId = sessionId,
-                page = page,
-                language = language,
-                sortBy = sortBy)
-        })
-    }).flow.map { pagingData -> pagingData.map { it.toResult() } }
-        .catch { t -> Timber.e("getFavoriteListPagingSource: ${t.message}") }
-
-    override fun getFavoriteListRemoteMediator(
-        accountId: Int,
-        sessionId: String,
-        loadSinglePage: Boolean,
-        language: String?,
-        sortBy: String?,
-    ): Flow<PagingData<Result>> = Pager(
-        config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-        remoteMediator = MoviesPagingRemoteMediator(
-            networkCall = { page ->
-                network.getFavoriteList(
-                    accountId = accountId,
-                    sessionId = sessionId,
-                    page = page,
-                    language = language,
-                    sortBy = sortBy)
-            },
-            pagingCategory = MoviePagingCategory.FAVORITE,
-            dbCallGetMovieKey = { id: String, pagingCategory: MoviePagingCategory ->
-                cache.movieKeyId(id = id, pagingCategory = pagingCategory)
-            },
-            dbCallOnRefreshClearDb = { pagingCategory: MoviePagingCategory ->
-                cache.clearMovieKeys(pagingCategory = pagingCategory)
-                cache.clearMovies(pagingCategory = pagingCategory)
-            },
-            dbCallOnSuccess = { movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
-                cache.insertAllMovieKeys(movieKeys)
-                cache.insertAllMovies(movies)
-            }
-        ),
-        pagingSourceFactory = {
-            cache.getMovies(pagingCategory = MoviePagingCategory.FAVORITE)
-        }
-    ).flow.map { pagingData ->
-        pagingData.map {
-            it.toResult()
-        }
-    }.catch { t: Throwable ->
-        Timber.e("getFavoriteListRemoteMediator: ${t.message}")
-    }
-
-    override fun getWatchListPagingSource(
-        accountId: Int,
-        sessionId: String,
-        loadSinglePage: Boolean,
-        language: String?,
-        sortBy: String?,
-    ): Flow<PagingData<Result>> = Pager(config = PagingConfig(
-        pageSize = 20, enablePlaceholders = false
-    ), pagingSourceFactory = {
-        MoviesPagingSource(loadSinglePage = loadSinglePage, networkCall = { page ->
-            network.getWatchList(
-                accountId = accountId,
-                sessionId = sessionId,
-                page = page,
-                language = language,
-                sortBy = sortBy)
-        })
-    }).flow.map { pagingData -> pagingData.map { it.toResult() } }
-        .catch { t -> Timber.e("getWatchListPagingSource: ${t.message}") }
-
-    override fun getWatchListRemoteMediator(
-        accountId: Int,
-        sessionId: String,
-        loadSinglePage: Boolean,
-        language: String?,
-        sortBy: String?,
-    ): Flow<PagingData<Result>> = Pager(
-        config = PagingConfig(pageSize = 20, enablePlaceholders = false),
-        remoteMediator = MoviesPagingRemoteMediator(
-            networkCall = { page ->
-                network.getWatchList(
-                    accountId = accountId,
-                    sessionId = sessionId,
-                    page = page,
-                    language = language,
-                    sortBy = sortBy)
-            },
-            pagingCategory = MoviePagingCategory.WATCHLIST,
-            dbCallGetMovieKey = { id: String, pagingCategory: MoviePagingCategory ->
-                cache.movieKeyId(id = id, pagingCategory = pagingCategory)
-            },
-            dbCallOnRefreshClearDb = { pagingCategory: MoviePagingCategory ->
-                cache.clearMovieKeys(pagingCategory = pagingCategory)
-                cache.clearMovies(pagingCategory = pagingCategory)
-            },
-            dbCallOnSuccess = { movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
-                cache.insertAllMovieKeys(movieKeys)
-                cache.insertAllMovies(movies)
-            }
-        ),
-        pagingSourceFactory = {
-            cache.getMovies(pagingCategory = MoviePagingCategory.WATCHLIST)
-        }
-    ).flow.map { pagingData ->
-        pagingData.map {
-            it.toResult()
-        }
-    }.catch { t: Throwable ->
-        Timber.e("getWatchListRemoteMediator: ${t.message}")
-    }
 
     override suspend fun saveCasts(casts: List<Cast>) {
-        val castString = Gson().toJson(casts)
-        cache.saveCasts(castString)
+        wrapEspressoIdlingResource {
+            val castString = Gson().toJson(casts)
+            cache.saveCasts(castString)
+        }
     }
 
-    override fun getCasts(): Flow<List<Cast>> = cache.getCasts().map {
-        val gson = Gson()
-        val listType = object : TypeToken<List<Cast>>() {}.type
-        gson.fromJson<List<Cast>>(it, listType)
-    }.catch { t -> Timber.e("getCasts: ${t.message}") }
+    override fun getCasts(): Flow<List<Cast>> = wrapEspressoIdlingResource {
+        cache.getCasts().map {
+            val gson = Gson()
+            val listType = object : TypeToken<List<Cast>>() {}.type
+            gson.fromJson<List<Cast>>(it, listType)
+        }.catch { t -> Timber.e("getCasts: ${t.message}") }
+    }
 
     override suspend fun saveCrews(crews: List<Crew>) {
-        val crewString = Gson().toJson(crews)
-        cache.saveCrews(crewString)
+        wrapEspressoIdlingResource {
+            val crewString = Gson().toJson(crews)
+            cache.saveCrews(crewString)
+        }
     }
 
-    override fun getCrews(): Flow<List<Crew>> = cache.getCrews().map {
-        val gson = Gson()
-        val listType = object : TypeToken<List<Crew>>() {}.type
-        gson.fromJson<List<Crew>>(it, listType)
-    }.catch { t -> Timber.e("getCasts: ${t.message}") }
-
-//    override suspend fun saveAccountIdCache(accountId: Int) {
-//        cache.saveAccountId(accountId = accountId)
-//    }
-//
-//    override fun getAccountIdCache(): Flow<Int> = cache.getAccountId()
-
-    override suspend fun insertMovieToCache(
-        movie: MovieDetails,
-        isFavorite: Boolean,
-        isBookmark: Boolean,
-    ) {
-        val entity = movie.toMovieEntity(
-            isFavorite,
-            isBookmark
-        )
-        cache.insertMovie(entity)
+    override fun getCrews(): Flow<List<Crew>> = wrapEspressoIdlingResource {
+        cache.getCrews().map {
+            val gson = Gson()
+            val listType = object : TypeToken<List<Crew>>() {}.type
+            gson.fromJson<List<Crew>>(it, listType)
+        }.catch { t -> Timber.e("getCasts: ${t.message}") }
     }
-
-    override fun getCachedMovie(movieId: Int): Flow<SavedMovie?> =
-        cache.getMovie(movieId).map { it?.toSavedMovie() }
-            .catch { t -> Timber.e("getMovie: ${t.message}") }
-
-    override fun getCachedFavoriteMovies(): Flow<List<SavedMovie>> =
-        cache.getFavoriteMovies().map { it.map { it.toSavedMovie() } }
-            .catch { t -> Timber.e("getFavoriteMovies: ${t.message}") }
-
-    override fun getCachedBookmarkedMovies(): Flow<List<SavedMovie>> =
-        cache.getFavoriteMovies().map { it.map { it.toSavedMovie() } }
-            .catch { t -> Timber.e("getBookmarkedMovies: ${t.message}") }
-
-    override suspend fun updateBookmarkCache(movieId: Int, isBookmark: Boolean) {
-        cache.updateBookmark(movieId = movieId, isBookmark = isBookmark)
-    }
-
-    override suspend fun updateFavoriteCache(movieId: Int, isFavorite: Boolean) {
-        cache.updateFavorite(movieId = movieId, isFavorite = isFavorite)
-    }
-
-    override suspend fun deleteMovieCache(movieId: Int) {
-        cache.deleteMovie(movieId = movieId)
-    }
-
-    override suspend fun insertAccountDetailsCache(account: AccountDetails){
-        cache.insertAccountDetails(account.toAccountEntity())
-    }
-
-    override fun getAccountDetailsCache(): Flow<AccountDetails?> =
-        cache.getAccountDetails().map { it?.toAccountDetails() }
-
-    override suspend fun deleteAccountDetailsCache() = cache.deleteAccountDetails()
-
-    override fun getFavoriteCountCache(): Flow<Int> = cache.getFavoriteCount()
-
-    override fun getWatchlistCountCache(): Flow<Int> = cache.getWatchlistCount()
 
 }

@@ -6,8 +6,8 @@ import com.example.movieindex.core.data.external.model.Result
 
 @Entity(tableName = "movie_paging_table")
 data class MoviePagingEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int? = null,
+    @PrimaryKey(autoGenerate = false)
+    val id: String,
     val movieId: Int,
     val title: String,
     val overview: String?,

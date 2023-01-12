@@ -14,9 +14,10 @@ import timber.log.Timber
 
 @OptIn(ExperimentalPagingApi::class)
 class MoviesPagingRemoteMediator(
+    private val loadSinglePage: Boolean,
     private val networkCall: suspend (page: Int) -> NetworkResource<MoviesResponse>,
     private val pagingCategory: MoviePagingCategory,
-    private val dbCallGetMovieKey: suspend (id: String, pagingCategory: MoviePagingCategory) -> MovieEntityKey?,
+    private val dbCallGetMovieKey: suspend (id: String) -> MovieEntityKey?,
     private val dbCallOnRefreshClearDb: suspend (pagingCategory: MoviePagingCategory) -> Unit,
     private val dbCallOnSuccess: suspend (movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity>) -> Unit,
 ) : RemoteMediator<Int, MoviePagingEntity>() {
@@ -60,7 +61,8 @@ class MoviesPagingRemoteMediator(
         when (val networkResource = networkCall(page)) {
             is NetworkResource.Success -> {
                 val movies = networkResource.data.results
-                val endOfPagination = page == networkResource.data.total_pages
+                val endOfPagination =
+                    page == networkResource.data.total_pages || networkResource.data.total_pages == 0 || loadSinglePage
                 if (loadType == LoadType.REFRESH) {
                     dbCallOnRefreshClearDb(pagingCategory)
                 }
@@ -86,12 +88,11 @@ class MoviesPagingRemoteMediator(
                 } catch (e: Exception) {
                     Timber.e(e.message)
                 }
-
                 return MediatorResult.Success(endOfPaginationReached = endOfPagination)
             }
             is NetworkResource.Error -> {
-                Timber.e("errCode: ${networkResource.errCode}, errMsg: ${networkResource.errMessage}")
-                return MediatorResult.Error(throwable = Exception("errCode: ${networkResource.errCode}, errMsg: ${networkResource.errMessage}"))
+                Timber.e("errCode: ${networkResource.errCode}, errMsg: ${networkResource.errMsg}")
+                return MediatorResult.Error(throwable = Exception("errCode: ${networkResource.errCode}, errMsg: ${networkResource.errMsg}"))
             }
             is NetworkResource.Empty -> {
                 Timber.e("Empty")
@@ -105,8 +106,8 @@ class MoviesPagingRemoteMediator(
         // From that last page, get the last item
         // Get the remote keys of the last item retrieved
         return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()?.let { movie ->
-            val searchKey = "${movie.movieId}/${movie.pagingCategory}"
-            dbCallGetMovieKey(searchKey, pagingCategory)
+            val searchKey = movie.id
+            dbCallGetMovieKey(searchKey)
         }
     }
 
@@ -115,8 +116,8 @@ class MoviesPagingRemoteMediator(
         // From that first page, get the first item
         return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()?.let { movie ->
             // Get the remote keys of the first items retrieved
-            val searchKey = "${movie.movieId}/${movie.pagingCategory}"
-            dbCallGetMovieKey(searchKey, pagingCategory)
+            val searchKey = movie.id
+            dbCallGetMovieKey(searchKey)
         }
     }
 
@@ -127,8 +128,8 @@ class MoviesPagingRemoteMediator(
         // Get the item closest to the anchor position
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.let { movie ->
-                val searchKey = "${movie.movieId}/${movie.pagingCategory}"
-                dbCallGetMovieKey(searchKey, pagingCategory)
+                val searchKey = /*"${movie.movieId}/${movie.pagingCategory}"*/ movie.id
+                dbCallGetMovieKey(searchKey)
             }
         }
 

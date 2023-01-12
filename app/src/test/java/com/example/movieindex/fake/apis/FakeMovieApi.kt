@@ -2,7 +2,10 @@ package com.example.movieindex.fake.apis
 
 import com.example.movieindex.core.data.remote.MovieApi
 import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
+import com.example.movieindex.core.data.remote.model.account.MovieAccountStateResponse
+import com.example.movieindex.core.data.remote.model.auth.body.DeleteSessionBody
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.DeleteSessionResponse
 import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
@@ -146,4 +149,23 @@ class FakeMovieApi(private val testDataFactory: TestDataFactory) : MovieApi {
             isBodyEmpty = isBodyEmpty) { Response.success(testDataFactory.generateWatchListResponseTestData()) }
     }
 
+    override suspend fun deleteSession(body: DeleteSessionBody): Response<DeleteSessionResponse> {
+        return testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) {
+            Response.success(DeleteSessionResponse(success = true))
+        }
+    }
+
+    override suspend fun getMovieAccountState(
+        movieId: Int,
+        sessionId: String,
+    ): Response<MovieAccountStateResponse> {
+        return testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) {
+            Response.success(MovieAccountStateResponse(favorite = true,
+                id = movieId,
+                rated = true,
+                watchlist = true))
+        }
+    }
 }

@@ -4,10 +4,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.paging.PagingSource
 import com.example.movieindex.core.data.local.CacheConstants
-import com.example.movieindex.core.data.local.CacheConstants.ACCOUNT_ID
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
-import com.example.movieindex.core.data.local.model.MovieEntity
+import com.example.movieindex.core.data.local.model.AccountEntity
+import com.example.movieindex.core.data.local.model.MovieEntityKey
+import com.example.movieindex.core.data.local.model.MoviePagingCategory
+import com.example.movieindex.core.data.local.model.MoviePagingEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.TestDispatcher
@@ -20,48 +23,9 @@ class FakeCacheDataSource(
     private val dataStore: DataStore<Preferences>,
 ) : CacheDataSource {
 
-    private val movieList = arrayListOf<MovieEntity>()
-
-    override suspend fun insertMovie(movie: MovieEntity) {
-        movieList.add(movie)
-    }
-
-    override fun getMovie(movieId: Int): Flow<MovieEntity?> {
-        return flow { emit(movieList.find { it.movieId == movieId }) }
-    }
-
-    override fun getFavoriteMovies(): Flow<List<MovieEntity>> {
-        return flow { emit(movieList.filter { it.isFavorite }) }
-    }
-
-    override fun getBookmarkedMovies(): Flow<List<MovieEntity>> {
-        return flow { emit(movieList.filter { it.isBookmark }) }
-    }
-
-    override suspend fun updateBookmark(movieId: Int, isBookmark: Boolean) {
-        val movie = movieList.find { it.movieId == movieId }
-        val index = movieList.indexOf(movie)
-
-        movie?.let {
-            movieList[index] = it.copy(isBookmark = isBookmark)
-        }
-    }
-
-    override suspend fun updateFavorite(movieId: Int, isFavorite: Boolean) {
-        val movie = movieList.find { it.movieId == movieId }
-        val index = movieList.indexOf(movie)
-
-        movie?.let {
-            movieList[index] = it.copy(isFavorite = isFavorite)
-        }
-    }
-
-    override suspend fun deleteMovie(movieId: Int) {
-        val movie = movieList.find { it.movieId == movieId }
-        movie?.let {
-            movieList.remove(movie)
-        }
-    }
+    private val movieList = arrayListOf<MoviePagingEntity>()
+    private val movieKeyList = arrayListOf<MovieEntityKey>()
+    private val accountDetailsList = arrayListOf<AccountEntity>()
 
     override suspend fun saveSessionId(sessionId: String) {
         withContext(testDispatcher) {
@@ -134,25 +98,49 @@ class FakeCacheDataSource(
         }.flowOn(testDispatcher)
     }
 
-    override suspend fun saveAccountId(accountId: Int) {
-        withContext(testDispatcher) {
-            dataStore.edit { preferences ->
-                preferences[ACCOUNT_ID] = accountId
-            }
-        }
+    override suspend fun insertAllMovies(movies: List<MoviePagingEntity>) {
+        movieList.addAll(movies)
     }
 
-    override fun getAccountId(): Flow<Int> {
-        return dataStore.data.catch {
-            if (it is IOException) {
-                it.printStackTrace()
-                emit(emptyPreferences())
-            } else {
-                throw it
-            }
-        }.map { preferences ->
-            preferences[ACCOUNT_ID] ?: 0
-        }.flowOn(testDispatcher)
+    override fun getMovies(pagingCategory: MoviePagingCategory): PagingSource<Int, MoviePagingEntity> {
+        TODO("Not yet implemented")
     }
 
+    override fun getMoviesWithReferenceToPagingCategory(pagingCategory: MoviePagingCategory): Flow<List<MoviePagingEntity>> =
+        flow { emit(movieList.filter { it.pagingCategory == pagingCategory }) }
+
+    override fun getAllMovies(): Flow<List<MoviePagingEntity>> = flow { emit(movieList) }
+
+    override suspend fun clearMovies(pagingCategory: MoviePagingCategory) {
+        movieList.clear()
+    }
+
+    override suspend fun insertAllMovieKeys(movieKeys: List<MovieEntityKey>) {
+        movieKeyList.addAll(movieKeys)
+    }
+
+    override fun getAllMovieKey(): Flow<List<MovieEntityKey>> = flow { emit(movieKeyList) }
+
+    override suspend fun movieKeyId(
+        id: String,
+    ): MovieEntityKey? {
+        return movieKeyList.find { it.id == id }
+    }
+
+    override suspend fun clearMovieKeys(pagingCategory: MoviePagingCategory) {
+        movieKeyList.clear()
+    }
+
+    override suspend fun insertAccountDetails(account: AccountEntity) {
+        accountDetailsList.add(account)
+    }
+
+    override fun getAccountDetails(): Flow<AccountEntity?> =
+        flow { emit(if (accountDetailsList.isEmpty()) null else accountDetailsList.first()) }
+
+    override suspend fun deleteAccountDetails() {
+        accountDetailsList.clear()
+    }
+
+    override fun getAccountId(): Flow<Int?> = flow { emit(if(accountDetailsList.isEmpty()) null else accountDetailsList.first().id) }
 }

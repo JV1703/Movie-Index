@@ -1,0 +1,449 @@
+{
+  "page": 1,
+  "results": [
+    {
+      "adult": false,
+      "backdrop_path": "/c1bz69r0v065TGFA5nqBiKzPDys.jpg",
+      "id": 830784,
+      "title": "Lyle, Lyle, Crocodile",
+      "original_language": "en",
+      "original_title": "Lyle, Lyle, Crocodile",
+      "overview": "When the Primm family moves to New York City, their young son Josh struggles to adapt to his new school and new friends. All of that changes when he discovers Lyle — a singing crocodile who loves baths, caviar and great music — living in the attic of his new home. But when Lyle’s existence is threatened by evil neighbor Mr. Grumps, the Primms must band together to show the world that family can come from the most unexpected places.",
+      "poster_path": "/irIS5Tn3TXjNi1R9BpWvGAN4CZ1.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        35,
+        10751,
+        10402
+      ],
+      "popularity": 485.193,
+      "release_date": "2022-10-07",
+      "video": false,
+      "vote_average": 7.7,
+      "vote_count": 240
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/2Ft4xmWa1Edgj2P1OYmoSAoYRqz.jpg",
+      "id": 663712,
+      "title": "Terrifier 2",
+      "original_language": "en",
+      "original_title": "Terrifier 2",
+      "overview": "After being resurrected by a sinister entity, Art the Clown returns to Miles County where he must hunt down and destroy a teenage girl and her younger brother on Halloween night.  As the body count rises, the siblings fight to stay alive while uncovering the true nature of Art's evil intent.",
+      "poster_path": "/8gLhu8UFPZfH2Hv11JhTZkb9CVl.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        27
+      ],
+      "popularity": 787.761,
+      "release_date": "2022-10-06",
+      "video": false,
+      "vote_average": 7.0,
+      "vote_count": 841
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/rpZFknesBbZL4uqESFcJ0aTnBo5.jpg",
+      "id": 676701,
+      "title": "Tad, the Lost Explorer and the Emerald Tablet",
+      "original_language": "es",
+      "original_title": "Tadeo Jones 3: La Tabla Esmeralda",
+      "overview": "Tad accidentally unleashes an ancient spell, endangering the lives of his friends Mummy, Jeff, and Belzoni. With everyone against him and only helped by Sara, he sets off on an adventure to end the Curse of the Mummy.",
+      "poster_path": "/eEWi0ptaVSwLUs84rhZjtNIhgbp.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        12,
+        16,
+        35,
+        10751,
+        14
+      ],
+      "popularity": 324.485,
+      "release_date": "2022-08-24",
+      "video": false,
+      "vote_average": 7.782,
+      "vote_count": 177
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/au4HUSWDRadIcl9CqySlw1kJMfo.jpg",
+      "id": 829799,
+      "title": "Paradise City",
+      "original_language": "en",
+      "original_title": "Paradise City",
+      "overview": "Renegade bounty hunter Ryan Swan must carve his way through the Hawaiian crime world to wreak vengeance on the kingpin who murdered his father.",
+      "poster_path": "/xdmmd437QdjcCls8yCQxrH5YYM4.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        28,
+        80,
+        53
+      ],
+      "popularity": 416.938,
+      "release_date": "2022-11-11",
+      "video": false,
+      "vote_average": 5.625,
+      "vote_count": 52
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/vNuHqmOJRQXY0PBd887DklSDlBP.jpg",
+      "id": 315162,
+      "title": "Puss in Boots: The Last Wish",
+      "original_language": "en",
+      "original_title": "Puss in Boots: The Last Wish",
+      "overview": "Puss in Boots discovers that his passion for adventure has taken its toll: He has burned through eight of his nine lives, leaving him with only one life left. Puss sets out on an epic journey to find the mythical Last Wish and restore his nine lives.",
+      "poster_path": "/lmf0zzR7ritjOL3qumRh3hfvOFK.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        16,
+        12,
+        35,
+        10751,
+        14
+      ],
+      "popularity": 1438.247,
+      "release_date": "2022-12-07",
+      "video": false,
+      "vote_average": 7.981,
+      "vote_count": 183
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/sqVxhRkPwOo6jogWZjE99V1HRE1.jpg",
+      "id": 1037858,
+      "title": "The Soccer Football Movie",
+      "original_language": "en",
+      "original_title": "The Soccer Football Movie",
+      "overview": "When mysterious green slime monsters start popping out of soccer balls, all-star athletes Zlatan Ibrahimović and Megan Rapinoe must team up with their four biggest fans to stop evil scientist \"Weird Al\" Yankovic from stealing their talent.",
+      "poster_path": "/sWoYDNPNZs5MtzPbirXV73tIHrA.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        16,
+        35,
+        10751
+      ],
+      "popularity": 275.898,
+      "release_date": "2022-11-09",
+      "video": false,
+      "vote_average": 6.329,
+      "vote_count": 73
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/H40nWdJngUc6gtytMAbElm9HOu.jpg",
+      "id": 881,
+      "title": "A Few Good Men",
+      "original_language": "en",
+      "original_title": "A Few Good Men",
+      "overview": "When cocky military lawyer Lt. Daniel Kaffee and his co-counsel, Lt. Cmdr. JoAnne Galloway, are assigned to a murder case, they uncover a hazing ritual that could implicate high-ranking officials such as shady Col. Nathan Jessep.",
+      "poster_path": "/rLOk4z9zL1tTukIYV56P94aZXKk.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        18
+      ],
+      "popularity": 22.367,
+      "release_date": "1992-12-11",
+      "video": false,
+      "vote_average": 7.5,
+      "vote_count": 2945
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/jBIMZ0AlUYuFNsKbd4L6FojWMoy.jpg",
+      "id": 820067,
+      "title": "The Quintessential Quintuplets Movie",
+      "original_language": "ja",
+      "original_title": "映画 五等分の花嫁",
+      "overview": "When five lovely young girls who hate studying hire part-time tutor Futaro, he guides not only their education but also their hearts. Time spent has brought them all closer, with feelings growing within the girls and Futaro. As they finish their third year of high school and their last school festival approaches, they set their sights on what’s next. Is there a future with one of them and Futaro?",
+      "poster_path": "/sg7klpt1xwK1IJirBI9EHaqQwJ5.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        16,
+        35,
+        10749
+      ],
+      "popularity": 220.079,
+      "release_date": "2022-05-20",
+      "video": false,
+      "vote_average": 8.731,
+      "vote_count": 143
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/hgKkCRQT9HhHJ9NKPQKnF1N5eGL.jpg",
+      "id": 1018403,
+      "title": "Tom and Jerry Snowman's Land",
+      "original_language": "en",
+      "original_title": "Tom and Jerry Snowman's Land",
+      "overview": "It’s time to chase that holiday spirit with Tom and Jerry! With magic in the air, Jerry and his nephew, Tuffy, make a snow mouse that miraculously comes to life! To keep their new friend, Larry the snow mouse from melting, Tuffy and Jerry must race him to the fabled Snowman’s Village. In hot pursuit, Tom and devious Dr. Doublevay have their own plans for Larry’s magic.",
+      "poster_path": "/memqWrs4zmLgMBfzTfebrOXbytG.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        10751,
+        35,
+        16,
+        12
+      ],
+      "popularity": 355.12,
+      "release_date": "2022-09-06",
+      "video": false,
+      "vote_average": 7.409,
+      "vote_count": 22
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/mSyQoValhBsJdq3JNGXJww2Q5yL.jpg",
+      "id": 593643,
+      "title": "The Menu",
+      "original_language": "en",
+      "original_title": "The Menu",
+      "overview": "A couple travels to a coastal island to eat at an exclusive restaurant where the chef has prepared a lavish menu, with some shocking surprises.",
+      "poster_path": "/fPtUgMcLIboqlTlPrq0bQpKK8eq.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        53,
+        27,
+        35
+      ],
+      "popularity": 612.165,
+      "release_date": "2022-11-17",
+      "video": false,
+      "vote_average": 7.3,
+      "vote_count": 739
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/sUuzl04qNIYsnwCLQpZ2RSvXA1V.jpg",
+      "id": 792775,
+      "title": "Cop Secret",
+      "original_language": "is",
+      "original_title": "Leynilögga",
+      "overview": "When Bússi, Iceland's toughest cop, is forced to work with a new partner to solve a series of bank robberies, the pressure to close the case as soon as possible proves too much for him.",
+      "poster_path": "/jnWyZsaCl3Ke6u6ReSmBRO8S1rX.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        35,
+        28,
+        53
+      ],
+      "popularity": 712.963,
+      "release_date": "2022-05-23",
+      "video": false,
+      "vote_average": 6.153,
+      "vote_count": 49
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/uEwGFGtao9YG2JolmdvtHLLVbA9.jpg",
+      "id": 111332,
+      "title": "Avatar: Creating the World of Pandora",
+      "original_language": "en",
+      "original_title": "Avatar: Creating the World of Pandora",
+      "overview": "The Making-of James Cameron's Avatar. It shows interesting parts of the work on the set.",
+      "poster_path": "/sjf3xjuofCtDhZghJRzXlTiEjJe.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        99
+      ],
+      "popularity": 637.023,
+      "release_date": "2010-02-07",
+      "video": false,
+      "vote_average": 7.329,
+      "vote_count": 35
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/6mEYUYdkKoVCMeYf3rTFj0L1uyv.jpg",
+      "id": 899112,
+      "title": "Violent Night",
+      "original_language": "en",
+      "original_title": "Violent Night",
+      "overview": "When a team of mercenaries breaks into a wealthy family compound on Christmas Eve, taking everyone inside hostage, the team isn’t prepared for a surprise combatant: Santa Claus is on the grounds, and he’s about to show why this Nick is no saint.",
+      "poster_path": "/nhXjUvOvq7rJlvJFCrZMUUJ9Mn0.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        28,
+        35,
+        80,
+        53
+      ],
+      "popularity": 3419.503,
+      "release_date": "2022-11-30",
+      "video": false,
+      "vote_average": 7.735,
+      "vote_count": 782
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/AaV1YIdWKnjAIAOe8UUKBFm327v.jpg",
+      "id": 361743,
+      "title": "Top Gun: Maverick",
+      "original_language": "en",
+      "original_title": "Top Gun: Maverick",
+      "overview": "After more than thirty years of service as one of the Navy’s top aviators, and dodging the advancement in rank that would ground him, Pete “Maverick” Mitchell finds himself training a detachment of TOP GUN graduates for a specialized mission the likes of which no living pilot has ever seen.",
+      "poster_path": "/62HCnUTziyWcpDaBO2i1DX17ljH.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        28,
+        18
+      ],
+      "popularity": 691.236,
+      "release_date": "2022-05-24",
+      "video": false,
+      "vote_average": 8.337,
+      "vote_count": 5429
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/mzFlwK2WN5KGCgEc4ExJmooJy97.jpg",
+      "id": 539681,
+      "title": "DC League of Super-Pets",
+      "original_language": "en",
+      "original_title": "DC League of Super-Pets",
+      "overview": "When Superman and the rest of the Justice League are kidnapped, Krypto the Super-Dog must convince a rag-tag shelter pack - Ace the hound, PB the potbellied pig, Merton the turtle and Chip the squirrel - to master their own newfound powers and help him rescue the superheroes.",
+      "poster_path": "/r7XifzvtezNt31ypvsmb6Oqxw49.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        16,
+        28,
+        10751,
+        35,
+        878
+      ],
+      "popularity": 260.082,
+      "release_date": "2022-07-27",
+      "video": false,
+      "vote_average": 7.438,
+      "vote_count": 1038
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/ojmI26hx0rLT3X5kMnb9LTtXEOJ.jpg",
+      "id": 16781,
+      "title": "Madea's Family Reunion",
+      "original_language": "en",
+      "original_title": "Madea's Family Reunion",
+      "overview": "Based upon Tyler Perry's acclaimed stage production, Madea's Family Reunion continues the adventures of Southern matriarch Madea. She has just been court ordered to be in charge of Nikki, a rebellious runaway, her nieces, Lisa and Vanessa, are suffering relationship trouble, and through it all, she has to organize her family reunion.",
+      "poster_path": "/lAzrDS5bJJSSdPAUxuctCoomXUc.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        18,
+        35,
+        10749
+      ],
+      "popularity": 14.566,
+      "release_date": "2006-02-24",
+      "video": false,
+      "vote_average": 6.4,
+      "vote_count": 176
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/kmzppWh7ljL6K9fXW72bPN3gKwu.jpg",
+      "id": 1013860,
+      "title": "R.I.P.D. 2: Rise of the Damned",
+      "original_language": "en",
+      "original_title": "R.I.P.D. 2: Rise of the Damned",
+      "overview": "When Sheriff Roy Pulsipher finds himself in the afterlife, he joins a special police force and returns to Earth to save humanity from the undead.",
+      "poster_path": "/g4yJTzMtOBUTAR2Qnmj8TYIcFVq.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        14,
+        28,
+        35,
+        80
+      ],
+      "popularity": 1204.0,
+      "release_date": "2022-11-15",
+      "video": false,
+      "vote_average": 6.574,
+      "vote_count": 305
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/bQXAqRx2Fgc46uCVWgoPz5L5Dtr.jpg",
+      "id": 436270,
+      "title": "Black Adam",
+      "original_language": "en",
+      "original_title": "Black Adam",
+      "overview": "Nearly 5,000 years after he was bestowed with the almighty powers of the Egyptian gods—and imprisoned just as quickly—Black Adam is freed from his earthly tomb, ready to unleash his unique form of justice on the modern world.",
+      "poster_path": "/pFlaoHTZeyNkG83vxsAJiGzfSsa.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        28,
+        14,
+        878
+      ],
+      "popularity": 2699.078,
+      "release_date": "2022-10-19",
+      "video": false,
+      "vote_average": 7.22,
+      "vote_count": 3519
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/7zQJYV02yehWrQN6NjKsBorqUUS.jpg",
+      "id": 724495,
+      "title": "The Woman King",
+      "original_language": "en",
+      "original_title": "The Woman King",
+      "overview": "The story of the Agojie, the all-female unit of warriors who protected the African Kingdom of Dahomey in the 1800s with skills and a fierceness unlike anything the world has ever seen, and General Nanisca as she trains the next generation of recruits and readies them for battle against an enemy determined to destroy their way of life.",
+      "poster_path": "/438QXt1E3WJWb3PqNniK0tAE5c1.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        28,
+        18,
+        36
+      ],
+      "popularity": 1748.42,
+      "release_date": "2022-09-15",
+      "video": false,
+      "vote_average": 7.821,
+      "vote_count": 960
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/bnXGwFBomUseQIc9Xqiymy9p8qP.jpg",
+      "id": 517302,
+      "title": "Hatching",
+      "original_language": "fi",
+      "original_title": "Pahanhautoja",
+      "overview": "12 year old Tinja is desperate to please her mother, a woman obsessed with presenting the image of a perfect family. One night, Tinja finds a strange egg. What hatches is beyond belief.",
+      "poster_path": "/jgJACjJIpcbFfEEmEglinfQWQPO.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        27,
+        14
+      ],
+      "popularity": 26.866,
+      "release_date": "2022-03-04",
+      "video": false,
+      "vote_average": 6.337,
+      "vote_count": 212
+    },
+    {
+      "adult": false,
+      "backdrop_path": "/bZ6hEHRoOB5wGkRm9P8AchduODu.jpg",
+      "id": 966220,
+      "title": "Sniper: The White Raven",
+      "original_language": "uk",
+      "original_title": "Снайпер. Білий ворон",
+      "overview": "Mykola is an eccentric pacifist who wants to be useful to humanity. When the war begins at Donbass, Mykola’s naive world is collapsing as the militants kill his pregnant wife and burn his home to the ground. Recovered, he makes a cardinal decision and gets enlisted in a sniper company. Having met his wife’s killers, he emotionally breaks down and arranges “sniper terror” for the enemy. He’s saved from a senseless death by his instructor who himself gets mortally wounded. The death of a friend leaves a “scar” and Mykola is ready to sacrifice his life.",
+      "poster_path": "/lZOODJzwuQo0etJJyBBZJOSdZcW.jpg",
+      "media_type": "movie",
+      "genre_ids": [
+        10752,
+        28,
+        18
+      ],
+      "popularity": 757.416,
+      "release_date": "2022-05-03",
+      "video": false,
+      "vote_average": 7.605,
+      "vote_count": 195
+    }
+  ],
+  "total_pages": 2,
+  "total_results": 30
+}

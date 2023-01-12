@@ -12,7 +12,6 @@ import com.example.movieindex.util.MainCoroutineRule
 import com.example.movieindex.util.TestDataFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -52,86 +51,39 @@ class AuthUseCaseTest {
     }
 
     @Test
-    fun login_loading() = runTest {
-        val actualResult = authUseCase.login(username = "", password = "").first()
-        val sessionId = authUseCase.getSessionId().first()
-
-        assertTrue(actualResult is Resource.Loading)
-        assertTrue(sessionId.isEmpty())
-    }
-
-    @Test
     fun login_success() = runTest {
-        val actualResult = authUseCase.login(username = "", password = "").toList()
-        val sessionId = authUseCase.getSessionId().first()
-
-        assertEquals(2, actualResult.size)
-        assertTrue(actualResult[1] is Resource.Success)
-        assertTrue(sessionId.isNotEmpty())
-    }
-
-    @Test
-    fun login_error() = runTest {
-
-        authRepository.isSuccess = false
-
-        val actualResult = authUseCase.login(username = "", password = "").toList()
-        val sessionId = authUseCase.getSessionId().first()
-
-        assertEquals(2, actualResult.size)
-        assertTrue(actualResult[1] is Resource.Error)
-        assertTrue(sessionId.isEmpty())
+        val apiCall = authUseCase.login(username = "", password = "")
+        assertTrue(apiCall is Resource.Success)
     }
 
     @Test
     fun login_empty() = runTest {
-
         authRepository.isBodyEmpty = true
-
-        val actualResult = authUseCase.login(username = "", password = "").toList()
-        val sessionId = authUseCase.getSessionId().first()
-
-        assertEquals(2, actualResult.size)
-        assertTrue(actualResult[1] is Resource.Empty)
-        assertTrue(sessionId.isEmpty())
-
+        val apiCall = authUseCase.login(username = "", password = "")
+        assertTrue(apiCall is Resource.Empty)
     }
 
     @Test
-    fun isUserLoggedIn_testUsingLogin() = runTest {
-
-        val actualResult = authUseCase.login(username = "", password = "").toList()
-        val sessionId = authUseCase.getSessionId().first()
-
-        assertEquals(2, actualResult.size)
-        assertTrue(actualResult[1] is Resource.Success)
-        assertTrue(sessionId.isNotEmpty())
-
-        val isUserLoggedIn = authUseCase.isUserLoggedIn().first()
-        assertTrue(isUserLoggedIn)
-
+    fun login_error() = runTest {
+        authRepository.isSuccess = false
+        val apiCall = authUseCase.login(username = "", password = "")
+        assertTrue(apiCall is Resource.Error)
     }
 
     @Test
-    fun isUserLoggedIn_testUsingDataStore() = runTest {
-        assertFalse(authUseCase.isUserLoggedIn().first())
-
+    fun isUserLoggedIn() = runTest {
         val sessionId = UUID.randomUUID().toString()
         authRepository.saveSessionId(sessionId = sessionId)
-        assertEquals(sessionId, authRepository.getSessionId().first())
-
-        val isUserLoggedIn = authUseCase.isUserLoggedIn().first()
-        assertTrue(isUserLoggedIn)
+        assertTrue(authUseCase.isUserLoggedIn().first())
     }
 
     @Test
-    fun saveSessionId_getSessionId() = runTest {
+    fun getSessionId() = runTest {
         val sessionId = UUID.randomUUID().toString()
-
-        authUseCase.saveSessionId(sessionId = sessionId)
-        val cachedData = authUseCase.getSessionId().first()
-
+        authRepository.saveSessionId(sessionId = sessionId)
+        val cachedData = authRepository.getSessionId().first()
         assertEquals(sessionId, cachedData)
     }
+
 
 }

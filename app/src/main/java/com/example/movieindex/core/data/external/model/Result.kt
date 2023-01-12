@@ -1,7 +1,5 @@
 package com.example.movieindex.core.data.external.model
 
-import com.example.movieindex.core.data.local.model.MovieEntity
-
 data class Result(
     val movieId: Int,
     val title: String,
@@ -13,16 +11,6 @@ data class Result(
     val adult: Boolean,
     val voteAverage: Double?,
     val releaseDate: String?,
-)
-
-fun Result.toMovieEntity(isFavorite: Boolean = false, isBookmark: Boolean = false) = MovieEntity(
-    movieId = movieId,
-    title = title,
-    overview = overview,
-    posterPath = posterPath,
-    releaseDate = releaseDate,
-    isFavorite = isFavorite,
-    isBookmark = isBookmark
 )
 
 val genreList = mapOf(

@@ -34,7 +34,8 @@ class WatchListWorker @AssistedInject constructor(
         val watchlist =
             workerParams.inputData.getBoolean(WATCH_LIST_WORKER_WATCH_LIST_KEY, false)
         val movieId = workerParams.inputData.getInt(WorkerConstants.WORKER_MOVIE_ID_KEY, 0)
-        val mediaType = workerParams.inputData.getString(WorkerConstants.WORKER_MOVIE_TYPE_KEY) ?: "movie"
+        val mediaType =
+            workerParams.inputData.getString(WorkerConstants.WORKER_MOVIE_TYPE_KEY) ?: "movie"
 
         Timber.i("watchlist worker - watchList: $watchlist")
 
@@ -44,10 +45,10 @@ class WatchListWorker @AssistedInject constructor(
             mediaType = mediaType
         )
 
-        return if(accountId == null || sessionId.isEmpty()){
+        return if (accountId == null || sessionId.isEmpty()) {
             Timber.e("WatchListWorker - invalidCredentials - sessionId: $sessionId, accountId: $accountId")
             Result.failure()
-        }else{
+        } else {
             val networkResource = network.addToWatchList(accountId = accountId,
                 sessionId = sessionId,
                 body = body)
@@ -58,10 +59,10 @@ class WatchListWorker @AssistedInject constructor(
                 }
                 is NetworkResource.Error -> {
                     if (runAttemptCount > WorkerConstants.MAX_RETRY_ATTEMPT) {
-                        Timber.e("WatchListWorker - fail - errMsg: ${networkResource.errMessage}")
+                        Timber.e("WatchListWorker - fail - errMsg: ${networkResource.errMsg}")
                         Result.failure()
                     } else {
-                        Timber.e("WatchListWorker - retry - errMsg: ${networkResource.errMessage}")
+                        Timber.e("WatchListWorker - retry - errMsg: ${networkResource.errMsg}")
                         Result.retry()
                     }
                 }
@@ -74,7 +75,6 @@ class WatchListWorker @AssistedInject constructor(
                 }
             }
         }
-
 
 
     }

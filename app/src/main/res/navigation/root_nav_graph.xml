@@ -90,5 +90,5 @@
         android:id="@+id/creditListFragment"
         android:name="com.example.movieindex.feature.list.credit_list.CreditListFragment"
         android:label="fragment_credit_list"
-        tools:layout="@layout/fragment_credit_list"/>
+        tools:layout="@layout/fragment_credit_list" />
 </navigation>

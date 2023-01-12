@@ -43,8 +43,10 @@ class MoviesCardAdapter(private val onMovieClicked: (movieId: Int) -> Unit) :
                 } else {
                     progress = movieRating
 
-                    setIndicatorColor(ContextCompat.getColor(this.context, getMovieRatingIndicatorColor(movieRating)))
-                    trackColor = ContextCompat.getColor(this.context, getMovieRatingTrackColor(movieRating))
+                    setIndicatorColor(ContextCompat.getColor(this.context,
+                        getMovieRatingIndicatorColor(movieRating)))
+                    trackColor =
+                        ContextCompat.getColor(this.context, getMovieRatingTrackColor(movieRating))
 
                 }
             }

@@ -7,11 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface AuthUseCase {
 
-    fun login(username: String, password: String): Flow<Resource<SessionIdResponse>>
+    suspend fun login(username: String, password: String): Resource<SessionIdResponse>
     fun isUserLoggedIn(): Flow<Boolean>
 
-    suspend fun saveSessionId(sessionId: String)
     fun getSessionId(): Flow<String>
 
-    fun logout(): Flow<Resource<DeleteSessionResponse>>
+    suspend fun logout(): Resource<DeleteSessionResponse>
 }

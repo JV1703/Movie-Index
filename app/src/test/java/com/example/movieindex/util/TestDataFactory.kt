@@ -3,9 +3,10 @@ package com.example.movieindex.util
 import com.example.movieindex.core.common.extensions.fromJson
 import com.example.movieindex.core.data.external.model.MovieDetails
 import com.example.movieindex.core.data.external.model.Result
-import com.example.movieindex.core.data.local.model.MovieEntity
 import com.example.movieindex.core.data.remote.model.account.AccountDetailsResponse
+import com.example.movieindex.core.data.remote.model.account.MovieAccountStateResponse
 import com.example.movieindex.core.data.remote.model.auth.body.LoginBody
+import com.example.movieindex.core.data.remote.model.auth.response.DeleteSessionResponse
 import com.example.movieindex.core.data.remote.model.auth.response.LoginResponse
 import com.example.movieindex.core.data.remote.model.auth.response.RequestTokenResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
@@ -24,6 +25,8 @@ import java.io.InputStreamReader
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.random.Random.Default.nextBoolean
+import kotlin.random.Random.Default.nextInt
 
 class TestDataFactory {
 
@@ -137,6 +140,17 @@ class TestDataFactory {
         return gson.fromJson(json)
     }
 
+    fun generateDeleteSessionResponseTestData(): DeleteSessionResponse {
+        return DeleteSessionResponse(success = true)
+    }
+
+    fun generateMovieAccountStateResponseTestData(): MovieAccountStateResponse {
+        return MovieAccountStateResponse(favorite = true,
+            id = nextInt(99_999),
+            rated = nextBoolean(),
+            watchlist = true)
+    }
+
     fun generateLoginBody() = LoginBody(username = "", password = "", request_token = "")
     fun generateFavoriteBody(favorite: Boolean = true) = FavoriteBody(favorite = favorite,
         mediaId = 0,
@@ -147,7 +161,7 @@ class TestDataFactory {
         mediaType = "")
 
     fun toMovieDetails(
-        movie: Result
+        movie: Result,
     ) = MovieDetails(
         id = movie.movieId,
         imdbId = null,
@@ -166,31 +180,8 @@ class TestDataFactory {
         videos = emptyList(),
         voteAverage = movie.voteAverage,
         reviews = null,
-        mpaaRating = null
+        mpaaRating = null,
+        popularity = null
     )
-
-    fun toMovieDetails(
-        movieEntity: MovieEntity,
-        isFavorite: Boolean = false,
-        isBookmark: Boolean = false,
-    ) =
-        MovieDetails(id = movieEntity.movieId,
-            title = movieEntity.title,
-            releaseDate = movieEntity.releaseDate,
-            overview = movieEntity.overview,
-            posterPath = movieEntity.posterPath,
-            imdbId = null,
-            adult = true,
-            backdropPath = null,
-            casts = emptyList(),
-            crews = emptyList(),
-            genres = emptyList(),
-            recommendations = null,
-            runtime = null,
-            tagline = null,
-            videos = emptyList(),
-            voteAverage = null,
-            reviews = null,
-            mpaaRating = null)
 
 }

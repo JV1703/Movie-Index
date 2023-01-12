@@ -9,7 +9,7 @@ import timber.log.Timber
 
 sealed class NetworkResource<out T> {
     data class Success<out T>(val data: T) : NetworkResource<T>()
-    data class Error(val errMessage: String? = null, val errCode: Int? = null) :
+    data class Error(val errMsg: String? = null, val errCode: Int? = null) :
         NetworkResource<Nothing>()
 
     object Empty : NetworkResource<Nothing>()
@@ -27,13 +27,13 @@ suspend fun <T, R> safeNetworkCall(
             when {
                 response.message().toString().contains("timeout") -> {
                     Timber.e("safeNetworkCall - errMsg: timeOut")
-                    NetworkResource.Error(errCode = 408, errMessage = "Network Timeout")
+                    NetworkResource.Error(errCode = 408, errMsg = "Network Timeout")
                 }
 
                 response.message().toString()
                     .contains("(only-if-cached)") && response.code() == 504 -> {
                     NetworkResource.Error(errCode = response.code(),
-                        errMessage = "Please check internet connection")
+                        errMsg = "Please check internet connection")
                 }
 
                 response.errorBody() != null -> {
@@ -42,7 +42,7 @@ suspend fun <T, R> safeNetworkCall(
                     Timber.e("network_result", errorBody)
                     Timber.e("safeNetworkCall - errMsg: $errorBody")
                     NetworkResource.Error(errCode = response.code(),
-                        errMessage = errorBody)
+                        errMsg = errorBody)
                 }
 
                 response.isSuccessful -> {
@@ -58,12 +58,12 @@ suspend fun <T, R> safeNetworkCall(
 
                 else -> {
                     Timber.e("safeNetworkCall - miscErr: ${response.message()}")
-                    NetworkResource.Error(errMessage = response.message())
+                    NetworkResource.Error(errMsg = response.message())
                 }
             }
         } catch (e: Exception) {
             Timber.e("safeNetworkCall - miscErr: ${e.message}")
-            NetworkResource.Error(errMessage = e.message ?: "Non api error")
+            NetworkResource.Error(errMsg = e.message ?: "Non api error")
         }
     }
 }

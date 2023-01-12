@@ -8,7 +8,6 @@ import com.example.movieindex.core.common.ColorPalette
 import com.example.movieindex.core.data.local.MovieDatabase
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
 import com.example.movieindex.core.data.local.dao.AccountDao
-import com.example.movieindex.core.data.local.dao.MovieDao
 import com.example.movieindex.core.data.local.dao.MoviePagingDao
 import com.example.movieindex.core.data.local.dao.MoviePagingKeyDao
 import com.example.movieindex.core.data.local.implementation.CacheDataSourceImpl
@@ -18,9 +17,10 @@ import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
 import com.example.movieindex.core.data.remote.implementation.NetworkDataSourceImpl
 import com.example.movieindex.core.data.remote.interceptor.ApiKeyInterceptor
 import com.example.movieindex.core.data.remote.interceptor.CacheInterceptor
-import com.example.movieindex.core.data.remote.interceptor.ForceCacheInterceptor
+import com.example.movieindex.core.repository.abstraction.AccountRepository
 import com.example.movieindex.core.repository.abstraction.AuthRepository
 import com.example.movieindex.core.repository.abstraction.MovieRepository
+import com.example.movieindex.core.repository.implementation.AccountRepositoryImpl
 import com.example.movieindex.core.repository.implementation.AuthRepositoryImpl
 import com.example.movieindex.core.repository.implementation.MovieRepositoryImpl
 import com.squareup.moshi.Moshi
@@ -60,21 +60,15 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCacheInterceptor(): CacheInterceptor = CacheInterceptor()
-
-    @Provides
-    @Singleton
     fun okHttpClient(
         cache: Cache,
         apiKeyInterceptor: ApiKeyInterceptor,
         loggingInterceptor: HttpLoggingInterceptor,
         cacheInterceptor: CacheInterceptor,
-        forceCacheInterceptor: ForceCacheInterceptor,
         /*, certificatePinner: CertificatePinner*/
     ) = OkHttpClient.Builder()
-//        .cache(cache)
-//        .addNetworkInterceptor(forceCacheInterceptor)
-//        .addInterceptor(cacheInterceptor)
+        .cache(cache)
+        .addInterceptor(cacheInterceptor)
         .addInterceptor(apiKeyInterceptor)
         .addInterceptor(loggingInterceptor)
         /*.certificatePinner(certificatePinner)*/.readTimeout(15, TimeUnit.SECONDS)
@@ -92,12 +86,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideMovieApi(retrofit: Retrofit): MovieApi = retrofit.create(MovieApi::class.java)
-
-    @Provides
-    @Singleton
-    fun provideMovieDao(
-        database: MovieDatabase,
-    ) = database.movieDao()
 
     @Provides
     @Singleton
@@ -124,14 +112,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideCacheDataSource(
-        movieDao: MovieDao,
         moviePagingDao: MoviePagingDao,
         moviePagingKeyDao: MoviePagingKeyDao,
         accountDao: AccountDao,
         dataStore: DataStore<Preferences>,
         @CoroutinesQualifiers.IoDispatcher ioDispatcher: CoroutineDispatcher,
     ): CacheDataSource = CacheDataSourceImpl(
-        movieDao = movieDao,
         moviePagingDao = moviePagingDao,
         moviePagingKeyDao = moviePagingKeyDao,
         accountDao = accountDao,
@@ -159,6 +145,13 @@ object AppModule {
         cache: CacheDataSource,
     ): AuthRepository =
         AuthRepositoryImpl(network = network, cache = cache)
+
+    @Provides
+    @Singleton
+    fun provideAccountRepository(
+        network: NetworkDataSource,
+        cache: CacheDataSource,
+    ): AccountRepository = AccountRepositoryImpl(network = network, cache = cache)
 
     @Provides
     @Singleton

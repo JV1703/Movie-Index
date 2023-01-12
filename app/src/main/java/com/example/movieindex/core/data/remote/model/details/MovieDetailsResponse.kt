@@ -58,5 +58,6 @@ fun MovieDetailsResponse.toMovieDetails() = MovieDetails(
     voteAverage = vote_average,
     reviews = reviews?.results?.map { it.toReviewResult() } ?: emptyList(),
     mpaaRating = release_dates?.results?.find { it.iso_3166_1 == "US" }?.release_dates?.find { it.certification != null && it.certification.isNotEmpty() }?.certification
-        ?: ""
+        ?: "",
+    popularity = popularity
 )

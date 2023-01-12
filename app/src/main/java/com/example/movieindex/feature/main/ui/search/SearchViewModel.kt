@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.example.movieindex.feature.common.domain.abstraction.MovieUseCase
+import com.example.movieindex.feature.main.ui.search.domain.abstraction.SearchUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val movieUseCase: MovieUseCase,
+    private val searchUseCase: SearchUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -30,7 +30,7 @@ class SearchViewModel @Inject constructor(
     val searchResult =
         searchQuery.debounce(1000).distinctUntilChanged()
             .filter { query -> query.trim().isNotEmpty() }.flatMapLatest {
-                movieUseCase.searchMoviesPagingSource(query = it)
+                searchUseCase.searchMoviesPagingSource(query = it)
             }.cachedIn(viewModelScope)
 
     fun updateSearchQuery(query: String) {

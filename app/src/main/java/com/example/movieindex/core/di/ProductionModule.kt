@@ -9,7 +9,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
-import com.example.movieindex.core.data.local.CacheConstants.AUTH_PREFERENCES_NAME
+import com.example.movieindex.core.data.local.CacheConstants
 import com.example.movieindex.core.data.local.CacheConstants.DATABASE_NAME
 import com.example.movieindex.core.data.local.MovieDatabase
 import com.example.movieindex.core.data.remote.NetworkConstants
@@ -49,9 +49,9 @@ object ProductionModule {
     fun providePreferencesDataStore(@ApplicationContext appContext: Context): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create(corruptionHandler = ReplaceFileCorruptionHandler(
             produceNewData = { emptyPreferences() }),
-            migrations = listOf(SharedPreferencesMigration(appContext, AUTH_PREFERENCES_NAME)),
+            migrations = listOf(SharedPreferencesMigration(appContext, CacheConstants.AUTH_PREFERENCES_NAME)),
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            produceFile = { appContext.preferencesDataStoreFile(AUTH_PREFERENCES_NAME) })
+            produceFile = { appContext.preferencesDataStoreFile(CacheConstants.AUTH_PREFERENCES_NAME) })
     }
 
 }

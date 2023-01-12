@@ -9,5 +9,5 @@ data class FavoriteBody(
     @Json(name = "media_id")
     val mediaId: Int,
     @Json(name = "media_type")
-    val mediaType: String
+    val mediaType: String,
 )

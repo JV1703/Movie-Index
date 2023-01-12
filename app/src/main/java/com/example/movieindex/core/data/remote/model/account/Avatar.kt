@@ -7,5 +7,5 @@ data class Avatar(
     @Json(name = "gravatar")
     val gravatar: Gravatar,
     @Json(name = "tmdb")
-    val tmdb: Tmdb
+    val tmdb: Tmdb,
 )

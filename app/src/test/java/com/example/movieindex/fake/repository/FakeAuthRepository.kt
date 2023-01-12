@@ -4,13 +4,15 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
+import com.example.movieindex.core.data.external.model.AccountDetails
 import com.example.movieindex.core.data.external.model.Resource
+import com.example.movieindex.core.data.external.model.networkResourceHandler
 import com.example.movieindex.core.data.local.CacheConstants
 import com.example.movieindex.core.data.remote.NetworkResource
+import com.example.movieindex.core.data.remote.model.auth.response.DeleteSessionResponse
 import com.example.movieindex.core.data.remote.model.auth.response.SessionIdResponse
 import com.example.movieindex.core.data.remote.safeNetworkCall
 import com.example.movieindex.core.repository.abstraction.AuthRepository
-import com.example.movieindex.core.repository.implementation.networkResourceHandler
 import com.example.movieindex.util.TestDataFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -28,19 +30,47 @@ class FakeAuthRepository(
 
     var isSuccess = true
     var isBodyEmpty = false
+    private val accountDetailsList = arrayListOf<AccountDetails>()
 
-    override fun login(username: String, password: String): Flow<Resource<SessionIdResponse>> {
+    override suspend fun login(
+        username: String,
+        password: String,
+    ): Resource<SessionIdResponse> {
         val data = testDataFactory.generateSessionIdTestData()
         val response = testDataFactory.generateResponse(isSuccess = isSuccess,
             isBodyEmpty = isBodyEmpty) { Response.success(data) }
-        return flow {
-            emit(Resource.Loading)
-            val networkResource =
-                safeNetworkCall(testDispatcher, networkCall = { response }, conversion = { it })
-            if(networkResource is NetworkResource.Success){
-                saveSessionId(sessionId = networkResource.data.session_id)
+        val networkResource = safeNetworkCall(dispatcher = testDispatcher,
+            networkCall = { response },
+            conversion = { it })
+        return networkResourceHandler(networkResource = networkResource, conversion = { it })
+    }
+
+    override suspend fun deleteSession(): Resource<DeleteSessionResponse> {
+        val data = testDataFactory.generateDeleteSessionResponseTestData()
+        val response = testDataFactory.generateResponse(isSuccess = isSuccess,
+            isBodyEmpty = isBodyEmpty) { Response.success(data) }
+        val networkResource = safeNetworkCall(dispatcher = testDispatcher,
+            networkCall = { response },
+            conversion = { it })
+
+        return when (networkResource) {
+            is NetworkResource.Success -> {
+                if (networkResource.data.success) {
+                    withContext(testDispatcher) {
+                        accountDetailsList.clear()
+                        dataStore.edit { preferences ->
+                            preferences.clear()
+                        }
+                    }
+                }
+                Resource.Success(networkResource.data)
             }
-            emit(networkResourceHandler(networkResource = networkResource, conversion = { it }))
+            is NetworkResource.Error -> {
+                Resource.Error(errCode = networkResource.errCode, errMsg = networkResource.errMsg)
+            }
+            is NetworkResource.Empty -> {
+                Resource.Empty
+            }
         }
     }
 

@@ -17,10 +17,10 @@ interface MoviePagingKeyDao {
     @Query("SELECT * FROM movie_paging_key_table")
     fun getAllMovieKey(): Flow<List<MovieEntityKey>>
 
-    @Query("SELECT * FROM movie_paging_key_table WHERE id = :id AND pagingCategory = :pagingCategory")
-    suspend fun movieKeyId(id: String, pagingCategory: MoviePagingCategory): MovieEntityKey?
+    @Query("SELECT * FROM movie_paging_key_table WHERE id = :id")
+    suspend fun movieKeyId(id: String): MovieEntityKey?
 
     @Query("DELETE FROM movie_paging_key_table WHERE pagingCategory = :pagingCategory")
     suspend fun clearMovieKeys(pagingCategory: MoviePagingCategory)
-    
+
 }
