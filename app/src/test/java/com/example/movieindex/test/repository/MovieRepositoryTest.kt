@@ -19,7 +19,6 @@ import com.example.movieindex.fake.data_source.FakeNetworkDataSource
 import com.example.movieindex.fake.datastore.FakePreferenceDataStore
 import com.example.movieindex.util.MainCoroutineRule
 import com.example.movieindex.util.TestDataFactory
-import com.example.movieindex.util.TestWorkManagerUtil
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestDispatcher

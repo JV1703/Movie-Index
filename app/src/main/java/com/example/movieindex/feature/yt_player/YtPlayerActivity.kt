@@ -90,8 +90,8 @@ class YtPlayerActivity : AppCompatActivity(), YtController {
     }
 
     override fun onStop() {
-        super.onStop()
         binding.youtubePlayerView.release()
+        super.onStop()
     }
 }
 

@@ -62,7 +62,7 @@
         android:id="@+id/splashFragment"
         android:name="com.example.movieindex.feature.splash.SplashFragment"
         android:label="fragment_splash"
-        tools:layout="@layout/fragment_splash" >
+        tools:layout="@layout/fragment_splash">
         <action
             android:id="@+id/action_splashFragment_to_loginFragment"
             app:destination="@id/auth_nav_graph"
@@ -74,7 +74,8 @@
             app:popUpTo="@id/splashFragment"
             app:popUpToInclusive="true" />
     </fragment>
-    <navigation android:id="@+id/auth_nav_graph"
+    <navigation
+        android:id="@+id/auth_nav_graph"
         app:startDestination="@id/loginFragment">
         <fragment
             android:id="@+id/loginFragment"

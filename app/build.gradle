@@ -146,6 +146,12 @@ dependencies {
     // Youtube Player
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:11.1.0'
 
+    // Youtube Extractor
+    implementation 'com.github.HaarigerHarald:android-youtubeExtractor:master-SNAPSHOT'
+
+    // Exo Player
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.2'
+
     // Work Manager
     implementation "androidx.work:work-runtime-ktx:$work_version"
     androidTestImplementation("androidx.work:work-testing:$work_version")
