@@ -82,7 +82,7 @@ class AccountFragment : Fragment() {
                     buttonText = "Logging Out"
                     gravity = DrawableButton.GRAVITY_TEXT_END
 
-                    progressColor = Color.WHITE
+                    progressColor = Color.BLACK
                 }
             } else {
                 binding.logOutButton.hideProgress("Log Out")

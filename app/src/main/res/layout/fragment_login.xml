@@ -85,6 +85,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="Log In"
+        app:backgroundTint="@color/button"
         app:cornerRadius="12dp"
         app:layout_constraintBottom_toTopOf="@id/register_cta"
         app:layout_constraintEnd_toEndOf="@id/password_til"

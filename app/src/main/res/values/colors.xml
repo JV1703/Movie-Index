@@ -7,10 +7,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="grey_300">#e0e0e0</color>
 
     <color name="main_bg">#000000</color>
     <color name="secondary_bg">#0f0f0f</color>
     <color name="tertiary_bg">#2b2b2b</color>
+
+    <color name="button">@color/grey_300</color>
 
     <color name="ratings_green">#4caf50</color>
     <color name="ratings_green_track_color">#c8e6c9</color>

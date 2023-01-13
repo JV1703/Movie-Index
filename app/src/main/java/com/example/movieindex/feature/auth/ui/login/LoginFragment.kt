@@ -93,7 +93,7 @@ class LoginFragment : Fragment() {
                     buttonText = "Logging In"
                     gravity = DrawableButton.GRAVITY_TEXT_END
 
-                    progressColor = Color.WHITE
+                    progressColor = Color.BLACK
                 }
             } else {
                 binding.loginButton.hideProgress("Log In")

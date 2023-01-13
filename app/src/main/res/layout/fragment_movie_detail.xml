@@ -557,7 +557,7 @@
         android:id="@+id/updating_ind"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminateTint="@color/black"
+        android:indeterminateTint="@color/tertiary_bg"
         android:translationZ="10dp"
         app:layout_constraintBottom_toBottomOf="@id/fab_main"
         app:layout_constraintEnd_toEndOf="@id/fab_main"
