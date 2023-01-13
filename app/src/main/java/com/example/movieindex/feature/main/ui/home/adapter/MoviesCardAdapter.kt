@@ -17,7 +17,6 @@ import com.example.movieindex.core.data.external.model.Result
 import com.example.movieindex.core.data.remote.NetworkConstants.BASE_IMG_URL
 import com.example.movieindex.core.data.remote.NetworkConstants.POSTER_SIZE_SMALL
 import com.example.movieindex.databinding.MovieVhItemBinding
-import timber.log.Timber
 import java.time.format.FormatStyle
 import java.util.*
 
@@ -37,7 +36,6 @@ class MoviesCardAdapter(private val onMovieClicked: (movieId: Int) -> Unit) :
             val movieRating = (movie.voteAverage?.times(10))?.toInt()
             binding.ratingsInd.apply {
                 max = 100
-                Timber.i("movieRating: $movieRating")
                 if (movieRating == null) {
                     progress = 0
                 } else {
@@ -83,12 +81,6 @@ class MoviesCardAdapter(private val onMovieClicked: (movieId: Int) -> Unit) :
         holder.itemView.setOnClickListener {
             onMovieClicked(currentMovie.movieId)
         }
-    }
-
-    override fun onViewRecycled(holder: MovieViewHolder) {
-
-        Timber.i("view - ${holder.absoluteAdapterPosition} recycled")
-        super.onViewRecycled(holder)
     }
 
     companion object DiffUtilCallback : DiffUtil.ItemCallback<Result>() {

@@ -18,7 +18,6 @@ android {
         versionCode 1
         versionName "1.0"
 
-//        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner "com.example.movieindex.HiltTestRunner"
     }
 
@@ -102,9 +101,6 @@ dependencies {
     // progress button
     implementation 'com.github.razir.progressbutton:progressbutton:2.1.0'
 
-    // biometric
-    implementation("androidx.biometric:biometric:1.1.0")
-
     // ROOM
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
@@ -112,7 +108,7 @@ dependencies {
     implementation("androidx.room:room-paging:$room_version")
     testImplementation("androidx.room:room-testing:$room_version")
 
-    // DataStore - preference
+    // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // retrofit
@@ -143,14 +139,8 @@ dependencies {
     // Text Drawable
     implementation 'com.github.ramseth001:TextDrawable:1.1.6'
 
-    // Youtube Player
-    implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:11.1.0'
-
-    // Youtube Extractor
-    implementation 'com.github.HaarigerHarald:android-youtubeExtractor:master-SNAPSHOT'
-
-    // Exo Player
-    implementation 'com.google.android.exoplayer:exoplayer:2.18.2'
+    // Youtube Api
+    implementation files('libs//YouTubeAndroidPlayerApi.jar')
 
     // Work Manager
     implementation "androidx.work:work-runtime-ktx:$work_version"

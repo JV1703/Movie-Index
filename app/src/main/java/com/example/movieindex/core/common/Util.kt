@@ -71,7 +71,7 @@ fun getCircleTextDrawable(text: String, color: Int, fontSize: Int) =
             color = color)
 
 fun hasInternetConnection(context: Context): Boolean {
-    val connectivityManager = context.getSystemService(
+    val connectivityManager = context.applicationContext.getSystemService(
         Context.CONNECTIVITY_SERVICE
     ) as ConnectivityManager
     val activeNetwork = connectivityManager.activeNetwork ?: return false

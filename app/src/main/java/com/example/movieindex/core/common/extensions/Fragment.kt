@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 fun Fragment.makeToast(msg: String) {
-    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+    Toast.makeText(this.requireActivity(), msg, Toast.LENGTH_SHORT).show()
 }
 
 fun <T> Fragment.collectLatestLifecycleFlow(flow: Flow<T>, collect: suspend (T) -> Unit) {
