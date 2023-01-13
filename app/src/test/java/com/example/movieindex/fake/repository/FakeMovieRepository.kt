@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.paging.PagingData
-import com.example.movieindex.core.common.extensions.fromJson
 import com.example.movieindex.core.data.external.*
 import com.example.movieindex.core.data.external.model.*
 import com.example.movieindex.core.data.local.CacheConstants

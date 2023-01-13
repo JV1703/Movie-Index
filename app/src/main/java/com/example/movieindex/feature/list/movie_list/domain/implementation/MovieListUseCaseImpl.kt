@@ -10,7 +10,10 @@ import kotlinx.coroutines.flow.catch
 import timber.log.Timber
 import javax.inject.Inject
 
-class MovieListUseCaseImpl @Inject constructor(private val movieRepository: MovieRepository, private val accountRepository: AccountRepository): MovieListUseCase {
+class MovieListUseCaseImpl @Inject constructor(
+    private val movieRepository: MovieRepository,
+    private val accountRepository: AccountRepository,
+) : MovieListUseCase {
 
     override fun getNowPlayingPagingSource(
         loadSinglePage: Boolean,

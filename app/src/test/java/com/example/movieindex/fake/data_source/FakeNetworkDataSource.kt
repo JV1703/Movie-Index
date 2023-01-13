@@ -180,7 +180,9 @@ class FakeNetworkDataSource(
         val data = testDataFactory.generateDeleteSessionResponseTestData()
         val response = testDataFactory.generateResponse(isSuccess = isSuccess,
             isBodyEmpty = isBodyEmpty) { Response.success(data) }
-        return safeNetworkCall(dispatcher = testDispatcher, networkCall = {response}, conversion = {it})
+        return safeNetworkCall(dispatcher = testDispatcher,
+            networkCall = { response },
+            conversion = { it })
     }
 
     override suspend fun getMovieAccountState(
@@ -190,6 +192,8 @@ class FakeNetworkDataSource(
         val data = testDataFactory.generateMovieAccountStateResponseTestData()
         val response = testDataFactory.generateResponse(isSuccess = isSuccess,
             isBodyEmpty = isBodyEmpty) { Response.success(data) }
-        return safeNetworkCall(dispatcher = testDispatcher, networkCall = {response}, conversion = {it})
+        return safeNetworkCall(dispatcher = testDispatcher,
+            networkCall = { response },
+            conversion = { it })
     }
 }

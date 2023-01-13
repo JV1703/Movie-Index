@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -242,13 +241,17 @@ class AccountRepositoryTest {
         val remoteMediator = MoviesPagingRemoteMediator(
             loadSinglePage = false,
             pagingCategory = MoviePagingCategory.WATCHLIST,
-            networkCall = { page -> network.getWatchList(accountId = 0, sessionId = "", page = page) },
-            dbCallGetMovieKey = {id -> cache.movieKeyId(id = id)},
+            networkCall = { page ->
+                network.getWatchList(accountId = 0,
+                    sessionId = "",
+                    page = page)
+            },
+            dbCallGetMovieKey = { id -> cache.movieKeyId(id = id) },
             dbCallOnRefreshClearDb = { pagingCategory: MoviePagingCategory ->
                 cache.clearMovieKeys(pagingCategory = pagingCategory)
                 cache.clearMovies(pagingCategory = pagingCategory)
             },
-            dbCallOnSuccess = {movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
+            dbCallOnSuccess = { movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
                 cache.insertAllMovieKeys(movieKeys)
                 cache.insertAllMovies(movies)
             }
@@ -269,13 +272,17 @@ class AccountRepositoryTest {
         val remoteMediator = MoviesPagingRemoteMediator(
             loadSinglePage = true,
             pagingCategory = MoviePagingCategory.WATCHLIST,
-            networkCall = { page -> network.getWatchList(accountId = 0, sessionId = "", page = page) },
-            dbCallGetMovieKey = {id -> cache.movieKeyId(id = id)},
+            networkCall = { page ->
+                network.getWatchList(accountId = 0,
+                    sessionId = "",
+                    page = page)
+            },
+            dbCallGetMovieKey = { id -> cache.movieKeyId(id = id) },
             dbCallOnRefreshClearDb = { pagingCategory: MoviePagingCategory ->
                 cache.clearMovieKeys(pagingCategory = pagingCategory)
                 cache.clearMovies(pagingCategory = pagingCategory)
             },
-            dbCallOnSuccess = {movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
+            dbCallOnSuccess = { movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
                 cache.insertAllMovieKeys(movieKeys)
                 cache.insertAllMovies(movies)
             }
@@ -299,13 +306,17 @@ class AccountRepositoryTest {
         val remoteMediator = MoviesPagingRemoteMediator(
             loadSinglePage = true,
             pagingCategory = MoviePagingCategory.WATCHLIST,
-            networkCall = { page -> network.getWatchList(accountId = 0, sessionId = "", page = page) },
-            dbCallGetMovieKey = {id -> cache.movieKeyId(id = id)},
+            networkCall = { page ->
+                network.getWatchList(accountId = 0,
+                    sessionId = "",
+                    page = page)
+            },
+            dbCallGetMovieKey = { id -> cache.movieKeyId(id = id) },
             dbCallOnRefreshClearDb = { pagingCategory: MoviePagingCategory ->
                 cache.clearMovieKeys(pagingCategory = pagingCategory)
                 cache.clearMovies(pagingCategory = pagingCategory)
             },
-            dbCallOnSuccess = {movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
+            dbCallOnSuccess = { movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
                 cache.insertAllMovieKeys(movieKeys)
                 cache.insertAllMovies(movies)
             }
@@ -325,13 +336,17 @@ class AccountRepositoryTest {
         val remoteMediator = MoviesPagingRemoteMediator(
             loadSinglePage = false,
             pagingCategory = MoviePagingCategory.FAVORITE,
-            networkCall = { page -> network.getFavoriteList(accountId = 0, sessionId = "", page = page) },
-            dbCallGetMovieKey = {id -> cache.movieKeyId(id = id)},
+            networkCall = { page ->
+                network.getFavoriteList(accountId = 0,
+                    sessionId = "",
+                    page = page)
+            },
+            dbCallGetMovieKey = { id -> cache.movieKeyId(id = id) },
             dbCallOnRefreshClearDb = { pagingCategory: MoviePagingCategory ->
                 cache.clearMovieKeys(pagingCategory = pagingCategory)
                 cache.clearMovies(pagingCategory = pagingCategory)
             },
-            dbCallOnSuccess = {movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
+            dbCallOnSuccess = { movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
                 cache.insertAllMovieKeys(movieKeys)
                 cache.insertAllMovies(movies)
             }
@@ -352,13 +367,17 @@ class AccountRepositoryTest {
         val remoteMediator = MoviesPagingRemoteMediator(
             loadSinglePage = true,
             pagingCategory = MoviePagingCategory.FAVORITE,
-            networkCall = { page -> network.getFavoriteList(accountId = 0, sessionId = "", page = page) },
-            dbCallGetMovieKey = {id -> cache.movieKeyId(id = id)},
+            networkCall = { page ->
+                network.getFavoriteList(accountId = 0,
+                    sessionId = "",
+                    page = page)
+            },
+            dbCallGetMovieKey = { id -> cache.movieKeyId(id = id) },
             dbCallOnRefreshClearDb = { pagingCategory: MoviePagingCategory ->
                 cache.clearMovieKeys(pagingCategory = pagingCategory)
                 cache.clearMovies(pagingCategory = pagingCategory)
             },
-            dbCallOnSuccess = {movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
+            dbCallOnSuccess = { movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
                 cache.insertAllMovieKeys(movieKeys)
                 cache.insertAllMovies(movies)
             }
@@ -382,13 +401,17 @@ class AccountRepositoryTest {
         val remoteMediator = MoviesPagingRemoteMediator(
             loadSinglePage = true,
             pagingCategory = MoviePagingCategory.FAVORITE,
-            networkCall = { page -> network.getFavoriteList(accountId = 0, sessionId = "", page = page) },
-            dbCallGetMovieKey = {id -> cache.movieKeyId(id = id)},
+            networkCall = { page ->
+                network.getFavoriteList(accountId = 0,
+                    sessionId = "",
+                    page = page)
+            },
+            dbCallGetMovieKey = { id -> cache.movieKeyId(id = id) },
             dbCallOnRefreshClearDb = { pagingCategory: MoviePagingCategory ->
                 cache.clearMovieKeys(pagingCategory = pagingCategory)
                 cache.clearMovies(pagingCategory = pagingCategory)
             },
-            dbCallOnSuccess = {movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
+            dbCallOnSuccess = { movieKeys: List<MovieEntityKey>, movies: List<MoviePagingEntity> ->
                 cache.insertAllMovieKeys(movieKeys)
                 cache.insertAllMovies(movies)
             }

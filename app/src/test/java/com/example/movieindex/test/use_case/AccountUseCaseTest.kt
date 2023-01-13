@@ -64,7 +64,7 @@ class AccountUseCaseTest {
     }
 
     @Test
-    fun getAccountDetails_success() = runTest{
+    fun getAccountDetails_success() = runTest {
         val accountDetailsData = AccountDetails(avatarPath = "",
             id = 1,
             includeAdult = Random.nextBoolean(),
@@ -76,14 +76,15 @@ class AccountUseCaseTest {
         assertEquals(accountDetailsData.id, useCase.getAccountId().first())
 
         val apiCall = useCase.getAccountDetails(sessionId = "").toList()
-        val lastExpectedResult = testDataFactory.generateAccountDetailsResponseTestData().toAccountDetails()
+        val lastExpectedResult =
+            testDataFactory.generateAccountDetailsResponseTestData().toAccountDetails()
 
         assertEquals(accountDetailsData, (apiCall[0] as Resource.Success).data)
         assertEquals(lastExpectedResult, (apiCall[1] as Resource.Success).data)
     }
 
     @Test
-    fun getAccountDetails_empty() = runTest{
+    fun getAccountDetails_empty() = runTest {
 
         accountRepository.isBodyEmpty = true
 
@@ -104,7 +105,7 @@ class AccountUseCaseTest {
     }
 
     @Test
-    fun getAccountDetails_error() = runTest{
+    fun getAccountDetails_error() = runTest {
 
         accountRepository.isSuccess = false
 

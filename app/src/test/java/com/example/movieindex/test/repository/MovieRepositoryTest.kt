@@ -45,8 +45,6 @@ class MovieRepositoryTest {
     private val context: Context = ApplicationProvider.getApplicationContext()
     private lateinit var network: FakeNetworkDataSource
     private lateinit var cache: CacheDataSource
-    private lateinit var testWorkManagerUtil: TestWorkManagerUtil
-    private lateinit var workManager: WorkManager
     private lateinit var testDataFactory: TestDataFactory
 
     private lateinit var dataStore: DataStore<Preferences>
@@ -65,12 +63,9 @@ class MovieRepositoryTest {
             testScope).testDataStore
         network = FakeNetworkDataSource(testDataFactory = testDataFactory,
             testDispatcher = testDispatcher)
-        testWorkManagerUtil = TestWorkManagerUtil(context)
-        testWorkManagerUtil.setupWorkManager()
-        workManager = WorkManager.getInstance(context)
         cache = FakeCacheDataSource(testDispatcher = testDispatcher, dataStore = dataStore)
         repository =
-            MovieRepositoryImpl(network = network, cache = cache, workManager = workManager)
+            MovieRepositoryImpl(network = network, cache = cache)
     }
 
     @Test

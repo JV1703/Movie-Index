@@ -24,7 +24,8 @@ class FakeAccountUseCase(
 
     var isSuccess = true
     var isBodyEmpty = false
-    private val accountDetailsList = arrayListOf(testDataFactory.generateAccountDetailsResponseTestData().toAccountDetails())
+    private val accountDetailsList =
+        arrayListOf(testDataFactory.generateAccountDetailsResponseTestData().toAccountDetails())
 
     override fun getAccountDetails(sessionId: String): Flow<Resource<AccountDetails?>> = flow {
         val networkData = testDataFactory.generateAccountDetailsResponseTestData()

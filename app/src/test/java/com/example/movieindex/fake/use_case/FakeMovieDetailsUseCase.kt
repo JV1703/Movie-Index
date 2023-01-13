@@ -21,7 +21,7 @@ class FakeMovieDetailsUseCase(
     private val testDispatcher: TestDispatcher,
     private val dataStore: DataStore<Preferences>,
     private val testDataFactory: TestDataFactory,
-): MovieDetailsUseCase {
+) : MovieDetailsUseCase {
 
     var isSuccess = true
     var isBodyEmpty = false

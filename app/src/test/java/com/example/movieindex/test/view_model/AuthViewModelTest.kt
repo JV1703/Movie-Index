@@ -58,7 +58,7 @@ class AuthViewModelTest {
         viewModel.validateUserLogin(username = "", password = "")
         advanceUntilIdle()
 
-        assertEquals(2,uiStateList.size)
+        assertEquals(2, uiStateList.size)
         assertNotNull(uiStateList.last().userMsg)
         assertFalse(uiStateList.last().isLoggedIn)
 
@@ -76,7 +76,7 @@ class AuthViewModelTest {
         viewModel.validateUserLogin(username = "", password = "Banana")
         advanceUntilIdle()
 
-        assertEquals(2,uiStateList.size)
+        assertEquals(2, uiStateList.size)
         assertNotNull(uiStateList.last().userMsg)
         assertFalse(uiStateList.last().isLoggedIn)
 
@@ -94,7 +94,7 @@ class AuthViewModelTest {
         viewModel.validateUserLogin(username = "Banana", password = "")
         advanceUntilIdle()
 
-        assertEquals(2,uiStateList.size)
+        assertEquals(2, uiStateList.size)
         assertNotNull(uiStateList.last().userMsg)
         assertFalse(uiStateList.last().isLoggedIn)
 

@@ -1,7 +1,10 @@
 package com.example.movieindex.core.repository.abstraction
 
 import androidx.paging.PagingData
-import com.example.movieindex.core.data.external.model.*
+import com.example.movieindex.core.data.external.model.AccountDetails
+import com.example.movieindex.core.data.external.model.MovieAccountState
+import com.example.movieindex.core.data.external.model.Resource
+import com.example.movieindex.core.data.external.model.Result
 import com.example.movieindex.core.data.remote.model.common.PostResponse
 import kotlinx.coroutines.flow.Flow
 

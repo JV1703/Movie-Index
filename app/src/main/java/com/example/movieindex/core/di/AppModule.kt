@@ -11,8 +11,13 @@ import com.example.movieindex.core.data.local.dao.AccountDao
 import com.example.movieindex.core.data.local.dao.MoviePagingDao
 import com.example.movieindex.core.data.local.dao.MoviePagingKeyDao
 import com.example.movieindex.core.data.local.implementation.CacheDataSourceImpl
+import com.example.movieindex.core.data.remote.DevCredentials.SSL_CERT_1
+import com.example.movieindex.core.data.remote.DevCredentials.SSL_CERT_2
+import com.example.movieindex.core.data.remote.DevCredentials.SSL_CERT_3
+import com.example.movieindex.core.data.remote.DevCredentials.SSL_CERT_4
 import com.example.movieindex.core.data.remote.MovieApi
 import com.example.movieindex.core.data.remote.NetworkConstants.CACHE_SIZE
+import com.example.movieindex.core.data.remote.NetworkConstants.TMDB_HOST_NAME
 import com.example.movieindex.core.data.remote.abstraction.NetworkDataSource
 import com.example.movieindex.core.data.remote.implementation.NetworkDataSourceImpl
 import com.example.movieindex.core.data.remote.interceptor.ApiKeyInterceptor
@@ -32,6 +37,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import okhttp3.Cache
+import okhttp3.CertificatePinner
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -60,18 +66,28 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideCertificatePinner(): CertificatePinner = CertificatePinner.Builder()
+        .add(TMDB_HOST_NAME, SSL_CERT_1)
+        .add(TMDB_HOST_NAME, SSL_CERT_2)
+        .add(TMDB_HOST_NAME, SSL_CERT_3)
+        .add(TMDB_HOST_NAME, SSL_CERT_4)
+        .build()
+
+    @Provides
+    @Singleton
     fun okHttpClient(
         cache: Cache,
         apiKeyInterceptor: ApiKeyInterceptor,
         loggingInterceptor: HttpLoggingInterceptor,
         cacheInterceptor: CacheInterceptor,
-        /*, certificatePinner: CertificatePinner*/
+        certificatePinner: CertificatePinner,
     ) = OkHttpClient.Builder()
         .cache(cache)
         .addInterceptor(cacheInterceptor)
         .addInterceptor(apiKeyInterceptor)
         .addInterceptor(loggingInterceptor)
-        /*.certificatePinner(certificatePinner)*/.readTimeout(15, TimeUnit.SECONDS)
+        .certificatePinner(certificatePinner)
+        .readTimeout(15, TimeUnit.SECONDS)
         .connectTimeout(15, TimeUnit.SECONDS).build()
 
     @Provides
@@ -132,11 +148,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideMovieRepository(
-        workManager: WorkManager,
         network: NetworkDataSource,
         cache: CacheDataSource,
     ): MovieRepository =
-        MovieRepositoryImpl(workManager = workManager, network = network, cache = cache)
+        MovieRepositoryImpl(network = network, cache = cache)
 
     @Provides
     @Singleton

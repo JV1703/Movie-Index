@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
 import com.example.movieindex.core.data.external.model.Resource
 import com.example.movieindex.fake.datastore.FakePreferenceDataStore
-import com.example.movieindex.fake.repository.FakeAccountRepository
 import com.example.movieindex.fake.repository.FakeMovieRepository
 import com.example.movieindex.feature.main.ui.home.domain.abstraction.HomeUseCase
 import com.example.movieindex.feature.main.ui.home.domain.implementation.HomeUseCaseImpl

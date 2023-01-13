@@ -88,7 +88,7 @@ class SearchFragment : Fragment() {
             val isListEmpty =
                 (loadState.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && searchAdapter.itemCount == 0)
 
-            if(isListEmpty){
+            if (isListEmpty) {
                 makeToast("No movie found")
             }
 

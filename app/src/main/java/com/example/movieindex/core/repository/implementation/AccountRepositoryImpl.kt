@@ -192,7 +192,8 @@ class AccountRepositoryImpl @Inject constructor(
                 movieId = movieId,
                 sessionId = sessionId)
 
-            return networkResourceHandler(networkResource, conversion = { it.toMovieAccountState() })
+            return networkResourceHandler(networkResource,
+                conversion = { it.toMovieAccountState() })
         }
     }
 

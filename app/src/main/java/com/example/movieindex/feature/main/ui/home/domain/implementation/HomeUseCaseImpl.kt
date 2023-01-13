@@ -6,7 +6,8 @@ import com.example.movieindex.core.repository.abstraction.MovieRepository
 import com.example.movieindex.feature.main.ui.home.domain.abstraction.HomeUseCase
 import javax.inject.Inject
 
-class HomeUseCaseImpl @Inject constructor(private val movieRepository: MovieRepository): HomeUseCase {
+class HomeUseCaseImpl @Inject constructor(private val movieRepository: MovieRepository) :
+    HomeUseCase {
 
     override suspend fun getNowPlaying(
         page: Int,

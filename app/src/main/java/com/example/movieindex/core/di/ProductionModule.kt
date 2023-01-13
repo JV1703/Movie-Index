@@ -47,11 +47,14 @@ object ProductionModule {
     @Provides
     @Singleton
     fun providePreferencesDataStore(@ApplicationContext appContext: Context): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create(corruptionHandler = ReplaceFileCorruptionHandler(
-            produceNewData = { emptyPreferences() }),
-            migrations = listOf(SharedPreferencesMigration(appContext, CacheConstants.AUTH_PREFERENCES_NAME)),
+        return PreferenceDataStoreFactory.create(
+            corruptionHandler = ReplaceFileCorruptionHandler(
+                produceNewData = { emptyPreferences() }),
+            migrations = listOf(SharedPreferencesMigration(appContext,
+                CacheConstants.AUTH_PREFERENCES_NAME)),
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            produceFile = { appContext.preferencesDataStoreFile(CacheConstants.AUTH_PREFERENCES_NAME) })
+            produceFile = { appContext.preferencesDataStoreFile(CacheConstants.AUTH_PREFERENCES_NAME) }
+        )
     }
 
 }

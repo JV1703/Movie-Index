@@ -4,7 +4,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import androidx.work.WorkManager
 import com.example.movieindex.core.common.wrapEspressoIdlingResource
 import com.example.movieindex.core.data.external.model.*
 import com.example.movieindex.core.data.local.abstraction.CacheDataSource
@@ -24,7 +23,6 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class MovieRepositoryImpl @Inject constructor(
-    private val workManager: WorkManager,
     private val network: NetworkDataSource,
     private val cache: CacheDataSource,
 ) : MovieRepository {

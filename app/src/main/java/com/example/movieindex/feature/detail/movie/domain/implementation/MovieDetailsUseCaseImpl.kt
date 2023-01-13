@@ -10,7 +10,10 @@ import com.example.movieindex.core.repository.abstraction.MovieRepository
 import com.example.movieindex.feature.detail.movie.domain.abstraction.MovieDetailsUseCase
 import javax.inject.Inject
 
-class MovieDetailsUseCaseImpl @Inject constructor(private val movieRepository: MovieRepository, private val accountRepository: AccountRepository): MovieDetailsUseCase {
+class MovieDetailsUseCaseImpl @Inject constructor(
+    private val movieRepository: MovieRepository,
+    private val accountRepository: AccountRepository,
+) : MovieDetailsUseCase {
 
     override suspend fun getMovieDetails(
         movieId: Int,

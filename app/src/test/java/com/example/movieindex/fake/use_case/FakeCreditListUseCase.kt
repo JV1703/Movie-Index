@@ -3,7 +3,6 @@ package com.example.movieindex.fake.use_case
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
-import com.example.movieindex.core.common.extensions.fromJson
 import com.example.movieindex.core.data.external.model.Cast
 import com.example.movieindex.core.data.external.model.Crew
 import com.example.movieindex.core.data.local.CacheConstants

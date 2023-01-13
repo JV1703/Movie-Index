@@ -3,7 +3,8 @@
     package="com.example.movieindex">
 
     <application>
-        <activity android:name=".HiltTestActivity"
+        <activity
+            android:name=".HiltTestActivity"
             android:exported="false" />
     </application>
 

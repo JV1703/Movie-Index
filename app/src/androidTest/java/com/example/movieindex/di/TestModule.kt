@@ -8,7 +8,6 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.navigation.testing.TestNavHostController
 import androidx.room.Room
 import com.example.movieindex.core.data.local.MovieDatabase
-import com.example.movieindex.core.data.remote.NetworkConstants.BASE_URL
 import com.example.movieindex.core.di.ProductionModule
 import com.example.movieindex.util.TestDataFactory
 import dagger.Module
@@ -19,8 +18,6 @@ import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import okhttp3.OkHttpClient
-import okhttp3.mockwebserver.MockWebServer
-import org.mockito.Mock
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 

@@ -142,5 +142,6 @@ class FakeCacheDataSource(
         accountDetailsList.clear()
     }
 
-    override fun getAccountId(): Flow<Int?> = flow { emit(if(accountDetailsList.isEmpty()) null else accountDetailsList.first().id) }
+    override fun getAccountId(): Flow<Int?> =
+        flow { emit(if (accountDetailsList.isEmpty()) null else accountDetailsList.first().id) }
 }

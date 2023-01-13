@@ -59,24 +59,24 @@ class AccountViewModel @Inject constructor(
         if (job != null) return
 
         job = viewModelScope.launch {
-                _uiState.update { it.copy(isLoading = true) }
-                when (val resource = authUseCase.logout()) {
-                    is Resource.Success -> {
-                        _uiState.update {
-                            it.copy(isLoading = false,
-                                isLoggedIn = !resource.data.success)
-                        }
-                    }
-                    is Resource.Error -> {
-                        _uiState.update { it.copy(isLoading = false) }
-                        updateUserMsg(msg = resource.errMsg ?: "Unknown Error")
-                    }
-                    is Resource.Empty -> {
-                        _uiState.update { it.copy(isLoading = false) }
-                        updateUserMsg("Unknown Error")
+            _uiState.update { it.copy(isLoading = true) }
+            when (val resource = authUseCase.logout()) {
+                is Resource.Success -> {
+                    _uiState.update {
+                        it.copy(isLoading = false,
+                            isLoggedIn = !resource.data.success)
                     }
                 }
+                is Resource.Error -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    updateUserMsg(msg = resource.errMsg ?: "Unknown Error")
+                }
+                is Resource.Empty -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    updateUserMsg("Unknown Error")
+                }
             }
+        }
     }
 
     private fun updateUserMsg(msg: String) {

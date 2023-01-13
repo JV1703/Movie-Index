@@ -4,6 +4,7 @@ object NetworkConstants {
 
     const val CACHE_SIZE = (50 * 1024 * 1024).toLong()
 
+    const val TMDB_HOST_NAME = "api.themoviedb.org"
     const val BASE_URL = "https://api.themoviedb.org/3/"
     const val BASE_IMG_URL = "https://image.tmdb.org/t/p/"
     const val AVATAR_URL = "https://secure.gravatar.com/avatar/"

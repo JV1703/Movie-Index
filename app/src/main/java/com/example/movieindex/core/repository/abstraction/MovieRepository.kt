@@ -2,7 +2,6 @@ package com.example.movieindex.core.repository.abstraction
 
 import androidx.paging.PagingData
 import com.example.movieindex.core.data.external.model.*
-import com.example.movieindex.core.data.remote.model.common.PostResponse
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {

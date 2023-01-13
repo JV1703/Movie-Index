@@ -11,12 +11,3 @@ data class AccountDetails(
     val name: String,
     val username: String,
 )
-
-fun AccountDetails.toAccountEntity() = AccountEntity(
-    avatarPath = avatarPath,
-    id = id,
-    include_adult = includeAdult,
-    iso_3166_1 = iso31661,
-    iso_639_1 = iso6391,
-    name = name,
-    username = username)
