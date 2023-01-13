@@ -3,41 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_nav_graph"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/splashFragment">
 
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.movieindex.feature.auth.ui.login.LoginFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login">
-        <action
-            android:id="@+id/action_loginFragment_to_registerFragment"
-            app:destination="@id/registerFragment" />
-        <argument
-            android:name="authArgs"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-        <action
-            android:id="@+id/action_loginFragment_to_mainFragment"
-            app:destination="@id/mainFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
-    <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.example.movieindex.feature.auth.ui.register.RegisterFragment"
-        android:label="fragment_register"
-        tools:layout="@layout/fragment_register">
-        <argument
-            android:name="authArgs"
-            app:argType="com.example.movieindex.feature.auth.AuthViewModel$AuthNavigationArgs" />
-        <action
-            android:id="@+id/action_registerFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.movieindex.feature.main.ui.MainFragment"
@@ -51,8 +18,8 @@
             app:destination="@id/movieListFragment" />
         <action
             android:id="@+id/action_mainFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/loginFragment"
+            app:destination="@id/auth_nav_graph"
+            app:popUpTo="@id/mainFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
@@ -91,4 +58,56 @@
         android:name="com.example.movieindex.feature.list.credit_list.CreditListFragment"
         android:label="fragment_credit_list"
         tools:layout="@layout/fragment_credit_list" />
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="com.example.movieindex.feature.splash.SplashFragment"
+        android:label="fragment_splash"
+        tools:layout="@layout/fragment_splash" >
+        <action
+            android:id="@+id/action_splashFragment_to_loginFragment"
+            app:destination="@id/auth_nav_graph"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/splashFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <navigation android:id="@+id/auth_nav_graph"
+        app:startDestination="@id/loginFragment">
+        <fragment
+            android:id="@+id/loginFragment"
+            android:name="com.example.movieindex.feature.auth.ui.login.LoginFragment"
+            android:label="fragment_login"
+            tools:layout="@layout/fragment_login">
+            <action
+                android:id="@+id/action_loginFragment_to_registerFragment"
+                app:destination="@id/registerFragment" />
+            <argument
+                android:name="authArgs"
+                android:defaultValue="@null"
+                app:argType="string"
+                app:nullable="true" />
+            <action
+                android:id="@+id/action_loginFragment_to_mainFragment"
+                app:destination="@id/mainFragment"
+                app:popUpTo="@id/loginFragment"
+                app:popUpToInclusive="true" />
+        </fragment>
+        <fragment
+            android:id="@+id/registerFragment"
+            android:name="com.example.movieindex.feature.auth.ui.register.RegisterFragment"
+            android:label="fragment_register"
+            tools:layout="@layout/fragment_register">
+            <argument
+                android:name="authArgs"
+                app:argType="com.example.movieindex.feature.auth.AuthViewModel$AuthNavigationArgs" />
+            <action
+                android:id="@+id/action_registerFragment_to_loginFragment"
+                app:destination="@id/loginFragment"
+                app:popUpTo="@id/loginFragment"
+                app:popUpToInclusive="true" />
+        </fragment>
+    </navigation>
 </navigation>

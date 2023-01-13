@@ -16,17 +16,6 @@ class ColorPalette {
         }
     }
 
-    fun calcDominantColor(drawable: Drawable): Int? {
-        var dominantColor: Int? = null
-        val bitmap = transformToBitMap(drawable)
-        Palette.from(bitmap).generate { palette ->
-            palette?.dominantSwatch?.rgb?.let { colorValue ->
-                dominantColor = colorValue
-            }
-        }
-        return dominantColor
-    }
-
     private fun transformToBitMap(drawable: Drawable): Bitmap {
         return (drawable as BitmapDrawable).bitmap.copy(Bitmap.Config.RGB_565, true)
     }

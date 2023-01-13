@@ -167,60 +167,6 @@ class MovieRepositoryImpl @Inject constructor(
         }
     }
 
-//    override fun addToFavorite(
-//        favorite: Boolean,
-//        mediaId: Int,
-//        mediaType: String,
-//    ) {
-//        val request = OneTimeWorkRequestBuilder<FavoriteWorker>()
-//            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-//            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
-//                .build())
-//            .setInputData(
-//                workDataOf(
-//                    FAVORITE_WORKER_FAVORITE_KEY to favorite,
-//                    WORKER_MOVIE_ID_KEY to mediaId,
-//                    WORKER_MOVIE_TYPE_KEY to mediaType
-//                )
-//            )
-//            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
-//                OneTimeWorkRequest.MAX_BACKOFF_MILLIS,
-//                TimeUnit.MINUTES)
-//            .build()
-//
-//        workManager.enqueueUniqueWork(
-//            "addToFavoriteWork",
-//            ExistingWorkPolicy.APPEND_OR_REPLACE,
-//            request)
-//    }
-
-//    override fun addToWatchList(
-//        watchlist: Boolean,
-//        mediaId: Int,
-//        mediaType: String,
-//    ) {
-//        val request = OneTimeWorkRequestBuilder<WatchListWorker>()
-//            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-//            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
-//                .build())
-//            .setInputData(
-//                workDataOf(
-//                    WATCH_LIST_WORKER_WATCH_LIST_KEY to watchlist,
-//                    WORKER_MOVIE_ID_KEY to mediaId,
-//                    WORKER_MOVIE_TYPE_KEY to mediaType
-//                )
-//            )
-//            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
-//                OneTimeWorkRequest.MAX_BACKOFF_MILLIS,
-//                TimeUnit.MINUTES)
-//            .build()
-//
-//        workManager.enqueueUniqueWork(
-//            "addToFavoriteWork",
-//            ExistingWorkPolicy.APPEND_OR_REPLACE,
-//            request)
-//    }
-
     override fun searchMoviesPagingSource(
         loadSinglePage: Boolean,
         query: String,

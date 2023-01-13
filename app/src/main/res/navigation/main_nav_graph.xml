@@ -15,11 +15,6 @@
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" />
     <fragment
-        android:id="@+id/discoverFragment"
-        android:name="com.example.movieindex.feature.main.ui.discover.DiscoverFragment"
-        android:label="fragment_discover"
-        tools:layout="@layout/fragment_discover" />
-    <fragment
         android:id="@+id/accountFragment"
         android:name="com.example.movieindex.feature.main.ui.account.AccountFragment"
         android:label="AccountFragment" />

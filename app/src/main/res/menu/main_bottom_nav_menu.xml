@@ -9,12 +9,6 @@
         android:title="Home"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/discoverFragment"
-        android:enabled="true"
-        android:icon="@drawable/ic_movie_24"
-        android:title="Discover"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/searchFragment"
         android:enabled="true"
         android:icon="@drawable/ic_search_24"
