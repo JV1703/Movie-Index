@@ -23,7 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Now Playing in Theaters"
+                android:text="@string/now_playing"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="View More >"
+                android:text="@string/view_more"
                 app:layout_constraintBottom_toBottomOf="@id/now_playing_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/now_playing_tv" />
@@ -49,14 +49,15 @@
                 android:orientation="horizontal"
                 android:paddingEnd="60dp"
                 app:layout_constraintStart_toStartOf="@id/now_playing_tv"
-                app:layout_constraintTop_toBottomOf="@id/now_playing_tv" />
+                app:layout_constraintTop_toBottomOf="@id/now_playing_tv"
+                tools:ignore="RtlSymmetry" />
 
             <TextView
                 android:id="@+id/popular_movies_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Popular Movies"
+                android:text="@string/popular_movies"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@id/now_playing_vp"
@@ -67,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="View More >"
+                android:text="@string/view_more"
                 app:layout_constraintBottom_toBottomOf="@id/popular_movies_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/popular_movies_tv" />
@@ -88,7 +89,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Trending Movies"
+                android:text="@string/trending_movies"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@id/popular_movies_rv"
@@ -99,7 +100,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="View More >"
+                android:text="@string/view_more"
                 app:layout_constraintBottom_toBottomOf="@id/trending_movies_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/trending_movies_tv" />
@@ -114,7 +115,6 @@
                 app:layout_constraintStart_toStartOf="@id/trending_movies_tv"
                 app:layout_constraintTop_toBottomOf="@id/trending_movies_tv"
                 tools:listitem="@layout/movie_vh_item" />
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

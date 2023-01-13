@@ -18,7 +18,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:src="@tools:sample/avatars" />
+        tools:src="@tools:sample/avatars"
+        android:contentDescription="@string/user_profile_picture" />
 
     <TextView
         android:id="@+id/username"
@@ -55,7 +56,7 @@
                 android:id="@+id/favorite_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="View Favorite List"
+                android:text="@string/view_favorite_list"
                 android:textAlignment="center"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -88,7 +89,7 @@
                 android:id="@+id/watchlist_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="View Watch List"
+                android:text="@string/view_watch_list"
                 android:textAlignment="center"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -107,7 +108,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Log Out"
+        android:text="@string/log_out"
         app:backgroundTint="@color/button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/watchlist_card"

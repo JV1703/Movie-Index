@@ -14,4 +14,37 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="username">username</string>
+    <string name="password">password</string>
+    <string name="forget_password">Forget Password</string>
+    <string name="log_in">Log In</string>
+    <string name="cta">Not registered yet?</string>
+    <string name="cta_highlight">Create an account</string>
+    <string name="now_playing">Now Playing in Theaters</string>
+    <string name="view_more"><![CDATA[View More >]]></string>
+    <string name="popular_movies">Popular Movies</string>
+    <string name="trending_movies">Trending Movies</string>
+    <string name="search_movies">Search movies</string>
+    <string name="retry">Retry</string>
+    <string name="movie_backdrop">movie backdrop</string>
+    <string name="movie_poster">movie poster</string>
+    <string name="user_score">User Score</string>
+    <string name="play_trailer">Play Trailer</string>
+    <string name="bullet_point">•</string>
+    <string name="overview">Overview</string>
+    <string name="top_billed_cast">Top Billed Cast</string>
+    <string name="cast_and_crew">Full Cast And Crew</string>
+    <string name="reviews">Reviews</string>
+    <string name="reviewer_image">image of reviewer</string>
+    <string name="all_review">Read All Reviews</string>
+    <string name="review_toggle">expand review toggle</string>
+    <string name="videos">Videos</string>
+    <string name="recommendations">Recommendations</string>
+    <string name="expand_save_movie_options">expand save movie options</string>
+    <string name="mark_favorite">mark movie as favorite</string>
+    <string name="add_to_watchlist">add movie to watchlist</string>
+    <string name="user_profile_picture">user profile picture</string>
+    <string name="view_favorite_list">View Favorite List</string>
+    <string name="view_watch_list">View Watch List</string>
+    <string name="log_out">Log Out</string>
 </resources>

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movieindex.core.common.CrewListHelper
 import com.example.movieindex.core.common.extensions.loadErrorImage
-import com.example.movieindex.core.common.extensions.loadImage
+import com.example.movieindex.core.common.extensions.loadImageRoundedCorner
 import com.example.movieindex.core.data.remote.NetworkConstants.BASE_IMG_URL
 import com.example.movieindex.core.data.remote.NetworkConstants.CREDIT_IMG_SIZE
 import com.example.movieindex.databinding.CreditListHeaderVhItemBinding
@@ -21,7 +21,8 @@ class CrewAdapter : ListAdapter<CrewListHelper, RecyclerView.ViewHolder>(DiffUti
         fun bind(crew: CrewListHelper.CrewDetails) {
 
             crew.crew.profilePath?.let {
-                binding.profilePicture.loadImage(BASE_IMG_URL + CREDIT_IMG_SIZE + crew.crew.profilePath)
+                binding.profilePicture.loadImageRoundedCorner(source = BASE_IMG_URL + CREDIT_IMG_SIZE + it,
+                    radius = 8)
             } ?: binding.profilePicture.loadErrorImage()
 
             binding.name.text = crew.crew.name

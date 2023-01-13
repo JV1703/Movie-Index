@@ -26,7 +26,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.75"
-                tools:src="@tools:sample/backgrounds/scenic" />
+                tools:src="@tools:sample/backgrounds/scenic"
+                android:contentDescription="@string/movie_backdrop" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/poster_container"
@@ -60,7 +61,8 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:src="@tools:sample/avatars" />
+                        tools:src="@tools:sample/avatars"
+                        android:contentDescription="@string/movie_poster" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -129,7 +131,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="User Score"
+                        android:text="@string/user_score"
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="@id/rating_ind"
                         app:layout_constraintEnd_toStartOf="@+id/separator"
@@ -152,7 +154,7 @@
                         android:id="@+id/play_trailer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Play Trailer"
+                        android:text="@string/play_trailer"
                         app:drawableStartCompat="@drawable/ic_play_arrow_24"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -199,7 +201,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="•"
+                        android:text="@string/bullet_point"
                         app:layout_constraintBottom_toBottomOf="@id/movie_release_date"
                         app:layout_constraintEnd_toStartOf="@id/runtime"
                         app:layout_constraintStart_toEndOf="@id/movie_release_date"
@@ -246,7 +248,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:text="Overview"
+                    android:text="@string/overview"
                     android:textSize="26sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -278,7 +280,7 @@
                     android:id="@+id/top_billed_cast_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Top Billed Cast"
+                    android:text="@string/top_billed_cast"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -307,7 +309,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Full Cast And Crew"
+                    android:text="@string/cast_and_crew"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@id/cast_rv"
@@ -327,7 +329,7 @@
                     android:id="@+id/review_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Reviews"
+                    android:text="@string/reviews"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -358,7 +360,8 @@
                             android:scaleType="fitXY"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            tools:srcCompat="@tools:sample/avatars" />
+                            tools:srcCompat="@tools:sample/avatars"
+                            android:contentDescription="@string/reviewer_image" />
 
                         <TextView
                             android:id="@+id/review_title"
@@ -424,7 +427,8 @@
                             android:layout_marginBottom="8dp"
                             android:rotation="0"
                             android:src="@drawable/ic_expand_more_24"
-                            app:layout_constraintBottom_toBottomOf="parent" />
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            android:contentDescription="@string/review_toggle" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -434,7 +438,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="18dp"
-                    android:text="Read All Reviews"
+                    android:text="@string/all_review"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@id/review_card"
@@ -455,7 +459,7 @@
                     android:id="@+id/video_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Videos"
+                    android:text="@string/videos"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -488,7 +492,7 @@
                     android:id="@+id/recommendation_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Recommendations"
+                    android:text="@string/recommendations"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -519,7 +523,8 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_add_48"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/expand_save_movie_options" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_favorite"
@@ -530,7 +535,8 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/fab_main"
         app:layout_constraintEnd_toStartOf="@id/fab_main"
-        app:layout_constraintTop_toTopOf="@id/fab_main" />
+        app:layout_constraintTop_toTopOf="@id/fab_main"
+        android:contentDescription="@string/mark_favorite" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_playlist"
@@ -542,7 +548,8 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/fab_main"
         app:layout_constraintEnd_toEndOf="@id/fab_main"
-        app:layout_constraintStart_toStartOf="@id/fab_main" />
+        app:layout_constraintStart_toStartOf="@id/fab_main"
+        android:contentDescription="@string/add_to_watchlist" />
 
     <ProgressBar
         android:id="@+id/loading_ind"
